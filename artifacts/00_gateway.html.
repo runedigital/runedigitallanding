@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SYSTEM // INTERRUPT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        body {
+            margin: 0; height: 100vh; background: #000; 
+            color: #00ffea; font-family: 'JetBrains Mono', monospace;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; text-transform: uppercase;
+        }
+
+        #terminal {
+            width: 600px; max-width: 90%;
+            padding: 40px; border: 1px solid #333;
+            box-shadow: 0 0 30px rgba(0, 255, 234, 0.1);
+            background: rgba(10, 10, 10, 0.9);
+            position: relative;
+        }
+
+        /* SCANLINE EFFECT */
+        #terminal::before {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        .line { margin-bottom: 10px; opacity: 0; }
+        .visible { opacity: 1; }
+        
+        .cursor { display: inline-block; width: 10px; height: 1.2em; background: #00ffea; animation: blink 1s infinite; vertical-align: middle; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        input {
+            background: transparent; border: none; color: #fff; 
+            font-family: inherit; font-size: inherit; width: 80%; 
+            outline: none; text-transform: lowercase;
+        }
+
+        .highlight { color: #fff; background: #00ffea; color: #000; padding: 0 5px; }
+        .alert { color: #ff0055; text-shadow: 0 0 5px #ff0055; }
+        
+        #success-msg { display: none; color: #00ff00; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="terminal">
+        <div id="log-container"></div>
+        
+        <div id="input-line" style="display:none; margin-top: 20px; border-top: 1px dashed #333; padding-top: 20px;">
+            <span>root@rune:~$ enter_id </span>
+            <!-- REPLACE THE ACTION URL BELOW WITH YOUR FORMSPREE URL -->
+            <form id="signup-form" action="https://formspree.io/f/xeowgdnn" method="POST" style="display:inline;">
+                <input type="email" name="email" id="email-input" autocomplete="off" spellcheck="false" autofocus>
+            </form>
+            <span class="cursor"></span>
+        </div>
+
+        <div id="success-msg">
+            >> ID VERIFIED.<br>
+            >> UPLINK ESTABLISHED.<br>
+            >> RESUMING STREAM...
+        </div>
+    </div>
+
+    <script>
+        // CONFIG
+        const logs = [
+            { text: ">> DETECTING SIGNAL...", delay: 500 },
+            { text: ">> CONNECTION UNSTABLE", delay: 1200, cls: "alert" },
+            { text: ">> BANDWIDTH LIMIT EXCEEDED", delay: 2000 },
+            { text: ">> PROTOCOL 7: IDENTITY VERIFICATION REQUIRED", delay: 2800 },
+            { text: ">> ENTER EMAIL TO BYPASS LOCK:", delay: 3500, cls: "highlight" }
+        ];
+
+        const container = document.getElementById('log-container');
+        const inputLine = document.getElementById('input-line');
+        const emailInput = document.getElementById('email-input');
+        const form = document.getElementById('signup-form');
+        const successMsg = document.getElementById('success-msg');
+
+        // BOOT SEQUENCE
+        let timer = 0;
+        logs.forEach(log => {
+            setTimeout(() => {
+                const div = document.createElement('div');
+                div.innerHTML = log.text; // allows HTML classes
+                div.className = "line visible " + (log.cls || "");
+                container.appendChild(div);
+            }, log.delay);
+            timer = Math.max(timer, log.delay);
+        });
+
+        // SHOW INPUT
+        setTimeout(() => {
+            inputLine.style.display = 'block';
+            emailInput.focus();
+        }, timer + 500);
+
+        // HANDLE SUBMIT
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Stop standard redirect
+            
+            if(!emailInput.value.includes('@')) return; // Basic validation
+
+            // UI FEEDBACK
+            inputLine.style.display = 'none';
+            container.innerHTML += `<div class="line visible">> VERIFYING: ${emailInput.value}...</div>`;
+            
+            // SEND DATA (AJAX)
+            const data = new FormData(form);
+            try {
+                await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: { 'Accept': 'application/json' }
+                });
+            } catch(err) {
+                console.log('Offline mode simulation');
+            }
+
+            // SUCCESS STATE
+            setTimeout(() => {
+                successMsg.style.display = 'block';
+            }, 1000);
+        });
+
+        // CLICK ANYWHERE TO FOCUS
+        document.body.addEventListener('click', () => emailInput.focus());
+
+    </script>
+</body>
+</html>
