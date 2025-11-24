@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RUNE // NEXUS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
+        
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'JetBrains Mono', monospace; }
+        
+        /* THE VIEWPORT */
+        #artifact-frame {
+            width: 100vw; height: 100vh; border: none;
+            position: absolute; top: 0; left: 0; z-index: 1;
+        }
+
+        /* THE OVERLAY UI */
+        #interface {
+            position: absolute; bottom: 30px; right: 30px; z-index: 100;
+            display: flex; flex-direction: column; align-items: flex-end;
+            pointer-events: none; /* Let clicks pass through to the WebGL behind */
+        }
+
+        #meta-title {
+            color: #fff; text-transform: uppercase; font-size: 12px; letter-spacing: 2px;
+            margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            opacity: 0.7;
+        }
+
+        #jump-btn {
+            pointer-events: auto;
+            background: #00ffea; color: #000; border: none;
+            padding: 15px 30px; font-family: inherit; font-weight: 800;
+            font-size: 16px; text-transform: uppercase; cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.3);
+        }
+
+        #jump-btn:hover { background: #fff; transform: scale(1.05); }
+        #jump-btn:active { transform: scale(0.95); }
+
+        /* STATIC NOISE OVERLAY (Transitions) */
+        #static {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); /* Placeholder Noise */
+            background-size: cover; opacity: 0; pointer-events: none; z-index: 99;
+            transition: opacity 0.3s;
+            mix-blend-mode: screen;
+        }
+        
+        .glitch-active { opacity: 0.4 !important; }
+
+    </style>
+</head>
+<body>
+
+    <!-- THE VIEWPORT -->
+    <iframe id="artifact-frame"></iframe>
+
+    <!-- STATIC NOISE -->
+    <div id="static"></div>
+
+    <!-- CONTROLS -->
+    <div id="interface">
+        <div id="meta-title">Waiting for signal...</div>
+        <button id="jump-btn" onclick="jump()">// NEXT SIGNAL</button>
+    </div>
+
+    <script>
+        let inventory = [];
+        let currentIndex = -1;
+        const frame = document.getElementById('artifact-frame');
+        const titleDisplay = document.getElementById('meta-title');
+        const staticScreen = document.getElementById('static');
+
+        // INIT
+        async function init() {
+            try {
+                const req = await fetch('nexus_manifest.json');
+                inventory = await req.json();
+                jump(); // Load first random artifact
+            } catch (e) {
+                titleDisplay.innerText = "ERR: MANIFEST NOT FOUND";
+            }
+        }
+
+        function jump() {
+            if(inventory.length === 0) return;
+
+            // VISUAL GLITCH EFFECT
+            staticScreen.classList.add('glitch-active');
+            
+            // LOGIC: Pick random index, don't repeat immediate same one
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * inventory.length);
+            } while (newIndex === currentIndex && inventory.length > 1);
+            
+            currentIndex = newIndex;
+            const artifact = inventory[currentIndex];
+
+            // LOAD ARTIFACT
+            setTimeout(() => {
+                frame.src = artifact.path;
+                titleDisplay.innerText = `// LOADING: ${artifact.title}`;
+                
+                // WAIT FOR LOAD TO CLEAR STATIC
+                frame.onload = () => {
+                    titleDisplay.innerText = `// ACTIVE: ${artifact.title}`;
+                    staticScreen.classList.remove('glitch-active');
+                };
+            }, 300); // Short delay for the static to feel real
+        }
+
+        init();
+    </script>
+</body>
+</html>

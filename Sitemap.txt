@@ -1,0 +1,13 @@
+RUNE_DIGITAL_ROOT
+│
+├── assets              # Images, global styles
+├── _artifacts          # --- DROP ZONES. Put your HTML demos here.
+│   ├── void.html
+│   ├── tesseract.html
+│   ├── phage.html
+│   └── prototype_04.html
+│
+├── nexus_builder.py     # --- The Python Script (The Automator)
+├── nexus_manifest.json  # --- Generated automatically
+│
+└── index.html           # --- The Main Interface (The Router)
