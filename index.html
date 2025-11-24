@@ -1,3 +1,17 @@
+console.log("%c RUNE // DIGITAL ", "background: #000; color: #00ffea; font-size: 20px; padding: 10px; font-weight: bold;");
+console.log("%c SYSTEM BREACH DETECTED.", "color: #ff0055; font-family: monospace;");
+console.log("To access the Asset Vault, execute: %c join('your@email.com')", "color: #00ffea; font-weight: bold;");
+
+window.join = function(email) {
+    // Send this to a Zapier Webhook or Formspree
+    fetch('YOUR_WEBHOOK_URL', {
+        method: 'POST',
+        body: JSON.stringify({ email: email })
+    });
+    console.log(`%c >> UPLINK ESTABLISHED. WELCOME, ${email}.`, "color: #00ff00;");
+    return "ACCESS GRANTED";
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,4 +130,5 @@
         init();
     </script>
 </body>
+
 </html>
