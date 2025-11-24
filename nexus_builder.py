@@ -1,38 +1,47 @@
 import os
 import json
-from bs4 import BeautifulSoup # pip install beautifulsoup4
+import re
 
-# CONFIG
+# CONFIGURATION
 ARTIFACTS_DIR = "_artifacts"
 OUTPUT_FILE = "nexus_manifest.json"
 
+def get_title(filepath):
+    """Extracts <title> from HTML without external dependencies."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+            # Regex to find title tag
+            match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE | re.DOTALL)
+            if match:
+                return match.group(1).strip()
+    except Exception as e:
+        print(f"Warning reading {filepath}: {e}")
+    return os.path.basename(filepath)
+
 def scan_artifacts():
     inventory = []
-    
-    print(f"// SCANNING SECTOR: {ARTIFACTS_DIR}...")
+    print(f"// RUNE SYSTEM: SCANNING SECTOR [{ARTIFACTS_DIR}]...")
 
+    # Create directory if it doesn't exist to prevent build errors
     if not os.path.exists(ARTIFACTS_DIR):
-        print("!! ERROR: Artifact sector not found.")
+        print(f"!! NOTICE: Directory {ARTIFACTS_DIR} not found. Creating empty manifest.")
+        # Write empty JSON so the site still loads
+        with open(OUTPUT_FILE, 'w') as f:
+            json.dump([], f)
         return
 
     for filename in os.listdir(ARTIFACTS_DIR):
         if filename.endswith(".html"):
             filepath = os.path.join(ARTIFACTS_DIR, filename)
+            title = get_title(filepath)
             
-            # Open file to extract the <title> for the UI
-            try:
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    soup = BeautifulSoup(f, 'html.parser')
-                    title = soup.title.string if soup.title else filename
-                    
-                    inventory.append({
-                        "id": filename.split('.')[0],
-                        "title": title,
-                        "path": f"{ARTIFACTS_DIR}/{filename}"
-                    })
-                    print(f"   -> LINKED: {title}")
-            except Exception as e:
-                print(f"   !! CORRUPTED: {filename} ({e})")
+            inventory.append({
+                "id": filename.split('.')[0],
+                "title": title,
+                "path": f"{ARTIFACTS_DIR}/{filename}"
+            })
+            print(f"   -> LINKED: {title}")
 
     # Write the JSON Manifest
     with open(OUTPUT_FILE, 'w') as f:
