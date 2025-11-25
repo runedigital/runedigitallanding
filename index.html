@@ -1,21 +1,8 @@
-console.log("%c RUNE // DIGITAL ", "background: #000; color: #00ffea; font-size: 20px; padding: 10px; font-weight: bold;");
-console.log("%c SYSTEM BREACH DETECTED.", "color: #ff0055; font-family: monospace;");
-console.log("To access the Asset Vault, execute: %c join('your@email.com')", "color: #00ffea; font-weight: bold;");
-
-window.join = function(email) {
-    // Send this to a Zapier Webhook or Formspree
-    fetch('YOUR_WEBHOOK_URL', {
-        method: 'POST',
-        body: JSON.stringify({ email: email })
-    });
-    console.log(`%c >> UPLINK ESTABLISHED. WELCOME, ${email}.`, "color: #00ff00;");
-    return "ACCESS GRANTED";
-}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RUNE // NEXUS</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
@@ -26,19 +13,38 @@ window.join = function(email) {
         #artifact-frame {
             width: 100vw; height: 100vh; border: none;
             position: absolute; top: 0; left: 0; z-index: 1;
+            background: #000;
+        }
+
+        /* THE STATIC ENGINE (CANVAS) */
+        #static-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 99;
+            opacity: 0.08; /* Default Film Grain Level */
+            mix-blend-mode: overlay; /* Blends nicely with dark backgrounds */
+            transition: opacity 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+            
+            /* CRUNCHY PIXELS */
+            image-rendering: pixelated; 
+        }
+
+        /* MODE: TRANSITION */
+        .full-static {
+            opacity: 1.0 !important;
+            mix-blend-mode: normal !important;
         }
 
         /* THE OVERLAY UI */
         #interface {
             position: absolute; bottom: 30px; right: 30px; z-index: 100;
             display: flex; flex-direction: column; align-items: flex-end;
-            pointer-events: none; /* Let clicks pass through to the WebGL behind */
+            pointer-events: none;
         }
 
         #meta-title {
             color: #fff; text-transform: uppercase; font-size: 12px; letter-spacing: 2px;
             margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
-            opacity: 0.7;
+            background: rgba(0,0,0,0.5); padding: 5px 10px;
         }
 
         #jump-btn {
@@ -47,37 +53,26 @@ window.join = function(email) {
             padding: 15px 30px; font-family: inherit; font-weight: 800;
             font-size: 16px; text-transform: uppercase; cursor: pointer;
             clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-            transition: transform 0.1s, background 0.2s;
+            transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
             box-shadow: 0 0 20px rgba(0, 255, 234, 0.3);
         }
 
-        #jump-btn:hover { background: #fff; transform: scale(1.05); }
+        #jump-btn:hover { background: #fff; transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 234, 0.6); }
         #jump-btn:active { transform: scale(0.95); }
-
-        /* STATIC NOISE OVERLAY (Transitions) */
-        #static {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); /* Placeholder Noise */
-            background-size: cover; opacity: 0; pointer-events: none; z-index: 99;
-            transition: opacity 0.3s;
-            mix-blend-mode: screen;
-        }
-        
-        .glitch-active { opacity: 0.4 !important; }
 
     </style>
 </head>
 <body>
 
-    <!-- THE VIEWPORT -->
+    <!-- THE CONTENT -->
     <iframe id="artifact-frame"></iframe>
 
-    <!-- STATIC NOISE -->
-    <div id="static"></div>
+    <!-- THE NOISE -->
+    <canvas id="static-canvas"></canvas>
 
     <!-- CONTROLS -->
     <div id="interface">
-        <div id="meta-title">Waiting for signal...</div>
+        <div id="meta-title">INITIALIZING SYSTEM...</div>
         <button id="jump-btn" onclick="jump()">// NEXT SIGNAL</button>
     </div>
 
@@ -86,26 +81,71 @@ window.join = function(email) {
         let currentIndex = -1;
         const frame = document.getElementById('artifact-frame');
         const titleDisplay = document.getElementById('meta-title');
-        const staticScreen = document.getElementById('static');
+        const canvas = document.getElementById('static-canvas');
+        const ctx = canvas.getContext('2d');
 
-        // INIT
+        // --- NOISE ENGINE ---
+        // We render to a small buffer and scale it up via CSS for performance & aesthetic
+        let w, h;
+        
+        function resize() {
+            // Low internal resolution for chunky pixels
+            w = 320; 
+            h = Math.ceil(window.innerHeight * (320 / window.innerWidth));
+            canvas.width = w;
+            canvas.height = h;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawNoise() {
+            const iData = ctx.createImageData(w, h);
+            const buffer = new Uint32Array(iData.data.buffer);
+            const len = buffer.length;
+
+            for (let i = 0; i < len; i++) {
+                // Random grayscale noise
+                // 0xff000000 is full alpha, we add random brightness
+                if (Math.random() < 0.5) {
+                    buffer[i] = 0xff000000; // Black
+                } else {
+                    buffer[i] = 0xffffffff; // White
+                }
+            }
+            ctx.putImageData(iData, 0, 0);
+            requestAnimationFrame(drawNoise);
+        }
+        
+        // Start the engine
+        drawNoise();
+
+
+        // --- CHAOS ROUTER LOGIC ---
         async function init() {
             try {
+                // Pull the manifest generated by Python
                 const req = await fetch('nexus_manifest.json');
                 inventory = await req.json();
-                jump(); // Load first random artifact
+                
+                if(inventory.length > 0) {
+                    jump(); 
+                } else {
+                    titleDisplay.innerText = "ERR: NO SIGNAL DETECTED";
+                }
             } catch (e) {
-                titleDisplay.innerText = "ERR: MANIFEST NOT FOUND";
+                console.error(e);
+                titleDisplay.innerText = "ERR: MANIFEST CORRUPT";
             }
         }
 
         function jump() {
             if(inventory.length === 0) return;
 
-            // VISUAL GLITCH EFFECT
-            staticScreen.classList.add('glitch-active');
+            // 1. ENGAGE STATIC (Cover the transition)
+            canvas.classList.add('full-static');
+            titleDisplay.innerText = "// SEARCHING...";
             
-            // LOGIC: Pick random index, don't repeat immediate same one
+            // 2. SELECT NEW ARTIFACT
             let newIndex;
             do {
                 newIndex = Math.floor(Math.random() * inventory.length);
@@ -114,21 +154,23 @@ window.join = function(email) {
             currentIndex = newIndex;
             const artifact = inventory[currentIndex];
 
-            // LOAD ARTIFACT
+            // 3. LOAD (With slight artificial delay for effect)
             setTimeout(() => {
                 frame.src = artifact.path;
                 titleDisplay.innerText = `// LOADING: ${artifact.title}`;
                 
-                // WAIT FOR LOAD TO CLEAR STATIC
+                // 4. WAIT FOR LOAD EVENT BEFORE CLEARING STATIC
                 frame.onload = () => {
-                    titleDisplay.innerText = `// ACTIVE: ${artifact.title}`;
-                    staticScreen.classList.remove('glitch-active');
+                    // Small delay to ensure WebGL context is actually ready visible
+                    setTimeout(() => {
+                        titleDisplay.innerText = `// ACTIVE: ${artifact.title}`;
+                        canvas.classList.remove('full-static');
+                    }, 500);
                 };
-            }, 300); // Short delay for the static to feel real
+            }, 400); 
         }
 
         init();
     </script>
 </body>
-
 </html>
