@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RUNE // COMPILER</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #050505;
+      color: #00ffea;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* LEFT PANEL */
+    #editor {
+      width: 400px;
+      border-right: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      background: #0a0a0a;
+      z-index: 10;
+      box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+    }
+
+    #header {
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      font-weight: bold;
+      letter-spacing: 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #settings { padding: 0 20px 20px 20px; }
+
+    #api-key {
+      width: 100%;
+      background: #111;
+      border: 1px solid #333;
+      color: #00ffea;
+      padding: 10px;
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #api-key:focus { border-color: #00ffea; }
+
+    #prompt-area {
+      flex: 1;
+      padding: 20px;
+      background: transparent;
+      border: none;
+      color: #e0e0e0;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+    }
+    #prompt-area::placeholder { color: #333; }
+
+    #controls {
+      padding: 20px;
+      border-top: 1px solid #333;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: #00ffea;
+      color: #000;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      letter-spacing: 1px;
+    }
+    .btn:hover {
+      background: #fff;
+      box-shadow: 0 0 15px #00ffea;
+    }
+    .btn:disabled {
+      background: #333;
+      color: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* RIGHT PANEL */
+    #preview { flex: 1; position: relative; background: #000; }
+    iframe { width: 100%; height: 100%; border: none; }
+
+    /* LOADER */
+    #loader {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #00ffea;
+      z-index: 20;
+    }
+
+    .blink { animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+
+  <div id="editor">
+    <div id="header">
+      <span>RUNE // COMPILER</span>
+      <span style="font-size:10px; opacity:0.5; border: 1px solid #333; padding: 2px 6px;">GOD MODE</span>
+    </div>
+
+    <div id="settings">
+      <input type="password" id="api-key" placeholder=":: ENTER OPENAI API KEY ::" />
+    </div>
+
+    <textarea id="prompt-area"
+      placeholder="// INPUT PARAMETERS...
+// e.g. 'A cyberpunk city grid that scrolls infinitely, rendered in neon green wireframe.'"></textarea>
+
+    <div id="controls">
+      <button id="compile-btn" class="btn">INITIALIZE</button>
+    </div>
+  </div>
+
+  <div id="preview">
+    <div id="loader">
+      <div class="blink" style="font-size: 1.2rem; margin-bottom: 10px;">// COMPILING ASSETS //</div>
+      <div style="font-size: 0.8rem; color: #555;">PLEASE WAIT</div>
+    </div>
+    <iframe id="output-frame"></iframe>
+  </div>
+
+  <script>
+    const promptInput = document.getElementById('prompt-area');
+    const apiKeyInput = document.getElementById('api-key');
+    const compileBtn = document.getElementById('compile-btn');
+    const loader = document.getElementById('loader');
+    const iframe = document.getElementById('output-frame');
+
+    compileBtn.addEventListener('click', compile);
+
+    async function compile() {
+      const prompt = promptInput.value.trim();
+      const apiKey = apiKeyInput.value.trim();
+
+      if (!apiKey) {
+        alert("ACCESS DENIED: API KEY REQUIRED");
+        return;
+      }
+      if (!prompt) {
+        alert("INPUT ERROR: PROMPT EMPTY");
+        return;
+      }
+
+      loader.style.display = 'flex';
+      compileBtn.disabled = true;
+      compileBtn.innerText = "PROCESSING...";
+
+      const systemPrompt = `
+        You are a high-end WebGL engineer for Rune Digital.
+        Your task: write a SINGLE, SELF-CONTAINED HTML file based on the user's prompt.
+
+        TECHNICAL CONSTRAINTS:
+        1. Use Three.js version 0.160.0 via ES Modules.
+        2. MUST use a <script type="importmap"> for dependencies:
+           {
+             "imports": {
+               "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+             }
+           }
+        3. CSS: Embedded. Body: margin:0; overflow:hidden; background:#000.
+        4. Handle window resize automatically.
+        5. No external image / texture assets. Use primitives / procedural content.
+        6. Visual style: "Rune Digital" (dark, high-contrast, neon, tech).
+        7. Output ONLY valid HTML code. No markdown fences, no explanation.
+      `;
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4.1-mini",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: prompt }
+            ],
+            temperature: 0.7
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error.message || "OpenAI API error");
+        }
+        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+          throw new Error("Invalid API response format");
+        }
+
+        let code = data.choices[0].message.content || "";
+        code = code.replace(/```html/g, "").replace(/```/g, "");
+
+        iframe.srcdoc = code;
+      } catch (err) {
+        console.error(err);
+        alert("COMPILATION FAILED: " + err.message);
+      } finally {
+        loader.style.display = 'none';
+        compileBtn.disabled = false;
+        compileBtn.innerText = "INITIALIZE";
+      }
+    }
+  </script>
+</body>
+</html>

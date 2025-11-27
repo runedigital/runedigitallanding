@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OPERATOR // ORIGIN</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=JetBrains+Mono:wght@300;700&display=swap');
+        
+        body {
+            margin: 0; background: #020202; color: #c5a059; /* Antique Gold */
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden; display: flex; align-items: center; justify-content: center; height: 100vh;
+        }
+
+        /* FOG BACKGROUND */
+        #bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.2; }
+
+        /* THE ITEM CARD */
+        .card {
+            position: relative; z-index: 10; width: 900px; max-width: 95%;
+            display: grid; grid-template-columns: 350px 1fr; gap: 0;
+            background: #050505;
+            border: 1px solid #333;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* LEFT COL: THE ARTIFACT */
+        .visual-col {
+            background: #000; border-right: 1px solid #333;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative;
+        }
+        #artifact-canvas { width: 100%; height: 350px; }
+        
+        .stats-box {
+            width: 100%; padding: 20px; box-sizing: border-box;
+            border-top: 1px solid #333;
+            font-family: 'Cinzel', serif; color: #888;
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; letter-spacing: 1px; }
+        .stat-val { color: #c5a059; font-weight: bold; }
+
+        /* RIGHT COL: THE LORE */
+        .content-col { padding: 40px; position: relative; }
+        
+        h1 { 
+            font-family: 'Cinzel', serif; font-size: 2.5rem; margin: 0 0 5px 0; 
+            color: #eee; letter-spacing: 2px; text-transform: uppercase;
+            border-bottom: 1px solid #333; padding-bottom: 20px;
+        }
+        
+        .class-tag { 
+            position: absolute; top: 45px; right: 40px; 
+            color: #ff0055; font-size: 10px; letter-spacing: 2px; border: 1px solid #ff0055; padding: 4px 8px;
+        }
+
+        p { font-size: 0.85rem; line-height: 1.7; color: #aaa; margin-bottom: 20px; }
+        .highlight { color: #c5a059; }
+
+        /* TAGS (ATTUNEMENT SLOTS) */
+        .attunement { margin-top: 30px; }
+        .attunement-label { font-size: 10px; color: #555; display: block; margin-bottom: 10px; letter-spacing: 2px; }
+        .slots { display: flex; gap: 10px; flex-wrap: wrap; }
+        .rune { 
+            background: #111; border: 1px solid #333; color: #888; padding: 5px 10px; font-size: 10px; 
+            transition: all 0.3s; cursor: default; 
+        }
+        .rune:hover { border-color: #c5a059; color: #c5a059; box-shadow: 0 0 10px rgba(197, 160, 89, 0.2); }
+
+        /* ACTIONS */
+        .actions { margin-top: 40px; display: flex; gap: 20px; }
+        .btn {
+            text-decoration: none; border: 1px solid #c5a059; color: #c5a059;
+            padding: 12px 24px; font-weight: bold; text-transform: uppercase;
+            font-size: 11px; letter-spacing: 2px; transition: all 0.3s;
+            background: rgba(197, 160, 89, 0.05);
+        }
+        .btn:hover { background: #c5a059; color: #000; box-shadow: 0 0 20px rgba(197, 160, 89, 0.4); }
+        .btn-ghost { border-color: #333; color: #555; background: transparent; }
+        .btn-ghost:hover { border-color: #eee; color: #eee; }
+
+        /* MOBILE */
+        @media(max-width: 800px) { .card { grid-template-columns: 1fr; height: auto; overflow-y: auto; } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- LEFT: VISUALS -->
+        <div class="visual-col">
+            <div id="artifact-canvas"></div>
+            <div class="stats-box">
+                <div class="stat-row"><span>LEVEL</span> <span class="stat-val">UNKNOWN</span></div>
+                <div class="stat-row"><span>INSIGHT</span> <span class="stat-val">99</span></div>
+                <div class="stat-row"><span>ORIGIN</span> <span class="stat-val">THE STATIC</span></div>
+                <div class="stat-row"><span>COVENANT</span> <span class="stat-val">RUNE DIGITAL</span></div>
+            </div>
+        </div>
+
+        <!-- RIGHT: LORE -->
+        <div class="content-col">
+            <h1>The Operator</h1>
+            <div class="class-tag">CLASS: VOID WALKER</div>
+            
+            <p>
+                I didn't go to school for this. I dove into the static. 
+                I asked the Machine how to speak, and it answered in <span class="highlight">Geometry</span> and <span class="highlight">Logic</span>.
+            </p>
+            <p>
+                This platform is the result of that conversation. A documentation of the rabbit hole—from GPU rendering pipelines to creative jailbreaks. 
+                I don't use AI to replace the work; I use it to gain <strong>Insight</strong>. To see the systems behind the reality.
+            </p>
+            <p>
+                From Souls-like punishment to Runic syntax, I am just a student mapping the dark.
+Yes, AI wrote this. 
+            </p>
+
+            <div class="attunement">
+                <span class="attunement-label">ATTUNEMENT SLOTS:</span>
+                <div class="slots">
+                    <div class="rune">THREE.JS</div>
+                    <div class="rune">GENERATIVE AI</div>
+                    <div class="rune">SYSTEMS ENG</div>
+                    <div class="rune">NO-CODE</div>
+                    <div class="rune">GPU LOGIC</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="mailto:services@runedigitalstudio.com" class="btn">SUMMON</a>
+                <a href="NEURAL_HUB.html" class="btn btn-ghost">RETURN</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+        // --- THE ARTIFACT (ROTATING DARK SIGN) ---
+        const container = document.getElementById('artifact-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // GEOMETRY: A Torus Knot (Twisted Ring)
+        const geometry = new THREE.TorusKnotGeometry(1.2, 0.1, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xff0055, // BLOOD RED
+            wireframe: true,
+            transparent: true,
+            opacity: 0.5
+        });
+        const ring = new THREE.Mesh(geometry, material);
+        scene.add(ring);
+
+        // INNER GLOW
+        const coreGeo = new THREE.SphereGeometry(0.5, 32, 32);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(core);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Glitch movement
+            ring.rotation.x += 0.01;
+            ring.rotation.y += 0.005;
+            
+            // Occasional twitch
+            if(Math.random() > 0.98) {
+                ring.scale.setScalar(1.1);
+                material.color.setHex(0xc5a059); // Flash Gold
+            } else {
+                ring.scale.setScalar(1.0);
+                material.color.setHex(0xff0055); // Return to Blood
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize Handle
+        window.addEventListener('resize', () => {
+            // Simple reload on resize to keep it clean or add logic here
+        });
+    </script>
+</body>
+</html>
