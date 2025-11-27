@@ -21,6 +21,8 @@
     .log-ok { color: #00ffea; text-shadow: 0 0 5px rgba(0, 255, 234, 0.3); }
     .log-warn { color: #ffcc00; }
     .log-input { color: #fff; font-weight: bold; }
+    .log-locked { color: #ff0055; font-weight: bold; opacity: 0.9; }
+    .log-tier { color: #fff; margin-left: 10px; border-left: 2px solid #444; padding-left: 10px; }
     #output::-webkit-scrollbar { width: 6px; }
     #output::-webkit-scrollbar-track { background: #000; }
     #output::-webkit-scrollbar-thumb { background: #333; }
@@ -29,14 +31,20 @@
 <body>
   <div id="viewport"><canvas id="bg"></canvas><canvas id="matrix-overlay"></canvas></div>
   <div id="console">
-    <div id="console-header"><span>RUNE // CMD_SCHOOL // V2.4</span><span id="access-level">ACCESS: GUEST</span></div>
+    <div id="console-header"><span>RUNE // CMD_SCHOOL // V2.5 [COMMERCIAL]</span><span id="access-level">ACCESS: GUEST</span></div>
     <div id="output"></div>
     <div id="input-row"><span id="prompt-label">&gt;</span><input id="input-line" autocomplete="off" autofocus /></div>
   </div>
   <script>
+    // --- CONFIGURATION ---
     const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeowgdnn"; 
     const MASTER_KEY = "0xRUNE_MASTER"; 
-    
+    const LINKS = {
+        OPERATOR: "https://buy.stripe.com/YOUR_9_DOLLAR_LINK",
+        ARCHITECT: "https://buy.stripe.com/YOUR_99_DOLLAR_LINK"
+    };
+
+    // --- GRAPHICS ENGINE ---
     const canvas = document.getElementById("bg"); const ctx = canvas.getContext("2d"); let W, H;
     function resize() { W = canvas.width = window.innerWidth; H = canvas.height = document.getElementById('viewport').clientHeight; if(!window.hasInitialized) { drawGrid(); window.hasInitialized = true; } }
     window.addEventListener("resize", resize); setTimeout(resize, 10);
@@ -83,17 +91,23 @@
             else { log(">> ERROR: INVALID KEY.", "log-error"); }
             return;
         }
-        if (cmd === "help") {
-        log("COMMAND LIST:", "log-system");
-          log("  signup      - Join Network", "log-ok");
-          log("  reactor     - Launch FinTech Sim", "log-ok"); // ADD THIS LINE
-          log("  auth [key]  - Unlock Pro Modules", "log-warn");
-else if (cmd === "signup") { MODE = 'SIGNUP_NAME'; log("ENTER NAME:", "log-system"); promptLabel.textContent = "NAME:"; promptLabel.style.color = "#ffcc00"; }
+        if (cmd === "help") { log("signup, reactor, auth, lesson [n], circle, square, matrix, clear", "log-system"); }
+        else if (cmd === "signup") { MODE = 'SIGNUP_NAME'; log("ENTER NAME:", "log-system"); promptLabel.textContent = "NAME:"; promptLabel.style.color = "#ffcc00"; }
         else if (cmd === "clear") { clearCanvas(); log("Wiped.", "log-warn"); }
         else if (cmd === "circle") { drawCircle(); log("Circle.", "log-ok"); }
         else if (cmd === "square") { drawSquare(); log("Square.", "log-ok"); }
         else if (cmd === "particles") { spawnParticles(); log("Emitter active.", "log-ok"); }
         else if (cmd === "matrix") { toggleMatrix(); log("Loading...", "log-ok"); }
+        
+        // REACTOR COMMAND
+        else if (cmd === "reactor") {
+            log(">> INITIALIZING FINANCIAL CORE...", "log-warn");
+            setTimeout(() => {
+                log(">> LAUNCHING MODULE.", "log-ok");
+                window.open('COMPOUND_REACTOR.html', '_blank');
+            }, 1000);
+        }
+
         else if (parts[0] === "lesson") {
             const num = parseInt(parts[1]);
             if (lessons[num]) lessons[num].forEach(l => log(l, "log-system"));
@@ -104,15 +118,7 @@ else if (cmd === "signup") { MODE = 'SIGNUP_NAME'; log("ENTER NAME:", "log-syste
             }
             else log("Lesson not found.", "log-error");
         }
-        else if (cmd === "reactor") {
-            log(">> INITIALIZING FINANCIAL CORE...", "log-warn");
-            log(">> LOADING ASSETS...", "log-system");
-            setTimeout(() => {
-                log(">> LAUNCHING MODULE.", "log-ok");
-                window.open('COMPOUND_REACTOR.html', '_blank');
-            }, 1000);
-        }
-else if (cmd === "buy 1" || cmd === "buy 2") {
+        else if (cmd === "buy 1" || cmd === "buy 2") {
             log(">> CONNECTING TO PAYMENT GATEWAY...", "log-system");
             setTimeout(() => {
                 log(">> ERROR: GATEWAY OFFLINE (PENDING REGISTRATION).", "log-error");
@@ -126,7 +132,7 @@ else if (cmd === "buy 1" || cmd === "buy 2") {
       output.scrollTop = output.scrollHeight;
     }
     inputLine.addEventListener("keydown", (e) => { if (e.key === "Enter") { handleInput(inputLine.value); inputLine.value = ""; } });
-    window.onload = () => { inputLine.focus(); log("RUNE SYSTEMS [V2.4]", "log-system"); log("Type 'help' or 'signup'.", "log-ok"); };
+    window.onload = () => { inputLine.focus(); log("RUNE SYSTEMS [V2.5]", "log-system"); log("Type 'help' to begin.", "log-ok"); };
   </script>
 </body>
 </html>

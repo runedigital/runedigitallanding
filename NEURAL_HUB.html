@@ -6,64 +6,23 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
 
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background: #00050a; 
-            font-family: 'JetBrains Mono', monospace; 
-        }
-
-        /* --- UI LAYER --- */
+        body { margin: 0; overflow: hidden; background: #00050a; font-family: 'JetBrains Mono', monospace; }
         #ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-
-        /* --- GLITCH TITLE --- */
-        #title-container {
-            position: absolute; top: 30px; width: 100%; text-align: center;
-            pointer-events: none; z-index: 20; mix-blend-mode: screen;
-        }
-        .glitch-text {
-            font-size: 24px; font-weight: 800; letter-spacing: 6px;
-            color: #00ffea; text-shadow: 0 0 10px rgba(0, 255, 234, 0.5);
-            transition: all 0.1s;
-        }
+        #title-container { position: absolute; top: 30px; width: 100%; text-align: center; pointer-events: none; z-index: 20; mix-blend-mode: screen; }
+        .glitch-text { font-size: 24px; font-weight: 800; letter-spacing: 6px; color: #00ffea; text-shadow: 0 0 10px rgba(0, 255, 234, 0.5); }
         .rune-mode { color: #ff0055 !important; text-shadow: 0 0 20px #ff0055, 2px 0 #fff !important; }
         .ghost-text { color: #333 !important; opacity: 0.3; text-shadow: none !important; }
-
-        /* --- LABELS --- */
-        .label {
-            position: absolute; color: #00ffea; font-size: 10px; 
-            background: rgba(0,0,0,0.7); padding: 2px 6px; border: 1px solid #00ffea;
-            transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.2s;
-        }
+        .label { position: absolute; color: #00ffea; font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border: 1px solid #00ffea; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.2s; }
         .label.classified { color: #555; border-color: #555; letter-spacing: 2px; }
-
-        /* --- LOADING --- */
-        #loading { 
-            position: absolute; bottom: 20px; left: 20px; color: #00ffea; 
-            font-size: 12px; animation: blink 1s infinite; 
-        }
+        #loading { position: absolute; bottom: 20px; left: 20px; color: #00ffea; font-size: 12px; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.3; } }
-        
-        /* --- BACK BUTTON --- */
-        #back-btn {
-            position: absolute; top: 20px; left: 20px;
-            color: #00ffea; border: 1px solid #00ffea; background: rgba(0,0,0,0.8);
-            padding: 10px 20px; cursor: pointer; pointer-events: auto; z-index: 100;
-            font-family: monospace; text-decoration: none; font-size: 12px;
-        }
+        #back-btn { position: absolute; top: 20px; left: 20px; color: #00ffea; border: 1px solid #00ffea; background: rgba(0,0,0,0.8); padding: 10px 20px; cursor: pointer; pointer-events: auto; z-index: 100; font-family: monospace; text-decoration: none; font-size: 12px; }
         #back-btn:hover { background: #00ffea; color: #000; }
-
-        /* --- HIRE ME BEACON --- */
-        #operator-status {
-            position: absolute; bottom: 20px; right: 20px;
-            font-size: 11px; color: #444; letter-spacing: 1px;
-            cursor: pointer; pointer-events: auto; z-index: 100; transition: color 0.3s;
-        }
+        #operator-status { position: absolute; bottom: 20px; right: 20px; font-size: 11px; color: #444; letter-spacing: 1px; cursor: pointer; pointer-events: auto; z-index: 100; transition: color 0.3s; }
         #operator-status:hover { color: #00ffea; }
         #operator-status span { color: #00ff44; animation: pulse 2s infinite; }
         @keyframes pulse { 50% { opacity: 0.3; } }
     </style>
-    
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
     </script>
@@ -71,11 +30,10 @@
 <body>
 
     <a href="index.html" id="back-btn">&lt; DISCONNECT</a>
-    
     <div id="title-container"><span id="main-title" class="glitch-text">NEURAL // HUB</span></div>
 
-    <!-- EMAIL LINK -->
-    <div id="operator-status" onclick="window.location.href='mailto:services@runedigitalstudio.com?subject=RUNE_CONTRACT_INQUIRY'">
+    <!-- ENTER YOUR EMAIL HERE -->
+    <div id="operator-status" onclick="window.location.href='mailto:sales@runedigitalstudio.com?subject=RUNE_CONTRACT_INQUIRY'">
         OPERATOR: <span>ONLINE</span> // [ AVAILABLE_FOR_CONTRACT ]
     </div>
 
@@ -88,7 +46,6 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
-        // --- GLITCH ENGINE ---
         const titleEl = document.getElementById('main-title');
         const originalText = "NEURAL // HUB";
         function triggerGlitch() {
@@ -107,31 +64,35 @@
         setInterval(triggerGlitch, 6000);
         titleEl.addEventListener('mouseenter', triggerGlitch);
 
-        // --- FILE SYSTEM ---
+        // --- THE FILE SYSTEM ---
         const fileSystem = {
             name: "ROOT", type: "folder", children: [
                 { name: "OPERATOR_PROFILE.html", type: "file", url: "OPERATOR.html" },
-                { name: "APPLICATIONS", type: "folder", children: [
+                { 
+                    name: "APPLICATIONS", type: "folder", children: [
                         { name: "CMD_SCHOOL.html", type: "app", url: "CMD_SCHOOL.html" },
-                        { name: "THE_COMPILER.html", type: "app", url: "THE_COMPILER.html" }
-			{ name: "COMPOUND_REACTOR.html", type: "app", url: "COMPOUND_REACTOR.html" }
+                        { name: "THE_COMPILER.html", type: "app", url: "THE_COMPILER.html" },
+                        { name: "COMPOUND_REACTOR.html", type: "app", url: "COMPOUND_REACTOR.html" }
                     ]
                 },
-                { name: "EXPERIMENTS", type: "folder", children: [
+                { 
+                    name: "EXPERIMENTS", type: "folder", children: [
                         { name: "CHAOS_THEORY.html", type: "file", url: "CHAOS_THEORY.html" },
                         { name: "ENTANGLEMENT.html", type: "file", url: "ENTANGLEMENT.html" },
                         { name: "EVENT_HORIZON.html", type: "file", url: "EVENT_HORIZON.html" },
                         { name: "MULTIVERSE.html", type: "file", url: "MULTIVERSE.html" }
                     ]
                 },
-                { name: "THEORY", type: "folder", children: [
+                { 
+                    name: "THEORY", type: "folder", children: [
                         { name: "HYPER.html", type: "file", url: "HYPER.html" },
                         { name: "THE_GOD_FRACTAL.html", type: "file", url: "THE_GOD_FRACTAL.html" },
                         { name: "THE_TESSERACT.html", type: "file", url: "THE_TESSERACT.html" },
-                        
+                        { name: "VIVALDI_MASTER.html", type: "file", url: "VIVALDI_MASTER.html" }
                     ]
                 },
-                { name: "R_AND_D", type: "folder", children: [
+                { 
+                    name: "R_AND_D", type: "folder", children: [
                         { name: "PROJECT_KINETIC [CLASSIFIED]", type: "classified", url: null },
                         { name: "RUNE_OS_KERNEL [OFFLINE]", type: "classified", url: null }
                     ]
@@ -139,22 +100,16 @@
             ]
         };
 
-        // --- ENGINE ---
         const scene = new THREE.Scene(); scene.background = new THREE.Color(0x00050a);
         scene.fog = new THREE.FogExp2(0x00050a, 0.002);
-        
-        // ** ADJUSTED ZOOM HERE **
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 20); // MOVED CLOSER (Was 0, 20, 40)
-
+        camera.position.set(0, 5, 20);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-        
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.05;
-        controls.minDistance = 5; // Don't let them zoom INSIDE the atoms
-        controls.maxDistance = 100;
+        controls.minDistance = 5; controls.maxDistance = 100;
 
         const composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
@@ -232,7 +187,6 @@
                 n.mesh.rotation.y += 0.01; if(n.type === 'app') n.mesh.rotation.x += 0.02;
                 const v = n.position.clone().project(camera);
                 const x = (v.x * .5 + .5) * window.innerWidth; const y = (v.y * -.5 + .5) * window.innerHeight;
-                // Increased range for label visibility slightly
                 if(v.z < 1 && camera.position.distanceTo(n.position) < 60) { 
                     n.el.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`; 
                     n.el.style.opacity = 1; 
@@ -244,8 +198,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
