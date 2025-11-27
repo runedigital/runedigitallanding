@@ -83,8 +83,12 @@
             else { log(">> ERROR: INVALID KEY.", "log-error"); }
             return;
         }
-        if (cmd === "help") { log("signup, auth, lesson [n], circle, square, matrix, clear", "log-system"); }
-        else if (cmd === "signup") { MODE = 'SIGNUP_NAME'; log("ENTER NAME:", "log-system"); promptLabel.textContent = "NAME:"; promptLabel.style.color = "#ffcc00"; }
+        if (cmd === "help") {
+        log("COMMAND LIST:", "log-system");
+          log("  signup      - Join Network", "log-ok");
+          log("  reactor     - Launch FinTech Sim", "log-ok"); // ADD THIS LINE
+          log("  auth [key]  - Unlock Pro Modules", "log-warn");
+else if (cmd === "signup") { MODE = 'SIGNUP_NAME'; log("ENTER NAME:", "log-system"); promptLabel.textContent = "NAME:"; promptLabel.style.color = "#ffcc00"; }
         else if (cmd === "clear") { clearCanvas(); log("Wiped.", "log-warn"); }
         else if (cmd === "circle") { drawCircle(); log("Circle.", "log-ok"); }
         else if (cmd === "square") { drawSquare(); log("Square.", "log-ok"); }
@@ -100,7 +104,15 @@
             }
             else log("Lesson not found.", "log-error");
         }
-        else if (cmd === "buy 1" || cmd === "buy 2") {
+        else if (cmd === "reactor") {
+            log(">> INITIALIZING FINANCIAL CORE...", "log-warn");
+            log(">> LOADING ASSETS...", "log-system");
+            setTimeout(() => {
+                log(">> LAUNCHING MODULE.", "log-ok");
+                window.open('COMPOUND_REACTOR.html', '_blank');
+            }, 1000);
+        }
+else if (cmd === "buy 1" || cmd === "buy 2") {
             log(">> CONNECTING TO PAYMENT GATEWAY...", "log-system");
             setTimeout(() => {
                 log(">> ERROR: GATEWAY OFFLINE (PENDING REGISTRATION).", "log-error");

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>COMPOUND_REACTOR // SINGULARITY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&display=swap');
+
+         :root {
+            --bg: #050505;
+            --money-green: #c5a059; /* CHANGED TO RUNE GOLD */
+            --core-white: #ffffff;
+            --grid: rgba(255, 255, 255, 0.05);
+        }
+        
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: var(--bg);
+            color: var(--core-white);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* LEFT: CONTROLS */
+        .control-panel {
+            width: 350px;
+            background: #0a0a0a;
+            padding: 40px;
+            border-right: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 10px 0 50px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 1.5rem; letter-spacing: -1px; margin-bottom: 40px; color: var(--money-green); }
+        
+        .input-group { margin-bottom: 30px; }
+        label { display: flex; justify-content: space-between; font-size: 0.8rem; color: #888; margin-bottom: 10px; }
+        .val-display { color: #fff; font-weight: bold; }
+
+        input[type=range] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: #222;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            background: var(--money-green);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--money-green);
+        }
+
+        /* RIGHT: VISUALIZATION */
+        .vis-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        /* READOUT OVERLAY */
+        .readout {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .big-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--money-green);
+            text-shadow: 0 0 30px rgba(0, 255, 157, 0.3);
+        }
+
+        .sub-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .breakdown {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #fff;
+        }
+        .b-principal { border-left: 3px solid #fff; padding-left: 10px; margin-bottom: 5px; }
+        .b-interest { border-left: 3px solid var(--money-green); padding-left: 10px; color: var(--money-green); }
+
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <h1>WEALTH_REACTOR</h1>
+
+        <div class="input-group">
+            <label>INITIAL INVESTMENT <span class="val-display" id="d-init">$10,000</span></label>
+            <input type="range" id="i-init" min="0" max="100000" step="1000" value="10000">
+        </div>
+
+        <div class="input-group">
+            <label>MONTHLY CONTRIBUTION <span class="val-display" id="d-monthly">$6,000</span></label>
+            <input type="range" id="i-monthly" min="0" max="20000" step="100" value="6000">
+        </div>
+
+        <div class="input-group">
+            <label>INTEREST RATE (APY) <span class="val-display" id="d-rate">10%</span></label>
+            <input type="range" id="i-rate" min="1" max="20" step="0.1" value="10">
+        </div>
+
+        <div class="input-group">
+            <label>TIME HORIZON <span class="val-display" id="d-years">20 Years</span></label>
+            <input type="range" id="i-years" min="1" max="50" step="1" value="20">
+        </div>
+
+        <p style="font-size: 0.7rem; color: #444; line-height: 1.6;">
+            "Compound interest is the eighth wonder of the world. He who understands it, earns it... he who doesn't... pays it."
+        </p>
+    </div>
+
+    <div class="vis-container" id="container">
+        <canvas id="reactor"></canvas>
+        
+        <div class="readout">
+            <div class="sub-label">Future Net Worth</div>
+            <div class="big-number" id="totalValue">$0</div>
+            <div class="breakdown">
+                <div class="b-principal">Principal: <span id="totalPrin">$0</span></div>
+                <div class="b-interest">Interest: <span id="totalInt">$0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('reactor');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('container');
+
+        // INPUTS
+        const inputs = {
+            init: document.getElementById('i-init'),
+            monthly: document.getElementById('i-monthly'),
+            rate: document.getElementById('i-rate'),
+            years: document.getElementById('i-years')
+        };
+
+        // DISPLAYS
+        const displays = {
+            init: document.getElementById('d-init'),
+            monthly: document.getElementById('d-monthly'),
+            rate: document.getElementById('d-rate'),
+            years: document.getElementById('d-years'),
+            total: document.getElementById('totalValue'),
+            prin: document.getElementById('totalPrin'),
+            int: document.getElementById('totalInt')
+        };
+
+        let w, h;
+        let particles = [];
+
+        // FORMATTER
+        const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+        function resize() {
+            w = container.offsetWidth;
+            h = container.offsetHeight;
+            canvas.width = w;
+            canvas.height = h;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // CALCULATION ENGINE
+        function calculate() {
+            let P = parseFloat(inputs.init.value); // Principal
+            let PMT = parseFloat(inputs.monthly.value); // Monthly Contribution
+            let r = parseFloat(inputs.rate.value) / 100; // Rate
+            let t = parseFloat(inputs.years.value); // Years
+            let n = 12; // Compounded monthly
+
+            // Future Value of Initial Lump Sum
+            let fv_lump = P * Math.pow((1 + r/n), (n*t));
+
+            // Future Value of a Series (Monthly Contributions)
+            let fv_series = PMT * ( (Math.pow((1 + r/n), (n*t)) - 1) / (r/n) );
+
+            let total = fv_lump + fv_series;
+            let totalPrincipal = P + (PMT * n * t);
+            let totalInterest = total - totalPrincipal;
+
+            return { total, totalPrincipal, totalInterest };
+        }
+
+        // UPDATE UI & DATA
+        function update() {
+            // Update Text Displays
+            displays.init.innerText = fmt.format(inputs.init.value);
+            displays.monthly.innerText = fmt.format(inputs.monthly.value);
+            displays.rate.innerText = inputs.rate.value + "%";
+            displays.years.innerText = inputs.years.value + " Years";
+
+            const data = calculate();
+            displays.total.innerText = fmt.format(data.total);
+            displays.prin.innerText = fmt.format(data.totalPrincipal);
+            displays.int.innerText = fmt.format(data.totalInterest);
+
+            return data;
+        }
+
+        // PARTICLE SYSTEM
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.angle = Math.random() * Math.PI * 2;
+                this.radius = Math.random() * 100 + 50; // Orbit distance
+                this.velocity = (Math.random() * 0.02) + 0.005;
+                this.size = Math.random() * 2;
+                this.type = type; // 'prin' or 'int'
+            }
+
+            update(centerX, centerY, scale) {
+                this.angle += this.velocity;
+                // Interest particles orbit wider and faster as they grow
+                let orbit = this.radius * scale;
+                
+                this.x = centerX + Math.cos(this.angle) * orbit;
+                this.y = centerY + Math.sin(this.angle) * orbit;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = this.type === 'int' ? '#00ff9d' : '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // VISUALIZER LOOP
+        function draw() {
+            const data = update(); // Get math
+            
+            // Clear
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; // Trails
+            ctx.fillRect(0, 0, w, h);
+
+            const centerX = w / 2;
+            const centerY = h / 2;
+
+            // 1. CALCULATE RATIOS
+            // We want to visualize the ratio of Principal vs Interest
+            const total = data.total;
+            const prinRatio = data.totalPrincipal / total;
+            const intRatio = data.totalInterest / total;
+
+            // 2. DRAW CORE (Principal)
+            // The core size is constant relative to screen, but density changes
+            const maxRadius = 200;
+            const prinRadius = maxRadius * prinRatio; // Shrinks as interest takes over
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 50 + (prinRatio*50), 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255, 0.1)';
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 3. DRAW HALO (Interest)
+            // This grows massive
+            const intRadius = 100 + (Math.sqrt(data.totalInterest) / 10); // Scale based on raw wealth
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, intRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0, 255, 157, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 4. DRAW PARTICLES
+            // Number of particles based on "Velocity" (Rate + Monthly)
+            const particleCount = 100; 
+            
+            // Maintain particle array size
+            if(particles.length < particleCount) {
+                for(let i=0; i < particleCount - particles.length; i++) {
+                    particles.push(new Particle(centerX, centerY, Math.random() > 0.5 ? 'int' : 'prin'));
+                }
+            }
+
+            particles.forEach(p => {
+                // Scale orbits based on wealth
+                let scale = 1 + (data.total / 1000000); 
+                p.update(centerX, centerY, scale);
+                
+                // Override color based on logic
+                // Inner particles = Principal
+                // Outer particles = Interest
+                // We fake this visually
+                let dist = Math.hypot(p.x - centerX, p.y - centerY);
+                if(dist > 60 + (prinRatio*50)) {
+                    p.type = 'int';
+                } else {
+                    p.type = 'prin';
+                }
+                
+                p.draw(ctx);
+            });
+
+            // 5. GLOW EFFECT
+            // If Interest > Principal (The Singularity), screen glows green
+            if (data.totalInterest > data.totalPrincipal) {
+                canvas.style.boxShadow = `inset 0 0 100px rgba(0, 255, 157, 0.2)`;
+            } else {
+                canvas.style.boxShadow = `none`;
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // LISTENERS
+        Object.values(inputs).forEach(i => i.addEventListener('input', update));
+
+        draw();
+
+    </script>
+</body>
+</html>
