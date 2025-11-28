@@ -160,160 +160,112 @@
     </style>
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
-    </script>
-</head>
-<body>
-
-    <nav>
-        <div class="logo"><i data-feather="hexagon"></i> PAWN PASS</div>
-        <div style="font-size: 0.7rem; color: var(--dim);">BETA v0.9</div>
-    </nav>
-
-    <div class="app-view">
-        
-        <!-- SCREEN 1 -->
-        <div class="screen active" id="screen1">
-            <div class="content-area">
-                <h1>Get Cash.</h1>
-                <p class="sub">Instant valuation. No human interaction.</p>
-                
-                <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">ASSET</label>
-                <select id="itemSelect">
-                    <option value="385">Sony PlayStation 5</option>
-                    <option value="850">MacBook Pro M1</option>
-                    <option value="8400">Rolex Submariner</option>
-                    <option value="620">iPhone 14 Pro</option>
-                </select>
-                
-                <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">CONDITION</label>
-                <select>
-                    <option>Pristine (Like New)</option>
-                    <option>Good (Minor Wear)</option>
-                    <option>Fair</option>
-                </select>
-                
-                <div style="margin-top:1rem; padding:1rem; background:#111; border-radius:8px; display:flex; align-items:center; gap:0.5rem; color:#666; font-size:0.8rem;">
-                    <i data-feather="shield" style="width:14px"></i> 256-Bit Encrypted
-                </div>
-            </div>
-            
-            <div class="btn-area">
-                <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 2 -->
-        <div class="screen" id="screen2">
-            <div class="content-area">
-                <div style="text-align: center;">
-                    <p class="sub" style="margin-bottom: 1rem;">INSTANT OFFER</p>
-                    <div class="quote-box">
-                        <div class="price-tag" id="priceDisplay">$0.00</div>
-                        <div style="color: var(--dim); font-size: 0.8rem; margin-top: 0.5rem;">Funds ready for transfer</div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
-                        <div style="color: #666; font-size: 0.7rem;">RATE</div>
-                        <div style="font-weight: bold;">5.0%</div>
-                    </div>
-                    <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
-                        <div style="color: #666; font-size: 0.7rem;">TERM</div>
-                        <div style="font-weight: bold;">30 Days</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-area">
-                <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
-                <button style="width:100%; padding:1rem; background:transparent; border:none; color:#666;" onclick="reset()">Decline Offer</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 3 (SCANNER) -->
-        <div class="screen" id="screen3">
-            <h2 style="text-align: center; font-family: 'Syncopate'; letter-spacing: 2px; font-size: 1rem; margin-top: 1rem;">VERIFICATION</h2>
-            <p style="text-align: center; color: #666; font-size: 0.8rem;">Hold thumb to sign contract</p>
-
-            <div class="scan-ui">
-                <div class="fingerprint-zone" id="scanZone">
-                    <i data-feather="fingerprint" class="scan-icon"></i>
-                </div>
-                <div class="progress-bar"><div class="fill" id="scanFill"></div></div>
-                <div id="scanText" style="margin-top: 1.5rem; font-size: 0.8rem; color: #444; letter-spacing: 2px;">WAITING FOR BIOMETRICS</div>
-            </div>
-            
-            <div id="canvas-container"></div>
-        </div>
-
-    </div>
-
-    <!-- SUCCESS -->
-    <div class="success-overlay" id="successScreen">
-        <i data-feather="check-circle" class="check-anim"></i>
-        <h1 style="margin-top: 2rem;">FUNDS SENT</h1>
-        <p style="color: #666;">Courier Dispatched.</p>
-        <div style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; color: #888; border-radius: 8px; font-family: monospace;">TXID: #9942-XF</div>
-        <button style="margin-top: 3rem; background: transparent; border: 1px solid #333; color: #fff; padding: 0.8rem 2rem; border-radius: 20px;" onclick="reset()">DONE</button>
-    </div>
-
-    <script type="module">
-        import * as THREE from 'three';
-        feather.replace();
-
-        // --- LOGIC ---
-        window.toScreen2 = () => {
+     <!-- SCRIPT 1: LOGIC (Loads Instantly - Buttons will work immediately) -->
+    <script>
+        // --- NAVIGATION LOGIC ---
+        function toScreen2() {
             const val = document.getElementById('itemSelect').value;
             document.getElementById('priceDisplay').innerText = '$' + val;
             switchScreen('screen1', 'screen2');
-        };
+        }
 
-        window.toScreen3 = () => {
+        function toScreen3() {
             switchScreen('screen2', 'screen3');
-            initThreeJS();
-        };
+            // Trigger the 3D init if it's ready, otherwise set a flag
+            if(window.initParticles) window.initParticles();
+            else window.startParticlesOnLoad = true;
+        }
 
-        window.reset = () => location.reload();
+        function reset() {
+            location.reload();
+        }
 
         function switchScreen(fromId, toId) {
             document.getElementById(fromId).classList.remove('active');
             document.getElementById(fromId).classList.add('prev');
             
-            document.getElementById(toId).classList.add('active');
+            const next = document.getElementById(toId);
+            next.classList.add('active');
+            next.classList.remove('prev'); // Reset just in case
         }
 
-        // --- SCANNER ---
+        // --- SCANNER LOGIC ---
         const zone = document.getElementById('scanZone');
         const fill = document.getElementById('scanFill');
         const text = document.getElementById('scanText');
         let isScanning = false;
-        let progress = 0;
+        let scanProgress = 0;
+        let scanInterval;
 
-        const start = (e) => { e.preventDefault(); isScanning = true; zone.classList.add('scanning'); text.innerText = "VERIFYING..."; text.style.color = "#00ff9d"; }
-        const stop = () => { isScanning = false; zone.classList.remove('scanning'); text.innerText = "WAITING..."; text.style.color = "#444"; progress = 0; fill.style.width = '0%'; }
+        function startScan(e) {
+            if(e.cancelable) e.preventDefault(); // Prevent scrolling on touch
+            isScanning = true;
+            zone.classList.add('scanning');
+            text.innerText = "VERIFYING...";
+            text.style.color = "#00ff9d";
+            
+            // Start Loop
+            clearInterval(scanInterval);
+            scanInterval = setInterval(() => {
+                if(isScanning) {
+                    scanProgress += 2; // Speed of scan
+                    fill.style.width = scanProgress + '%';
+                    
+                    // Trigger 3D acceleration if loaded
+                    if(window.setScanState) window.setScanState(true);
 
-        zone.addEventListener('mousedown', start);
-        zone.addEventListener('touchstart', start);
-        window.addEventListener('mouseup', stop);
-        window.addEventListener('touchend', stop);
-
-        setInterval(() => {
-            if(isScanning) {
-                progress += 2.5;
-                fill.style.width = progress + '%';
-                if(progress >= 100) {
-                    isScanning = false;
-                    document.getElementById('successScreen').style.display = 'flex';
+                    if(scanProgress >= 100) {
+                        clearInterval(scanInterval);
+                        isScanning = false;
+                        document.getElementById('successScreen').style.display = 'flex';
+                    }
                 }
-            }
-        }, 20);
+            }, 20);
+        }
 
-        // --- PARTICLES ---
+        function stopScan() {
+            isScanning = false;
+            clearInterval(scanInterval);
+            zone.classList.remove('scanning');
+            text.innerText = "WAITING...";
+            text.style.color = "#444";
+            scanProgress = 0;
+            fill.style.width = '0%';
+            
+            // Stop 3D acceleration
+            if(window.setScanState) window.setScanState(false);
+        }
+
+        // Bind Events (Mouse & Touch)
+        if(zone) {
+            zone.addEventListener('mousedown', startScan);
+            zone.addEventListener('touchstart', startScan, {passive: false});
+            
+            window.addEventListener('mouseup', stopScan);
+            window.addEventListener('touchend', stopScan);
+        }
+        
+        // Initialize Feather Icons
+        if(typeof feather !== 'undefined') feather.replace();
+    </script>
+
+    <!-- SCRIPT 2: VISUALS (Loads Three.js - Can take a second) -->
+    <script type="module">
+        import * as THREE from 'three';
+        
+        // Re-run feather in case module loads fast
+        if(typeof feather !== 'undefined') feather.replace();
+
         let renderer, scene, camera, particles;
-        function initThreeJS() {
-            if(renderer) return;
+        let is3DReady = false;
+
+        // Make function global so Script 1 can call it
+        window.initParticles = function() {
+            if(renderer) return; // Already running
+            
             const container = document.getElementById('canvas-container');
+            if(!container) return;
+
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, container.offsetWidth/container.offsetHeight, 0.1, 1000);
             camera.position.z = 25;
@@ -332,21 +284,37 @@
             particles = new THREE.Points(geo, mat);
             scene.add(particles);
             
+            is3DReady = true;
             animate();
-        }
+        };
+
+        // Allow Logic Script to control 3D state
+        let scanState = false;
+        window.setScanState = function(state) {
+            scanState = state;
+        };
 
         function animate() {
             requestAnimationFrame(animate);
-            if(isScanning) {
+            
+            if(scanState) {
+                // Fast Spin on Scan
                 particles.rotation.z += 0.05;
                 particles.material.opacity = 0.8;
                 camera.position.z = Math.max(10, camera.position.z - 0.5);
             } else {
+                // Idle Float
                 particles.rotation.z += 0.002;
                 particles.material.opacity = 0.3;
                 camera.position.z = Math.min(25, camera.position.z + 0.5);
             }
+            
             renderer.render(scene, camera);
+        }
+
+        // Check if logic requested start already
+        if(window.startParticlesOnLoad) {
+            window.initParticles();
         }
     </script>
 </body>
