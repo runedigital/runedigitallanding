@@ -6,7 +6,7 @@
     <title>PAWN PASS // ULTRA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
-    <style>
+       <style>
         :root {
             --bg: #050505;
             --card: #111;
@@ -16,77 +16,102 @@
             --border: #222;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; user-select: none; -webkit-user-select: none; }
 
         body {
             background: var(--bg);
             color: var(--text);
-            overflow: hidden; /* Lock scroll for app feel */
-            height: 100vh;
+            /* FIX: Use dynamic height to handle mobile address bars */
+            height: 100vh; 
+            height: 100dvh; 
+            overflow: hidden;
             display: flex; flex-direction: column;
         }
 
         /* --- NAV --- */
         nav {
             padding: 1.5rem;
+            flex-shrink: 0; /* Don't shrink nav */
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--border);
             background: rgba(5,5,5,0.9); backdrop-filter: blur(10px);
-            z-index: 10;
+            z-index: 20;
         }
         .logo { font-weight: 800; font-size: 1.2rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
 
         /* --- APP CONTAINER --- */
         .app-view {
-            flex: 1;
+            flex: 1; /* Take remaining space */
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            padding: 2rem;
+            /* FIX: Add padding bottom for safe area + button space */
+            padding: 1.5rem;
+            padding-bottom: max(2rem, env(safe-area-inset-bottom)); 
             display: flex; flex-direction: column;
             background: var(--bg);
             transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.4s;
             opacity: 0; pointer-events: none; transform: translateY(20px);
+            z-index: 1;
         }
 
-        .screen.active { opacity: 1; pointer-events: auto; transform: translateY(0); z-index: 2; }
+        .screen.active { opacity: 1; pointer-events: auto; transform: translateY(0); z-index: 5; }
         .screen.prev { transform: translateY(-20px); opacity: 0; }
 
+        /* --- CONTENT SCROLL --- */
+        /* If content is too tall, allow scrolling inside the screen, but keep button fixed */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+
         /* --- TYPOGRAPHY --- */
-        h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1; }
+        h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.1; }
         h2 { font-size: 1.5rem; margin-bottom: 1rem; }
-        .sub { color: var(--dim); margin-bottom: 2rem; font-size: 0.9rem; }
+        .sub { color: var(--dim); margin-bottom: 1.5rem; font-size: 0.9rem; }
 
         /* --- FORMS --- */
         select, input {
             width: 100%; background: #111; border: 1px solid var(--border);
-            color: #fff; padding: 1.2rem; border-radius: 12px; font-size: 1rem;
-            margin-bottom: 1rem; outline: none;
+            color: #fff; padding: 1rem; border-radius: 12px; font-size: 1rem;
+            margin-bottom: 1rem; outline: none; appearance: none;
         }
         select:focus { border-color: var(--accent); }
 
+        /* --- BUTTON FIX --- */
+        .btn-container {
+            margin-top: auto; /* Push to bottom */
+            padding-top: 1rem;
+            background: var(--bg); /* Cover content behind it */
+            z-index: 10;
+        }
+
         .btn-main {
-            width: 100%; padding: 1.2rem; background: var(--accent);
+            width: 100%; padding: 1rem; background: var(--accent);
             color: #000; font-weight: 800; border: none; border-radius: 12px;
-            font-size: 1rem; cursor: pointer; margin-top: auto;
+            font-size: 1rem; cursor: pointer; 
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            /* Shadow to pop off screen */
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
         }
         .btn-main:active { transform: scale(0.98); }
 
         /* --- QUOTE SCREEN --- */
         .quote-box {
             background: rgba(0,255,157,0.05); border: 1px solid var(--accent);
-            padding: 2rem; border-radius: 16px; text-align: center; margin-bottom: 2rem;
+            padding: 1.5rem; border-radius: 16px; text-align: center; margin-bottom: 1.5rem;
         }
-        .price-tag { font-size: 3.5rem; font-weight: 800; color: var(--accent); text-shadow: 0 0 20px rgba(0,255,157,0.3); }
+        .price-tag { font-size: 3rem; font-weight: 800; color: var(--accent); text-shadow: 0 0 20px rgba(0,255,157,0.3); }
 
         /* --- SCANNER (THE MAGIC) --- */
-        #scanner-canvas {
+        #canvas-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.5;
+            z-index: 0; opacity: 0.5; pointer-events: none;
         }
         
         .scan-ui {
@@ -95,16 +120,22 @@
         }
 
         .fingerprint-zone {
-            width: 120px; height: 120px;
+            width: 100px; height: 100px;
             border: 2px dashed #333; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 2rem; position: relative;
             transition: all 0.3s;
+            /* Make touch target bigger */
+            position: relative;
+        }
+        /* Invisible larger touch area */
+        .fingerprint-zone::after {
+            content: ''; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
         }
 
-        .fingerprint-zone.scanning { border-color: var(--accent); border-style: solid; box-shadow: 0 0 30px var(--accent); }
+        .fingerprint-zone.scanning { border-color: var(--accent); border-style: solid; box-shadow: 0 0 30px var(--accent); transform: scale(1.1); }
 
-        .scan-icon { width: 60px; height: 60px; color: #333; transition: 0.3s; }
+        .scan-icon { width: 50px; height: 50px; color: #333; transition: 0.3s; }
         .fingerprint-zone.scanning .scan-icon { color: var(--accent); opacity: 1; }
 
         .progress-bar {
@@ -118,7 +149,7 @@
             background: #000; z-index: 100; display: none;
             flex-direction: column; align-items: center; justify-content: center;
         }
-        .check-anim { width: 100px; height: 100px; color: var(--accent); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .check-anim { width: 80px; height: 80px; color: var(--accent); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
     </style>
@@ -137,32 +168,23 @@
     <div class="app-view">
         
         <!-- SCREEN 1: SELECTION -->
-        <div class="screen active" id="screen1">
-            <h1>Get Cash.</h1>
-            <p class="sub">Instant valuation. No human interaction.</p>
-            
-            <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">ASSET TYPE</label>
-            <select id="itemSelect">
-                <option value="385">Sony PlayStation 5</option>
-                <option value="850">MacBook Pro M1</option>
-                <option value="8400">Rolex Submariner</option>
-                <option value="620">iPhone 14 Pro</option>
-            </select>
-            
-            <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">CONDITION</label>
-            <select>
-                <option>Pristine (Like New)</option>
-                <option>Good (Minor Wear)</option>
-                <option>Fair</option>
-            </select>
+<div class="content-area">
+    <h1>Get Cash.</h1>
+    <p class="sub">Instant valuation. No human interaction.</p>
+    <!-- Selects here... -->
+</div>
+<div class="btn-container">
+    <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
+</div>
 
-            <div style="margin-top: 1rem; padding: 1rem; background: #111; border-radius: 8px; font-size: 0.8rem; color: #666;">
-                <i data-feather="lock" style="width:12px; display:inline"></i> 256-Bit Encrypted Valuation
-            </div>
-
-            <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
-        </div>
-
+<!-- INSIDE SCREEN 2 -->
+<div class="content-area">
+    <!-- Quote box here... -->
+</div>
+<div class="btn-container">
+    <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
+    <button style="background: transparent; border: none; color: #666; width: 100%; padding: 1rem;" onclick="reset()">Decline</button>
+</div>
         <!-- SCREEN 2: VALUATION -->
         <div class="screen" id="screen2">
             <div style="text-align: center; margin-bottom: 2rem;">
