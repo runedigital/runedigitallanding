@@ -11,6 +11,7 @@
             --bg: #050505;
             --card: #111;
             --accent: #00ff9d;
+            --warning: #ffaa00;
             --text: #fff;
             --dim: #666;
             --border: #222;
@@ -18,13 +19,12 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        /* --- CORE LAYOUT FIX --- */
+        /* --- CORE LAYOUT --- */
         body {
             background: var(--bg);
             color: var(--text);
             width: 100vw;
-            height: 100vh; /* Fallback */
-            height: 100dvh; /* Dynamic Height for Mobile Browsers */
+            height: 100dvh; /* Dynamic Height for Mobile */
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -56,7 +56,6 @@
             background: var(--bg);
             display: flex; flex-direction: column;
             padding: 1.5rem;
-            /* Safe area for iPhone Home Bar */
             padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
             opacity: 0; 
@@ -77,18 +76,18 @@
             opacity: 0;
         }
 
-        /* --- SCROLLABLE CONTENT AREA --- */
+        /* --- CONTENT & BUTTONS --- */
         .content-area {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 1rem;
         }
 
-        /* --- FIXED BUTTON AREA --- */
         .btn-area {
             margin-top: auto;
             flex-shrink: 0;
             padding-top: 1rem;
+            background: var(--bg);
         }
 
         /* --- COMPONENTS --- */
@@ -117,6 +116,15 @@
         }
         .price-tag { font-size: 3rem; font-weight: 800; color: var(--accent); }
 
+        /* --- WARNING BOX --- */
+        .warning-box {
+            margin-top: 1rem;
+            background: rgba(255, 170, 0, 0.1);
+            border-left: 3px solid var(--warning);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
         /* --- SCANNER --- */
         #canvas-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -136,11 +144,7 @@
             transition: 0.3s;
         }
         
-        /* Invisible Hit Box for easier touching */
-        .fingerprint-zone::before {
-            content: ''; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px;
-        }
-
+        .fingerprint-zone::before { content: ''; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; }
         .fingerprint-zone.scanning { border-color: var(--accent); border-style: solid; box-shadow: 0 0 40px var(--accent); transform: scale(1.1); }
         .scan-icon { width: 50px; height: 50px; color: #333; transition: 0.3s; }
         .fingerprint-zone.scanning .scan-icon { color: var(--accent); }
@@ -160,9 +164,114 @@
     </style>
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
-     <!-- SCRIPT 1: LOGIC (Loads Instantly - Buttons will work immediately) -->
+    </script>
+</head>
+<body>
+
+    <nav>
+        <div class="logo"><i data-feather="hexagon"></i> PAWN PASS</div>
+        <div style="font-size: 0.7rem; color: var(--dim);">BETA v0.9</div>
+    </nav>
+
+    <div class="app-view">
+        
+        <!-- SCREEN 1: SELECTION -->
+        <div class="screen active" id="screen1">
+            <div class="content-area">
+                <h1>Get Cash.</h1>
+                <p class="sub">Instant valuation. No human interaction.</p>
+                
+                <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">ASSET</label>
+                <select id="itemSelect">
+                    <option value="385">Sony PlayStation 5</option>
+                    <option value="850">MacBook Pro M1</option>
+                    <option value="8400">Rolex Submariner</option>
+                    <option value="620">iPhone 14 Pro</option>
+                </select>
+                
+                <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">CONDITION</label>
+                <select>
+                    <option>Pristine (Like New)</option>
+                    <option>Good (Minor Wear)</option>
+                    <option>Fair</option>
+                </select>
+                
+                <!-- THE WARNING BOX -->
+                <div class="warning-box">
+                    <div style="color: var(--warning); font-size: 0.75rem; font-weight: bold; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 5px;">
+                        <i data-feather="alert-triangle" style="width: 12px;"></i> IMPORTANT
+                    </div>
+                    <p style="color: #888; font-size: 0.7rem; line-height: 1.4;">
+                        Please be accurate with grading. Discrepancies discovered during physical inspection will void this offer immediately.
+                    </p>
+                </div>
+
+            </div>
+            
+            <div class="btn-area">
+                <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: QUOTE -->
+        <div class="screen" id="screen2">
+            <div class="content-area">
+                <div style="text-align: center;">
+                    <p class="sub" style="margin-bottom: 1rem;">INSTANT OFFER</p>
+                    <div class="quote-box">
+                        <div class="price-tag" id="priceDisplay">$0.00</div>
+                        <div style="color: var(--dim); font-size: 0.8rem; margin-top: 0.5rem;">Funds ready for transfer</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="color: #666; font-size: 0.7rem;">RATE</div>
+                        <div style="font-weight: bold;">5.0%</div>
+                    </div>
+                    <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="color: #666; font-size: 0.7rem;">TERM</div>
+                        <div style="font-weight: bold;">30 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-area">
+                <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
+                <button style="width:100%; padding:1rem; background:transparent; border:none; color:#666;" onclick="reset()">Decline Offer</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: SCANNER -->
+        <div class="screen" id="screen3">
+            <h2 style="text-align: center; font-family: 'Syncopate'; letter-spacing: 2px; font-size: 1rem; margin-top: 1rem;">VERIFICATION</h2>
+            <p style="text-align: center; color: #666; font-size: 0.8rem;">Hold thumb to sign contract</p>
+
+            <div class="scan-ui">
+                <div class="fingerprint-zone" id="scanZone">
+                    <i data-feather="fingerprint" class="scan-icon"></i>
+                </div>
+                <div class="progress-bar"><div class="fill" id="scanFill"></div></div>
+                <div id="scanText" style="margin-top: 1.5rem; font-size: 0.8rem; color: #444; letter-spacing: 2px;">WAITING FOR BIOMETRICS</div>
+            </div>
+            
+            <div id="canvas-container"></div>
+        </div>
+
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-overlay" id="successScreen">
+        <i data-feather="check-circle" class="check-anim"></i>
+        <h1 style="margin-top: 2rem;">FUNDS SENT</h1>
+        <p style="color: #666;">Courier Dispatched.</p>
+        <div style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; color: #888; border-radius: 8px; font-family: monospace;">TXID: #9942-XF</div>
+        <button style="margin-top: 3rem; background: transparent; border: 1px solid #333; color: #fff; padding: 0.8rem 2rem; border-radius: 20px;" onclick="reset()">DONE</button>
+    </div>
+
+    <!-- SCRIPT 1: LOGIC (Instantly Interactive) -->
     <script>
-        // --- NAVIGATION LOGIC ---
+        // --- NAVIGATION ---
         function toScreen2() {
             const val = document.getElementById('itemSelect').value;
             document.getElementById('priceDisplay').innerText = '$' + val;
@@ -171,22 +280,19 @@
 
         function toScreen3() {
             switchScreen('screen2', 'screen3');
-            // Trigger the 3D init if it's ready, otherwise set a flag
+            // Trigger 3D init if ready
             if(window.initParticles) window.initParticles();
             else window.startParticlesOnLoad = true;
         }
 
-        function reset() {
-            location.reload();
-        }
+        function reset() { location.reload(); }
 
         function switchScreen(fromId, toId) {
             document.getElementById(fromId).classList.remove('active');
             document.getElementById(fromId).classList.add('prev');
-            
             const next = document.getElementById(toId);
             next.classList.add('active');
-            next.classList.remove('prev'); // Reset just in case
+            next.classList.remove('prev');
         }
 
         // --- SCANNER LOGIC ---
@@ -198,21 +304,18 @@
         let scanInterval;
 
         function startScan(e) {
-            if(e.cancelable) e.preventDefault(); // Prevent scrolling on touch
+            if(e.cancelable) e.preventDefault();
             isScanning = true;
             zone.classList.add('scanning');
             text.innerText = "VERIFYING...";
             text.style.color = "#00ff9d";
             
-            // Start Loop
             clearInterval(scanInterval);
             scanInterval = setInterval(() => {
                 if(isScanning) {
-                    scanProgress += 2; // Speed of scan
+                    scanProgress += 2;
                     fill.style.width = scanProgress + '%';
-                    
-                    // Trigger 3D acceleration if loaded
-                    if(window.setScanState) window.setScanState(true);
+                    if(window.setScanState) window.setScanState(true); // 3D Speed Up
 
                     if(scanProgress >= 100) {
                         clearInterval(scanInterval);
@@ -231,38 +334,28 @@
             text.style.color = "#444";
             scanProgress = 0;
             fill.style.width = '0%';
-            
-            // Stop 3D acceleration
-            if(window.setScanState) window.setScanState(false);
+            if(window.setScanState) window.setScanState(false); // 3D Slow Down
         }
 
-        // Bind Events (Mouse & Touch)
         if(zone) {
             zone.addEventListener('mousedown', startScan);
             zone.addEventListener('touchstart', startScan, {passive: false});
-            
             window.addEventListener('mouseup', stopScan);
             window.addEventListener('touchend', stopScan);
         }
         
-        // Initialize Feather Icons
         if(typeof feather !== 'undefined') feather.replace();
     </script>
 
-    <!-- SCRIPT 2: VISUALS (Loads Three.js - Can take a second) -->
+    <!-- SCRIPT 2: VISUALS (Loads Background) -->
     <script type="module">
         import * as THREE from 'three';
-        
-        // Re-run feather in case module loads fast
         if(typeof feather !== 'undefined') feather.replace();
 
         let renderer, scene, camera, particles;
-        let is3DReady = false;
 
-        // Make function global so Script 1 can call it
         window.initParticles = function() {
-            if(renderer) return; // Already running
-            
+            if(renderer) return;
             const container = document.getElementById('canvas-container');
             if(!container) return;
 
@@ -284,38 +377,27 @@
             particles = new THREE.Points(geo, mat);
             scene.add(particles);
             
-            is3DReady = true;
             animate();
         };
 
-        // Allow Logic Script to control 3D state
         let scanState = false;
-        window.setScanState = function(state) {
-            scanState = state;
-        };
+        window.setScanState = function(state) { scanState = state; };
 
         function animate() {
             requestAnimationFrame(animate);
-            
             if(scanState) {
-                // Fast Spin on Scan
                 particles.rotation.z += 0.05;
                 particles.material.opacity = 0.8;
                 camera.position.z = Math.max(10, camera.position.z - 0.5);
             } else {
-                // Idle Float
                 particles.rotation.z += 0.002;
                 particles.material.opacity = 0.3;
                 camera.position.z = Math.min(25, camera.position.z + 0.5);
             }
-            
             renderer.render(scene, camera);
         }
 
-        // Check if logic requested start already
-        if(window.startParticlesOnLoad) {
-            window.initParticles();
-        }
+        if(window.startParticlesOnLoad) window.initParticles();
     </script>
 </body>
 </html>
