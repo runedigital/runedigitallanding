@@ -176,26 +176,28 @@ Here is the Corrected NEURAL_HUB.html.
 
         const nodes = [];
 
-        function build(data, parent=null) {
+   function build(data, parent=null) {
             const node = { ...data, id: Math.random(), position: new THREE.Vector3(), mesh: null };
-              if(parent) {
-                // DYNAMIC RADIUS: If parent has many children, increase the spread
+            
+            if(parent) {
+                // DYNAMIC RADIUS LOGIC
                 const siblingCount = parent.children ? parent.children.length : 1;
                 const baseRadius = (data.type === 'folder' ? 15 : 8);
-                const spread = Math.max(0, siblingCount - 5) * 1.5; // Add space for crowded folders
+                const spread = Math.max(0, siblingCount - 5) * 1.5; 
                 
                 const r = baseRadius + spread + (Math.random() * 5);
                 
+                // CALCULATE ANGLE (ONLY ONCE)
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos(2 * Math.random() - 1);
+                
                 node.position.set(
                     parent.position.x + r * Math.sin(phi) * Math.cos(theta),
                     parent.position.y + r * Math.sin(phi) * Math.sin(theta),
                     parent.position.z + r * Math.cos(phi)
                 );
             }
+
             let geo = fileGeo; let mat = mats.file;
             if (data.type === 'folder') { geo = folderGeo; mat = mats.folder; }
             else if (data.type === 'app') { geo = appGeo; mat = mats.app; }
@@ -220,6 +222,7 @@ Here is the Corrected NEURAL_HUB.html.
                 scene.add(line);
             }
             if(data.children) data.children.forEach(c => build(c, node));
+        
         }
         build(fileSystem);
         document.getElementById('loading').textContent = "SYSTEM // ONLINE";
