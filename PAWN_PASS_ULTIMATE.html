@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PAWN PASS // FINAL</title>
+    <title>PAWN PASS // LOGIC UPDATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
     <style>
@@ -19,78 +19,36 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        /* --- CORE LAYOUT --- */
         body {
-            background: var(--bg);
-            color: var(--text);
-            width: 100vw;
-            height: 100dvh; /* Dynamic Height for Mobile */
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background: var(--bg); color: var(--text);
+            width: 100vw; height: 100dvh; overflow: hidden;
+            display: flex; flex-direction: column;
         }
 
         nav {
-            height: 60px;
-            padding: 0 1.5rem;
+            height: 60px; padding: 0 1.5rem;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-            background: rgba(5,5,5,0.95);
-            flex-shrink: 0;
-            z-index: 50;
+            border-bottom: 1px solid var(--border); background: rgba(5,5,5,0.95);
+            flex-shrink: 0; z-index: 50;
         }
         .logo { font-weight: 800; font-size: 1.1rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
 
-        /* --- THE STAGE --- */
-        .app-view {
-            flex: 1;
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
+        .app-view { flex: 1; position: relative; width: 100%; overflow: hidden; }
 
-        /* --- SCREENS --- */
+        /* SCREENS */
         .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg);
-            display: flex; flex-direction: column;
-            padding: 1.5rem;
-            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: flex; flex-direction: column;
+            padding: 1.5rem; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
-            opacity: 0; 
-            pointer-events: none; 
-            transform: translateY(20px);
-            z-index: 1;
+            opacity: 0; pointer-events: none; transform: translateY(20px); z-index: 1;
         }
+        .screen.active { opacity: 1; pointer-events: auto; transform: translateY(0); z-index: 10; }
+        .screen.prev { transform: scale(0.95); opacity: 0; }
 
-        .screen.active {
-            opacity: 1; 
-            pointer-events: auto; 
-            transform: translateY(0); 
-            z-index: 10;
-        }
+        .content-area { flex: 1; overflow-y: auto; padding-bottom: 1rem; }
+        .btn-area { margin-top: auto; flex-shrink: 0; padding-top: 1rem; background: var(--bg); }
 
-        .screen.prev {
-            transform: scale(0.95);
-            opacity: 0;
-        }
-
-        /* --- CONTENT & BUTTONS --- */
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 1rem;
-        }
-
-        .btn-area {
-            margin-top: auto;
-            flex-shrink: 0;
-            padding-top: 1rem;
-            background: var(--bg);
-        }
-
-        /* --- COMPONENTS --- */
         h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.1; margin-top: 0.5rem; }
         .sub { color: var(--dim); margin-bottom: 2rem; font-size: 0.9rem; }
 
@@ -108,42 +66,27 @@
             box-shadow: 0 5px 20px rgba(0,255,157,0.15);
         }
         .btn-main:active { transform: scale(0.98); }
+        .btn-main.disabled { background: #333; color: #666; pointer-events: none; box-shadow: none; }
 
-        /* --- QUOTE BOX --- */
         .quote-box {
             background: rgba(0,255,157,0.05); border: 1px solid var(--accent);
             padding: 1.5rem; border-radius: 16px; text-align: center; margin-bottom: 2rem;
         }
         .price-tag { font-size: 3rem; font-weight: 800; color: var(--accent); }
 
-        /* --- WARNING BOX --- */
         .warning-box {
-            margin-top: 1rem;
-            background: rgba(255, 170, 0, 0.1);
-            border-left: 3px solid var(--warning);
-            padding: 1rem;
-            border-radius: 0 8px 8px 0;
+            margin-top: 1rem; background: rgba(255, 170, 0, 0.1);
+            border-left: 3px solid var(--warning); padding: 1rem; border-radius: 0 8px 8px 0;
         }
 
-        /* --- SCANNER --- */
-        #canvas-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none; opacity: 0.6;
-        }
+        /* SCANNER */
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6; }
+        .scan-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 20; }
         
-        .scan-ui {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; z-index: 20;
-        }
-
         .fingerprint-zone {
-            width: 100px; height: 100px;
-            border: 2px dashed #333; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 2rem; position: relative;
-            transition: 0.3s;
+            width: 100px; height: 100px; border: 2px dashed #333; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; position: relative; transition: 0.3s;
         }
-        
         .fingerprint-zone::before { content: ''; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; }
         .fingerprint-zone.scanning { border-color: var(--accent); border-style: solid; box-shadow: 0 0 40px var(--accent); transform: scale(1.1); }
         .scan-icon { width: 50px; height: 50px; color: #333; transition: 0.3s; }
@@ -152,15 +95,18 @@
         .progress-bar { width: 60%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
         .fill { width: 0%; height: 100%; background: var(--accent); }
 
-        /* --- SUCCESS SCREEN --- */
+        /* SUCCESS */
         .success-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 100; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem;
         }
         .check-anim { width: 80px; height: 80px; color: var(--accent); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
+        .step-list { text-align: left; margin-top: 2rem; font-size: 0.8rem; color: #666; border: 1px solid #222; padding: 1rem; border-radius: 12px; width: 100%; }
+        .step-item { margin-bottom: 0.5rem; display: flex; gap: 10px; align-items: center; }
+        .step-done { color: var(--accent); }
     </style>
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
@@ -170,7 +116,7 @@
 
     <nav>
         <div class="logo"><i data-feather="hexagon"></i> PAWN PASS</div>
-        <div style="font-size: 0.7rem; color: var(--dim);">BETA v0.9</div>
+        <div style="font-size: 0.7rem; color: var(--dim);">BETA v1.0</div>
     </nav>
 
     <div class="app-view">
@@ -183,10 +129,11 @@
                 
                 <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">ASSET</label>
                 <select id="itemSelect">
-                    <option value="385">Sony PlayStation 5</option>
-                    <option value="850">MacBook Pro M1</option>
-                    <option value="8400">Rolex Submariner</option>
-                    <option value="620">iPhone 14 Pro</option>
+                    <option value="385">Sony PlayStation 5 ($385)</option>
+                    <option value="850">MacBook Pro M1 ($850)</option>
+                    <option value="4000">Omega Seamaster ($4,000)</option>
+                    <option value="8400">Rolex Submariner ($8,400)</option>
+                    <option value="15000">Patek Philippe ($15,000)</option>
                 </select>
                 
                 <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">CONDITION</label>
@@ -196,7 +143,6 @@
                     <option>Fair</option>
                 </select>
                 
-                <!-- THE WARNING BOX -->
                 <div class="warning-box">
                     <div style="color: var(--warning); font-size: 0.75rem; font-weight: bold; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 5px;">
                         <i data-feather="alert-triangle" style="width: 12px;"></i> IMPORTANT
@@ -205,11 +151,9 @@
                         Please be accurate with grading. Discrepancies discovered during physical inspection will void this offer immediately.
                     </p>
                 </div>
-
             </div>
-            
             <div class="btn-area">
-                <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
+                <button class="btn-main" onclick="calcQuote()">GET OFFER</button>
             </div>
         </div>
 
@@ -217,17 +161,17 @@
         <div class="screen" id="screen2">
             <div class="content-area">
                 <div style="text-align: center;">
-                    <p class="sub" style="margin-bottom: 1rem;">INSTANT OFFER</p>
+                    <p class="sub" style="margin-bottom: 1rem;" id="quoteTitle">INSTANT OFFER</p>
                     <div class="quote-box">
                         <div class="price-tag" id="priceDisplay">$0.00</div>
-                        <div style="color: var(--dim); font-size: 0.8rem; margin-top: 0.5rem;">Funds ready for transfer</div>
+                        <div style="color: var(--dim); font-size: 0.8rem; margin-top: 0.5rem;" id="fundsText">Funds ready for transfer</div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" id="specsGrid">
                     <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
-                        <div style="color: #666; font-size: 0.7rem;">RATE</div>
-                        <div style="font-weight: bold;">5.0%</div>
+                        <div style="color: #666; font-size: 0.7rem;">RATE (MO)</div>
+                        <div style="font-weight: bold;" id="rateDisplay">0%</div>
                     </div>
                     <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
                         <div style="color: #666; font-size: 0.7rem;">TERM</div>
@@ -237,7 +181,7 @@
             </div>
 
             <div class="btn-area">
-                <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
+                <button class="btn-main" id="acceptBtn" onclick="toScreen3()">ACCEPT & SIGN</button>
                 <button style="width:100%; padding:1rem; background:transparent; border:none; color:#666;" onclick="reset()">Decline Offer</button>
             </div>
         </div>
@@ -254,33 +198,86 @@
                 <div class="progress-bar"><div class="fill" id="scanFill"></div></div>
                 <div id="scanText" style="margin-top: 1.5rem; font-size: 0.8rem; color: #444; letter-spacing: 2px;">WAITING FOR BIOMETRICS</div>
             </div>
-            
             <div id="canvas-container"></div>
         </div>
 
     </div>
 
-    <!-- SUCCESS SCREEN -->
+    <!-- SUCCESS SCREEN (UPDATED COPY) -->
     <div class="success-overlay" id="successScreen">
-        <i data-feather="check-circle" class="check-anim"></i>
-        <h1 style="margin-top: 2rem;">FUNDS SENT</h1>
-        <p style="color: #666;">Courier Dispatched.</p>
-        <div style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; color: #888; border-radius: 8px; font-family: monospace;">TXID: #9942-XF</div>
-        <button style="margin-top: 3rem; background: transparent; border: 1px solid #333; color: #fff; padding: 0.8rem 2rem; border-radius: 20px;" onclick="reset()">DONE</button>
+        <i data-feather="truck" class="check-anim"></i>
+        <h1 style="margin-top: 2rem;">COURIER DISPATCHED</h1>
+        <p style="color: #666;">Driver en route to your location.</p>
+        
+        <div class="step-list">
+            <div class="step-item step-done"><i data-feather="check" style="width:14px"></i> Contract Signed</div>
+            <div class="step-item step-done"><i data-feather="check" style="width:14px"></i> Courier Assigned</div>
+            <div class="step-item"><i data-feather="circle" style="width:14px"></i> Physical Inspection</div>
+            <div class="step-item"><i data-feather="circle" style="width:14px"></i> Funds Release</div>
+        </div>
+
+        <button style="margin-top: 3rem; background: transparent; border: 1px solid #333; color: #fff; padding: 0.8rem 2rem; border-radius: 20px;" onclick="reset()">CLOSE</button>
     </div>
 
-    <!-- SCRIPT 1: LOGIC (Instantly Interactive) -->
+    <!-- LOGIC SCRIPT -->
     <script>
-        // --- NAVIGATION ---
-        function toScreen2() {
-            const val = document.getElementById('itemSelect').value;
-            document.getElementById('priceDisplay').innerText = '$' + val;
+        // --- CALCULATION LOGIC ---
+        function calcQuote() {
+            const val = parseInt(document.getElementById('itemSelect').value);
+            const priceDisplay = document.getElementById('priceDisplay');
+            const rateDisplay = document.getElementById('rateDisplay');
+            const acceptBtn = document.getElementById('acceptBtn');
+            const specsGrid = document.getElementById('specsGrid');
+            const quoteTitle = document.getElementById('quoteTitle');
+            const fundsText = document.getElementById('fundsText');
+
+            // RESET UI
+            acceptBtn.classList.remove('disabled');
+            acceptBtn.innerText = "ACCEPT & SIGN";
+            specsGrid.style.display = "grid";
+            quoteTitle.innerText = "INSTANT OFFER";
+            fundsText.innerText = "Funds ready for transfer";
+
+            let rate = 0;
+
+            // LOGIC TREE
+            if (val >= 10000) {
+                // CONCIERGE PROTOCOL
+                priceDisplay.innerText = "CALL US";
+                priceDisplay.style.fontSize = "2.5rem";
+                rateDisplay.innerText = "N/A";
+                fundsText.innerText = "High-value asset protocol required.";
+                
+                // Disable Instant Accept
+                acceptBtn.innerText = "REQUEST CALLBACK";
+                acceptBtn.onclick = function() { alert("Concierge team notified."); };
+                
+                // Hide Rates
+                specsGrid.style.display = "none";
+            } 
+            else {
+                // STANDARD PROTOCOL
+                if (val > 5000) {
+                    rate = 15; // $5k - $10k
+                } else if (val > 1000) {
+                    rate = 20; // $1k - $5k
+                } else {
+                    rate = 35; // $50 - $1k
+                }
+                
+                priceDisplay.innerText = '$' + val.toLocaleString();
+                rateDisplay.innerText = rate + '%';
+                
+                // Ensure button points to scanner
+                acceptBtn.onclick = toScreen3;
+            }
+
             switchScreen('screen1', 'screen2');
         }
 
+        // --- NAVIGATION ---
         function toScreen3() {
             switchScreen('screen2', 'screen3');
-            // Trigger 3D init if ready
             if(window.initParticles) window.initParticles();
             else window.startParticlesOnLoad = true;
         }
@@ -295,7 +292,7 @@
             next.classList.remove('prev');
         }
 
-        // --- SCANNER LOGIC ---
+        // --- SCANNER ---
         const zone = document.getElementById('scanZone');
         const fill = document.getElementById('scanFill');
         const text = document.getElementById('scanText');
@@ -315,7 +312,7 @@
                 if(isScanning) {
                     scanProgress += 2;
                     fill.style.width = scanProgress + '%';
-                    if(window.setScanState) window.setScanState(true); // 3D Speed Up
+                    if(window.setScanState) window.setScanState(true); 
 
                     if(scanProgress >= 100) {
                         clearInterval(scanInterval);
@@ -334,7 +331,7 @@
             text.style.color = "#444";
             scanProgress = 0;
             fill.style.width = '0%';
-            if(window.setScanState) window.setScanState(false); // 3D Slow Down
+            if(window.setScanState) window.setScanState(false);
         }
 
         if(zone) {
@@ -347,7 +344,7 @@
         if(typeof feather !== 'undefined') feather.replace();
     </script>
 
-    <!-- SCRIPT 2: VISUALS (Loads Background) -->
+    <!-- VISUALS SCRIPT -->
     <script type="module">
         import * as THREE from 'three';
         if(typeof feather !== 'undefined') feather.replace();
