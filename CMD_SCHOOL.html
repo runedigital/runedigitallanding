@@ -65,21 +65,19 @@
     #output::-webkit-scrollbar { width: 6px; }
     #output::-webkit-scrollbar-track { background: #000; }
     #output::-webkit-scrollbar-thumb { background: #333; }
-    
-  /* --- MOBILE FORCE LANDSCAPE --- */
+
+    /* --- MOBILE FORCE LANDSCAPE --- */
     @media only screen and (max-width: 900px) and (orientation: portrait) {
         body::before {
             content: "SYSTEM ERROR: VERTICAL ORIENTATION DETECTED.\00000a\00000a>> ROTATE DEVICE TO LANDSCAPE\00000a>> OR USE DESKTOP TERMINAL.";
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #00ffea; z-index: 999999;
             display: flex; align-items: center; justify-content: center; text-align: center;
-            white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; pointer-events: all;
+            white-space: pre-wrap; font-family: monospace; font-size: 12px; padding: 20px; pointer-events: all;
         }
-        /* Hide everything else behind it */
-        #ui, #console, #viewport, canvas { opacity: 0.1; }
+        #console, #viewport { opacity: 0.1; }
     }
-
-</style>
+  </style>
 </head>
 <body>
 
@@ -90,7 +88,7 @@
 
   <div id="console">
     <div id="console-header">
-      <span>RUNE // CMD_SCHOOL // V2.6 [ARCHITECT]</span>
+      <span>RUNE // CMD_SCHOOL // V2.7</span>
       <span id="access-level">ACCESS: GUEST</span>
     </div>
     <div id="output"></div>
@@ -103,10 +101,11 @@
   <script>
     // --- CONFIGURATION ---
     const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeowgdnn"; 
-    const MASTER_KEY = "0xrune_master"; 
+    const MASTER_KEY = "0xrune_master"; // LOWERCASE FOR SAFETY
+    
     const LINKS = {
-        OPERATOR: "https://buy.stripe.com/5kQeVfesI50iew81HT6Ri01",
-        ARCHITECT: "https://buy.stripe.com/8x2dRbbgwcsKbjW2LX6Ri02"
+        OPERATOR: "https://buy.stripe.com/8x2dRbbgwcsKbjW2LX",
+        ARCHITECT: "https://buy.stripe.com/5kQeVfesI50iew81HT"
     };
 
     // --- 1. GRAPHICS ENGINE ---
@@ -187,8 +186,6 @@
     }
 
     // --- 3. VISUAL FX ---
-    
-    // PARTICLES
     let particles = [];
     function spawnParticles() {
       const cx = W / 2; const cy = H / 2;
@@ -210,7 +207,6 @@
     }
     animateParticles();
 
-    // MATRIX
     const mCanvas = document.getElementById('matrix-overlay');
     const mCtx = mCanvas.getContext('2d');
     let matrixActive = false; let drops = [];
@@ -320,15 +316,18 @@
       if (MODE === 'CMD') {
         const cmd = val.toLowerCase(); const parts = cmd.split(' ');
 
-     // AUTHENTICATION
+        // AUTH
         if (parts[0] === 'auth') {
-            // Compare the raw input part, NOT the lowercased cmd part
-            // We need to split the original 'val' (raw input)
-            const rawParts = val.trim().split(' ');
-            
-            if (rawParts[1] === MASTER_KEY) {
-                 // ... success
-            }
+            // CASE INSENSITIVE CHECK
+            if (parts[1] && parts[1].toLowerCase() === MASTER_KEY) { 
+                USER_LEVEL = 'SYNDICATE'; 
+                document.getElementById('access-level').textContent = "ACCESS: SYNDICATE_MASTER"; 
+                document.getElementById('access-level').style.color = "#00ffea"; 
+                log(">> AUTHENTICATION SUCCESSFUL.", "log-ok"); 
+                log(">> BLACK MAGIC MODULES UNLOCKED.", "log-ok");
+            } else { log(">> ERROR: INVALID KEY.", "log-error"); }
+            return;
+        }
 
         // COMMANDS
         if (cmd === "help") { log("signup, reactor, auth, lesson [n], circle, square, matrix, glitch, visualize", "log-system"); }
@@ -338,12 +337,7 @@
         else if (cmd === "square") { drawSquare(); log("Square.", "log-ok"); }
         else if (cmd === "particles") { spawnParticles(); log("Emitter active.", "log-ok"); }
         else if (cmd === "matrix") { 
-            if(USER_LEVEL === 'GUEST' && !lessons[4]) { // Optional: Allow matrix for free? No, lock it to Lesson 4 
-                // Actually let's allow matrix as a tease, but lock the LESSON text
-                toggleMatrix(); log("Loading...", "log-ok");
-            } else {
-                toggleMatrix(); log("Loading...", "log-ok"); 
-            }
+            toggleMatrix(); log("Loading...", "log-ok");
         }
         
         // PRO COMMANDS
@@ -395,7 +389,7 @@
       output.scrollTop = output.scrollHeight;
     }
     inputLine.addEventListener("keydown", (e) => { if (e.key === "Enter") { handleInput(inputLine.value); inputLine.value = ""; } });
-    window.onload = () => { inputLine.focus(); log("RUNE SYSTEMS [V2.6]", "log-system"); log("Type 'help' to begin.", "log-ok"); };
+    window.onload = () => { inputLine.focus(); log("RUNE SYSTEMS [V2.7]", "log-system"); log("Type 'help' to begin.", "log-ok"); };
   </script>
 </body>
 </html>
