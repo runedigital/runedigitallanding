@@ -5,167 +5,243 @@
   <title>CMD_SCHOOL // RUNE</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
-    body { margin: 0; background: #050505; color: #00ffea; font-family: "JetBrains Mono", monospace; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+    body {
+      margin: 0; background: #050505; color: #00ffea;
+      font-family: "JetBrains Mono", monospace;
+      overflow: hidden; display: flex; flex-direction: column; height: 100vh;
+    }
+
+    /* Canvas Area */
     #viewport { flex: 1; position: relative; overflow: hidden; }
     #bg { display: block; width: 100%; height: 100%; }
-    #matrix-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.8; mix-blend-mode: screen; display: none; }
-    #console { height: 240px; border-top: 1px solid #333; background: #0a0a0a; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 10; }
-    #console-header { padding: 8px 12px; font-size: 10px; letter-spacing: 2px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; color: #555; text-transform: uppercase; }
-    #output { flex: 1; padding: 12px; font-size: 13px; overflow-y: auto; line-height: 1.5; scroll-behavior: smooth; }
+    
+    /* Matrix Overlay */
+    #matrix-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; opacity: 0.8; mix-blend-mode: screen; display: none;
+    }
+
+    /* Console Area */
+    #console {
+      height: 240px; border-top: 1px solid #333; background: #0a0a0a;
+      display: flex; flex-direction: column;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5); z-index: 10;
+    }
+
+    #console-header {
+      padding: 8px 12px; font-size: 10px; letter-spacing: 2px;
+      border-bottom: 1px solid #222; display: flex; justify-content: space-between;
+      color: #555; text-transform: uppercase;
+    }
+
+    #output {
+      flex: 1; padding: 12px; font-size: 13px; overflow-y: auto;
+      line-height: 1.5; scroll-behavior: smooth;
+    }
+
     #input-row { display: flex; border-top: 1px solid #222; background: #000; }
-    #prompt-label { padding: 10px 6px 10px 12px; font-size: 13px; color: #00ffea; font-weight: bold; }
-    #input-line { flex: 1; padding: 10px; font-size: 13px; background: transparent; border: none; color: #fff; outline: none; font-family: inherit; }
+    
+    #prompt-label {
+      padding: 10px 6px 10px 12px; font-size: 13px; color: #00ffea; font-weight: bold;
+    }
+
+    #input-line {
+      flex: 1; padding: 10px; font-size: 13px; background: transparent;
+      border: none; color: #fff; outline: none; font-family: inherit;
+    }
+
+    /* Log Styles */
     .log-line { color: #ccc; margin-bottom: 2px; }
     .log-system { color: #555; font-style: italic; }
     .log-error { color: #ff3366; }
     .log-ok { color: #00ffea; text-shadow: 0 0 5px rgba(0, 255, 234, 0.3); }
     .log-warn { color: #ffcc00; }
     .log-input { color: #fff; font-weight: bold; }
-    .log-locked { color: #ff0055; font-weight: bold; opacity: 0.9; }
-    .log-tier { color: #fff; margin-left: 10px; border-left: 2px solid #444; padding-left: 10px; }
+    .log-locked { color: #ff0055; font-weight: bold; opacity: 0.9; border-left: 2px solid #ff0055; padding-left: 10px; }
+    .log-tier { color: #fff; margin-left: 10px; border-left: 2px solid #444; padding-left: 10px; margin-bottom: 5px; }
+
+    /* Scrollbar */
     #output::-webkit-scrollbar { width: 6px; }
     #output::-webkit-scrollbar-track { background: #000; }
     #output::-webkit-scrollbar-thumb { background: #333; }
   </style>
 </head>
 <body>
-  <div id="viewport"><canvas id="bg"></canvas><canvas id="matrix-overlay"></canvas></div>
-  <div id="console">
-    <div id="console-header"><span>RUNE // CMD_SCHOOL // V2.5 [COMMERCIAL]</span><span id="access-level">ACCESS: GUEST</span></div>
-    <div id="output"></div>
-    <div id="input-row"><span id="prompt-label">&gt;</span><input id="input-line" autocomplete="off" autofocus /></div>
+
+  <div id="viewport">
+    <canvas id="bg"></canvas>
+    <canvas id="matrix-overlay"></canvas>
   </div>
+
+  <div id="console">
+    <div id="console-header">
+      <span>RUNE // CMD_SCHOOL // V2.6 [ARCHITECT]</span>
+      <span id="access-level">ACCESS: GUEST</span>
+    </div>
+    <div id="output"></div>
+    <div id="input-row">
+      <span id="prompt-label">&gt;</span>
+      <input id="input-line" autocomplete="off" autofocus />
+    </div>
+  </div>
+
   <script>
     // --- CONFIGURATION ---
     const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeowgdnn"; 
     const MASTER_KEY = "0xRUNE_MASTER"; 
     const LINKS = {
-        OPERATOR: "https://buy.stripe.com/YOUR_9_DOLLAR_LINK",
-        ARCHITECT: "https://buy.stripe.com/YOUR_99_DOLLAR_LINK"
+        OPERATOR: "https://buy.stripe.com/test_4gMfZa7OW6jJ6eKec74wM01",
+        ARCHITECT: "https://buy.stripe.com/test_3cI14g6KS37x8mS6JF4wM00"
     };
 
-    // --- GRAPHICS ENGINE ---
-    const canvas = document.getElementById("bg"); const ctx = canvas.getContext("2d"); let W, H;
-    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = document.getElementById('viewport').clientHeight; if(!window.hasInitialized) { drawGrid(); window.hasInitialized = true; } }
-    window.addEventListener("resize", resize); setTimeout(resize, 10);
-    function drawGrid() { ctx.fillStyle = "#050505"; ctx.fillRect(0, 0, W, H); ctx.strokeStyle = "#111"; ctx.lineWidth = 1; const step = 50; ctx.beginPath(); for (let x = 0; x < W; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, H); } for (let y = 0; y < H; y += step) { ctx.moveTo(0, y); ctx.lineTo(W, y); } ctx.stroke(); }
-    function clearCanvas() { drawGrid(); particles = []; }
-    function drawCircle() { const x = Math.random() * (W - 100) + 50; const y = Math.random() * (H - 100) + 50; const r = Math.random() * 30 + 20; ctx.strokeStyle = "#00ffea"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke(); ctx.fillStyle = "rgba(0, 255, 234, 0.1)"; ctx.fill(); }
-    function drawSquare() { const size = Math.random() * 60 + 40; const x = Math.random() * (W - size); const y = Math.random() * (H - size); ctx.strokeStyle = "#ff0055"; ctx.lineWidth = 2; ctx.strokeRect(x, y, size, size); ctx.fillStyle = "rgba(255, 0, 85, 0.1)"; ctx.fillRect(x, y, size, size); }
+    // --- 1. GRAPHICS ENGINE ---
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    let W, H;
 
-    const output = document.getElementById("output"); let msgQueue = []; let isTyping = false;
-    function log(msg, cls = "log-line") { msgQueue.push({ text: msg, cls: cls }); processQueue(); }
-    function processQueue() { if (isTyping || msgQueue.length === 0) return; isTyping = true; const item = msgQueue.shift(); const div = document.createElement("div"); div.className = item.cls; output.appendChild(div); const speed = item.text.length > 50 ? 5 : 15; let i = 0; function typeChar() { if (i < item.text.length) { div.textContent += item.text.charAt(i); i++; output.scrollTop = output.scrollHeight; setTimeout(typeChar, speed); } else { isTyping = false; processQueue(); } } typeChar(); }
-
-    let particles = []; function spawnParticles() { const cx = W / 2; const cy = H / 2; for (let i = 0; i < 50; i++) { particles.push({ x: cx, y: cy, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 1.0, color: Math.random() > 0.5 ? "#00ffea" : "#ff0055" }); } }
-    function animateParticles() { particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.life -= 0.02; ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, 3, 3); ctx.globalAlpha = 1.0; if(p.life <= 0) particles.splice(i, 1); }); requestAnimationFrame(animateParticles); } animateParticles();
-
-    const mCanvas = document.getElementById('matrix-overlay'); const mCtx = mCanvas.getContext('2d'); let matrixActive = false; let drops = [];
-    function toggleMatrix() { if(matrixActive) { mCanvas.style.display = 'none'; matrixActive = false; return; } mCanvas.style.display = 'block'; mCanvas.width = W; mCanvas.height = H; drops = Array(Math.floor(W/20)).fill(1); matrixActive = true; drawMatrix(); }
-    function drawMatrix() { if(!matrixActive) return; mCtx.fillStyle = 'rgba(0, 0, 0, 0.05)'; mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height); mCtx.fillStyle = '#0F0'; mCtx.font = '15px monospace'; for(let i = 0; i < drops.length; i++) { const text = String.fromCharCode(0x30A0 + Math.random() * 96); mCtx.fillText(text, i * 20, drops[i] * 20); if(drops[i] * 20 > mCanvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; } requestAnimationFrame(drawMatrix); }
-
-    const inputLine = document.getElementById("input-line"); const promptLabel = document.getElementById("prompt-label");
-    let MODE = 'CMD'; let USER_LEVEL = 'GUEST'; let userData = { name: '', email: '' };
-    const lessons = { 
-        1: ["// LESSON 1: INITIATION", "Try commands: 'circle', 'square', 'clear'", "Stack them to create art."], 
-        2: ["// LESSON 2: CHAOS", "Type 'particles' for kinetic energy.", "Type 'matrix' to see the source."], 
-        3: ["// LESSON 3: THE UPLINK", "Type 'signup' to join the RUNE network."] 
-const lessons = {
-      // FREE TIER
-      1: [
-          "// LESSON 1: INITIATION", 
-          "You are an operator. This terminal is your wand.", 
-          "Commands: 'circle', 'square', 'clear'", 
-          "Goal: Stack shapes to create a composition."
-      ],
-      2: [
-          "// LESSON 2: CHAOS", 
-          "Entropy is a tool. Use it.", 
-          "Command: 'particles'", 
-          "Goal: Trigger multiple particle bursts to simulate an explosion.",
-          "Tip: Don't clear the canvas between bursts."
-      ],
-      3: [
-          "// LESSON 3: THE UPLINK", 
-          "You are ready for the network.", 
-          "Command: 'signup'", 
-          "Goal: Register your frequency to save progress and unlock the Architect Tier."
-      ],
-      
-      // PAID TIER (LOCKED BEHIND AUTH)
-      4: [
-          "// LESSON 4: THE MATRIX [ARCHITECT CLEARANCE]", 
-          "We are tearing down the simulation.", 
-          "New Command Unlocked: 'matrix'", 
-          "Concept: Arrays & Loops.", 
-          "The Matrix rain isn't a video. It is thousands of text strings falling in a 'Loop'.",
-          "Each column is an index in an Array. We update the Y position every frame.",
-          "TASK: Type 'matrix' and watch the code flow."
-      ],
-      5: [
-          "// LESSON 5: ENTROPY TEXT [ARCHITECT CLEARANCE]", 
-          "Static text is dead. Make it breathe.", 
-          "New Command Unlocked: 'glitch'", 
-          "Concept: String Manipulation.", 
-          "We swap characters randomly every 50ms before resolving to the final string.",
-          "This creates the 'Decryption' effect you see in the HUB.",
-          "TASK: Type 'glitch' to destabilize the console."
-      ],
-      6: [
-          "// LESSON 6: FREQUENCY [ARCHITECT CLEARANCE]", 
-          "See the sound. Hear the code.", 
-          "New Command Unlocked: 'visualize'", 
-          "Concept: Fast Fourier Transform (FFT).", 
-          "We tap into the microphone, break the audio into frequencies, and map them to bar height.",
-          "TASK: Type 'visualize', allow microphone access, and play music."
-      ]
-    };
-    
-
-
-
-};
-
-    async function sendData() {
-      log("PACKING DATA...", "log-system");
-      if (FORMSPREE_ENDPOINT.includes("YOUR_FORM_ID")) { log("ERROR: ENDPOINT_MISSING.", "log-error"); return; }
-      try {
-        const response = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
-        if (response.ok) { log(">> TRANSMISSION SUCCESSFUL.", "log-ok"); } else { log(">> ERROR: SERVER REJECTED.", "log-error"); }
-      } catch (error) { log(">> FATAL: CONNECTION FAILED.", "log-error"); }
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = document.getElementById('viewport').clientHeight;
+      if(!window.hasInitialized) { drawGrid(); window.hasInitialized = true; }
     }
- // --- LESSON 5: GLITCH EFFECT ---
+    window.addEventListener("resize", resize);
+    setTimeout(resize, 10);
+
+    function drawGrid() {
+      ctx.fillStyle = "#050505"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "#111"; ctx.lineWidth = 1;
+      const step = 50;
+      ctx.beginPath();
+      for (let x = 0; x < W; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+      for (let y = 0; y < H; y += step) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+      ctx.stroke();
+    }
+
+    function clearCanvas() { 
+        drawGrid(); 
+        particles = []; 
+        visActive = false;
+        if(matrixActive) toggleMatrix();
+    }
+
+    function drawCircle() {
+      const x = Math.random() * (W - 100) + 50;
+      const y = Math.random() * (H - 100) + 50;
+      const r = Math.random() * 30 + 20;
+      ctx.strokeStyle = "#00ffea"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = "rgba(0, 255, 234, 0.1)"; ctx.fill();
+    }
+
+    function drawSquare() {
+      const size = Math.random() * 60 + 40;
+      const x = Math.random() * (W - size);
+      const y = Math.random() * (H - size);
+      ctx.strokeStyle = "#ff0055"; ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, size, size);
+      ctx.fillStyle = "rgba(255, 0, 85, 0.1)"; ctx.fillRect(x, y, size, size);
+    }
+
+    // --- 2. TEXT ENGINE ---
+    const output = document.getElementById("output");
+    let msgQueue = []; let isTyping = false;
+
+    function log(msg, cls = "log-line") {
+      msgQueue.push({ text: msg, cls: cls });
+      processQueue();
+    }
+
+    function processQueue() {
+      if (isTyping || msgQueue.length === 0) return;
+      isTyping = true;
+      const item = msgQueue.shift();
+      const div = document.createElement("div");
+      div.className = item.cls;
+      output.appendChild(div);
+      
+      const speed = item.text.length > 50 ? 5 : 15; 
+      let i = 0;
+      function typeChar() {
+        if (i < item.text.length) {
+          div.textContent += item.text.charAt(i);
+          i++; output.scrollTop = output.scrollHeight;
+          setTimeout(typeChar, speed);
+        } else { isTyping = false; processQueue(); }
+      }
+      typeChar();
+    }
+
+    // --- 3. VISUAL FX ---
+    
+    // PARTICLES
+    let particles = [];
+    function spawnParticles() {
+      const cx = W / 2; const cy = H / 2;
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: cx, y: cy, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10,
+          life: 1.0, color: Math.random() > 0.5 ? "#00ffea" : "#ff0055"
+        });
+      }
+    }
+    function animateParticles() {
+      particles.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+        ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, 3, 3);
+        ctx.globalAlpha = 1.0;
+        if(p.life <= 0) particles.splice(i, 1);
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // MATRIX
+    const mCanvas = document.getElementById('matrix-overlay');
+    const mCtx = mCanvas.getContext('2d');
+    let matrixActive = false; let drops = [];
+    function toggleMatrix() {
+      if(matrixActive) { mCanvas.style.display = 'none'; matrixActive = false; return; }
+      mCanvas.style.display = 'block'; mCanvas.width = W; mCanvas.height = H;
+      drops = Array(Math.floor(W/20)).fill(1); matrixActive = true; drawMatrix();
+    }
+    function drawMatrix() {
+      if(!matrixActive) return;
+      mCtx.fillStyle = 'rgba(0, 0, 0, 0.05)'; mCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
+      mCtx.fillStyle = '#0F0'; mCtx.font = '15px monospace';
+      for(let i = 0; i < drops.length; i++) {
+        const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+        mCtx.fillText(text, i * 20, drops[i] * 20);
+        if(drops[i] * 20 > mCanvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+      requestAnimationFrame(drawMatrix);
+    }
+
+    // GLITCH
     function triggerGlitch() {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
         const target = "SYSTEM FAILURE // REALITY COMPROMISED // REBOOTING...";
         const div = document.createElement("div");
         div.className = "log-error";
         output.appendChild(div);
-        
         let iterations = 0;
         const interval = setInterval(() => {
             div.textContent = target.split("").map((letter, index) => {
                 if(index < iterations) return target[index];
                 return chars[Math.floor(Math.random() * chars.length)]
             }).join("");
-            
-            if(iterations >= target.length){ 
-                clearInterval(interval);
-                div.className = "log-ok"; // Turn green on success
-            }
-            iterations += 1/3; // Speed
-            output.scrollTop = output.scrollHeight;
+            if(iterations >= target.length){ clearInterval(interval); div.className = "log-ok"; }
+            iterations += 1/3; output.scrollTop = output.scrollHeight;
         }, 30);
     }
 
-    // --- LESSON 6: AUDIO VISUALIZER ---
+    // AUDIO VISUALIZER
     let audioContext, analyser, source;
     let visActive = false;
-    
     async function startVisualizer() {
         if(visActive) return;
         log(">> INITIALIZING AUDIO CORE...", "log-warn");
-        
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -176,103 +252,138 @@ const lessons = {
             visActive = true;
             drawVisualizer();
             log(">> MIC ACTIVE. PLAY MUSIC.", "log-ok");
-        } catch(e) {
-            log(">> ERROR: MIC BLOCKED.", "log-error");
-        }
+        } catch(e) { log(">> ERROR: MIC BLOCKED.", "log-error"); }
     }
-
     function drawVisualizer() {
         if(!visActive) return;
         const bufferLength = analyser.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
         analyser.getByteFrequencyData(dataArray);
-
-        // Overlay visualization on canvas
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Fade effect
-        ctx.fillRect(0, 0, W, H);
-        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.fillRect(0, 0, W, H);
         const barWidth = (W / bufferLength) * 2.5;
         let x = 0;
-
         for(let i = 0; i < bufferLength; i++) {
             const barHeight = dataArray[i] * 2;
-            ctx.fillStyle = `rgb(0, ${barHeight + 100}, 234)`; // Cyan gradient
+            ctx.fillStyle = `rgb(0, ${barHeight + 100}, 234)`;
             ctx.fillRect(x, H - barHeight/2, barWidth, barHeight/2);
             x += barWidth + 1;
         }
         requestAnimationFrame(drawVisualizer);
     }
 
+    // --- 4. COMMAND LOGIC ---
+    const inputLine = document.getElementById("input-line");
+    const promptLabel = document.getElementById("prompt-label");
+    
+    let MODE = 'CMD';
+    let USER_LEVEL = 'GUEST'; 
+    let userData = { name: '', email: '' };
+
+    const lessons = {
+      // FREE
+      1: ["// LESSON 1: INITIATION", "Commands: 'circle', 'square', 'clear'", "Goal: Stack shapes."],
+      2: ["// LESSON 2: CHAOS", "Command: 'particles'", "Goal: Create kinetic energy."],
+      3: ["// LESSON 3: THE UPLINK", "Command: 'signup'", "Goal: Join the Network."],
+      // PAID
+      4: ["// LESSON 4: MATRIX [ARCHITECT]", "Command: 'matrix'", "Concept: Arrays & Loops."],
+      5: ["// LESSON 5: ENTROPY [ARCHITECT]", "Command: 'glitch'", "Concept: String Manipulation."],
+      6: ["// LESSON 6: FREQUENCY [ARCHITECT]", "Command: 'visualize'", "Concept: FFT Audio Analysis."]
+    };
+
+    async function sendData() {
+      log("PACKING DATA...", "log-system");
+      if (FORMSPREE_ENDPOINT.includes("YOUR_FORM_ID")) { log("ERROR: ENDPOINT_MISSING.", "log-error"); return; }
+      try {
+        const response = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
+        if (response.ok) { log(">> TRANSMISSION SUCCESSFUL.", "log-ok"); } else { log(">> ERROR: SERVER REJECTED.", "log-error"); }
+      } catch (error) { log(">> FATAL: CONNECTION FAILED.", "log-error"); }
+    }
+
     function handleInput(raw) {
       const val = raw.trim(); if (!val) return;
       const div = document.createElement("div"); div.className = "log-input"; div.textContent = (MODE === 'CMD' ? "> " : "") + val; output.appendChild(div);
+
       if (MODE === 'CMD') {
         const cmd = val.toLowerCase(); const parts = cmd.split(' ');
+
+        // AUTH
         if (parts[0] === 'auth') {
-            if (parts[1] === MASTER_KEY) { USER_LEVEL = 'SYNDICATE'; document.getElementById('access-level').textContent = "ACCESS: SYNDICATE_MASTER"; document.getElementById('access-level').style.color = "#00ffea"; log(">> AUTHENTICATION SUCCESSFUL.", "log-ok"); } 
-            else { log(">> ERROR: INVALID KEY.", "log-error"); }
+            if (parts[1] === MASTER_KEY) { 
+                USER_LEVEL = 'SYNDICATE'; 
+                document.getElementById('access-level').textContent = "ACCESS: SYNDICATE_MASTER"; 
+                document.getElementById('access-level').style.color = "#00ffea"; 
+                log(">> AUTHENTICATION SUCCESSFUL.", "log-ok"); 
+                log(">> BLACK MAGIC MODULES UNLOCKED.", "log-ok");
+            } else { log(">> ERROR: INVALID KEY.", "log-error"); }
             return;
         }
-        if (cmd === "help") { log("signup, reactor, auth, lesson [n], circle, square, matrix, clear", "log-system"); }
+
+        // COMMANDS
+        if (cmd === "help") { log("signup, reactor, auth, lesson [n], circle, square, matrix, glitch, visualize", "log-system"); }
         else if (cmd === "signup") { MODE = 'SIGNUP_NAME'; log("ENTER NAME:", "log-system"); promptLabel.textContent = "NAME:"; promptLabel.style.color = "#ffcc00"; }
         else if (cmd === "clear") { clearCanvas(); log("Wiped.", "log-warn"); }
         else if (cmd === "circle") { drawCircle(); log("Circle.", "log-ok"); }
         else if (cmd === "square") { drawSquare(); log("Square.", "log-ok"); }
         else if (cmd === "particles") { spawnParticles(); log("Emitter active.", "log-ok"); }
-        else if (cmd === "matrix") { toggleMatrix(); log("Loading...", "log-ok"); }
+        else if (cmd === "matrix") { 
+            if(USER_LEVEL === 'GUEST' && !lessons[4]) { // Optional: Allow matrix for free? No, lock it to Lesson 4 
+                // Actually let's allow matrix as a tease, but lock the LESSON text
+                toggleMatrix(); log("Loading...", "log-ok");
+            } else {
+                toggleMatrix(); log("Loading...", "log-ok"); 
+            }
+        }
         
-        // REACTOR COMMAND
-        else if (cmd === "reactor") {
-            log(">> INITIALIZING FINANCIAL CORE...", "log-warn");
-            setTimeout(() => {
-                log(">> LAUNCHING MODULE.", "log-ok");
-                window.open('COMPOUND_REACTOR.html', '_blank');
-            }, 1000);
+        // PRO COMMANDS
+        else if (cmd === "glitch") {
+            if(USER_LEVEL === 'GUEST') log(">> LOCKED. UPGRADE REQUIRED.", "log-locked");
+            else triggerGlitch();
+        }
+        else if (cmd === "visualize") {
+            if(USER_LEVEL === 'GUEST') log(">> LOCKED. UPGRADE REQUIRED.", "log-locked");
+            else startVisualizer();
         }
 
+        // REACTOR
+        else if (cmd === "reactor") {
+            log(">> INITIALIZING FINANCIAL CORE...", "log-warn");
+            setTimeout(() => { log(">> LAUNCHING.", "log-ok"); window.open('COMPOUND_REACTOR.html', '_blank'); }, 1000);
+        }
+
+        // LESSONS
         else if (parts[0] === "lesson") {
             const num = parseInt(parts[1]);
-            if (lessons[num]) lessons[num].forEach(l => log(l, "log-system"));
-            else if (num >= 4) { 
-                log(">> ERROR: LESSON LOCKED.", "log-error"); 
-                log(">> MODULES " + num + "+ ARE IN MAINTENANCE MODE.", "log-warn");
-                log(">> PLEASE CHECK BACK LATER.", "log-system");
-            }
-            else log("Lesson not found.", "log-error");
+            if (lessons[num]) {
+                if (num >= 4 && USER_LEVEL === 'GUEST') {
+                    log(">> ERROR: ACCESS DENIED.", "log-error");
+                    log(">> MODULES " + num + "+ ARE ENCRYPTED.", "log-locked");
+                    log("1. OPERATOR ($9/mo)  :: PERSONAL USE", "log-tier");
+                    log("2. ARCHITECT ($99/mo) :: COMMERCIAL USE", "log-tier");
+                    log(">> TYPE 'buy 1' OR 'buy 2' TO UNLOCK.", "log-input");
+                } else {
+                    lessons[num].forEach(l => log(l, "log-system"));
+                }
+            } else { log("Lesson not found.", "log-error"); }
         }
-        else if (cmd === "buy 1" || cmd === "buy 2") {
-            log(">> CONNECTING TO PAYMENT GATEWAY...", "log-system");
-            setTimeout(() => {
-                log(">> ERROR: GATEWAY OFFLINE (PENDING REGISTRATION).", "log-error");
-                log(">> ESTIMATED UPTIME: T-MINUS 7 DAYS.", "log-warn");
-            }, 1000);
+
+        // BUY
+        else if (cmd === "buy 1") {
+            log(">> INITIATING STRIPE [OPERATOR]...", "log-ok");
+            setTimeout(() => window.open(LINKS.OPERATOR, '_blank'), 1000);
+        }
+        else if (cmd === "buy 2") {
+            log(">> INITIATING STRIPE [ARCHITECT]...", "log-warn");
+            setTimeout(() => window.open(LINKS.ARCHITECT, '_blank'), 1000);
         }
         else { log("Unknown: " + cmd, "log-error"); }
       }
-// ... inside handleInput ...
-        
-        else if (cmd === "glitch") {
-            if(USER_LEVEL === 'GUEST') {
-                log(">> ERROR: LOCKED. UPGRADE TO ARCHITECT.", "log-locked");
-            } else {
-                triggerGlitch();
-            }
-        }
-        
-        else if (cmd === "visualize") {
-            if(USER_LEVEL === 'GUEST') {
-                log(">> ERROR: LOCKED. UPGRADE TO ARCHITECT.", "log-locked");
-            } else {
-                startVisualizer();
-            }
-        }
-
+      
       else if (MODE === 'SIGNUP_NAME') { userData.name = val; MODE = 'SIGNUP_EMAIL'; log("ENTER EMAIL:", "log-system"); promptLabel.textContent = "EMAIL:"; }
       else if (MODE === 'SIGNUP_EMAIL') { userData.email = val; sendData(); MODE = 'CMD'; promptLabel.textContent = ">"; promptLabel.style.color = "#00ffea"; }
       output.scrollTop = output.scrollHeight;
     }
     inputLine.addEventListener("keydown", (e) => { if (e.key === "Enter") { handleInput(inputLine.value); inputLine.value = ""; } });
-    window.onload = () => { inputLine.focus(); log("RUNE SYSTEMS [V2.5]", "log-system"); log("Type 'help' to begin.", "log-ok"); };
+    window.onload = () => { inputLine.focus(); log("RUNE SYSTEMS [V2.6]", "log-system"); log("Type 'help' to begin.", "log-ok"); };
   </script>
 </body>
 </html>
