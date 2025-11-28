@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE GOD PROTOCOL // RUNTIME</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: none; /* We build our own cursor */
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* UI OVERLAY */
+        .interface {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none; /* Click through to canvas */
+            text-align: center;
+            mix-blend-mode: difference; /* Inverts colors based on background */
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            margin: 0;
+            font-weight: 100;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #00ffea;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        /* CUSTOM CURSOR */
+        .cursor-ring {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 20;
+            transition: width 0.1s, height 0.1s;
+            mix-blend-mode: exclusion;
+        }
+        
+        .cursor-dot {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: #00ffea;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 21;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="interface">
+        <h1 id="heroText">SYSTEM_VOID</h1>
+        <div class="status">PARTICLES: <span id="count">0</span> // LATENCY: 0ms</div>
+    </div>
+
+    <div class="cursor-ring" id="cRing"></div>
+    <div class="cursor-dot" id="cDot"></div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        /**
+         * CORE ENGINE: FLUID DYNAMICS
+         * Pure Math. No Libraries.
+         */
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        
+        // CONFIGURATION
+        const PARTICLE_COUNT = 4000; // Drop to 1000 if on mobile
+        const CONNECT_DISTANCE = 100;
+        const MOUSE_RADIUS = 200;
+        
+        // MOUSE STATE
+        const mouse = { x: -1000, y: -1000, isActive: false };
+
+        // TEXT SCRAMBLER
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+        const hero = document.getElementById('heroText');
+        
+        // CURSOR UI
+        const cRing = document.getElementById('cRing');
+        const cDot = document.getElementById('cDot');
+
+        // SETUP
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // MOUSE TRACKING
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            mouse.isActive = true;
+            
+            // UI Follow
+            cRing.style.left = `${e.clientX}px`;
+            cRing.style.top = `${e.clientY}px`;
+            cDot.style.left = `${e.clientX}px`;
+            cDot.style.top = `${e.clientY}px`;
+        });
+
+        window.addEventListener('mousedown', () => {
+            cRing.style.width = '60px';
+            cRing.style.height = '60px';
+            explode();
+        });
+
+        window.addEventListener('mouseup', () => {
+            cRing.style.width = '40px';
+            cRing.style.height = '40px';
+        });
+
+        // PARTICLE CLASS
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 2; // Velocity X
+                this.vy = (Math.random() - 0.5) * 2; // Velocity Y
+                this.size = Math.random() * 2;
+                this.color = '#fff';
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                // PHYSICS ENGINE ------------------------
+                
+                // 1. Calculate Distance to Mouse
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // 2. Force Calculation (Repulsion / Attraction)
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+                let maxDistance = MOUSE_RADIUS;
+                let force = (maxDistance - distance) / maxDistance;
+                
+                let directionX = forceDirectionX * force * this.density;
+                let directionY = forceDirectionY * force * this.density;
+
+                if (distance < MOUSE_RADIUS) {
+                    // If close to mouse, move away (Repulsion Field)
+                    // CHANGE to -= to += to make it a Black Hole (Attraction)
+                    this.x -= directionX;
+                    this.y -= directionY;
+                    
+                    // Color shift based on energy
+                    this.color = `rgb(${255 - (distance)}, 0, ${distance + 100})`;
+                } else {
+                    // Return to chaos (Velocity movement)
+                    if (this.x !== this.baseX) {
+                        let dx = this.x - this.baseX;
+                        this.x -= dx / 50; // Elastic snapback
+                    }
+                    if (this.y !== this.baseY) {
+                        let dy = this.y - this.baseY;
+                        this.y -= dy / 50;
+                    }
+                    this.color = 'rgba(0, 255, 234, 0.5)'; // Cyan idle state
+                }
+
+                // 3. Apply Standard Velocity (Drift)
+                // this.x += this.vx;
+                // this.y += this.vy;
+
+                // Boundary Check
+                if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > height) this.vy = -this.vy;
+            }
+        }
+
+        // EXPLOSION MECHANIC
+        function explode() {
+            particles.forEach(p => {
+                // Scramble targets
+                p.baseX = Math.random() * width;
+                p.baseY = Math.random() * height;
+            });
+            scrambleText();
+        }
+
+        // TEXT SCRAMBLER LOGIC
+        function scrambleText() {
+            let iteration = 0;
+            const originalText = "SYSTEM_VOID";
+            
+            clearInterval(window.scrambleInterval);
+            
+            window.scrambleInterval = setInterval(() => {
+                hero.innerText = originalText
+                    .split("")
+                    .map((letter, index) => {
+                        if(index < iteration) {
+                            return originalText[index];
+                        }
+                        return letters[Math.floor(Math.random() * 26)];
+                    })
+                    .join("");
+                
+                if(iteration >= originalText.length) {
+                    clearInterval(window.scrambleInterval);
+                }
+                
+                iteration += 1 / 3;
+            }, 30);
+        }
+
+        // INITIALIZE SWARM
+        function init() {
+            particles = [];
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push(new Particle());
+            }
+            document.getElementById('count').innerText = PARTICLE_COUNT;
+        }
+
+        // RENDER LOOP
+        function animate() {
+            // TRAIL EFFECT
+            // Instead of clearing the canvas completely, we draw a semi-transparent black rectangle.
+            // This creates the "Trails" because previous frames fade out slowly.
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // BOOT
+        init();
+        animate();
+        scrambleText();
+
+    </script>
+</body>
+</html>
