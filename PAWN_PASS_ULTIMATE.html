@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PAWN PASS // ULTRA</title>
+    <title>PAWN PASS // FINAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
-       <style>
+    <style>
         :root {
             --bg: #050505;
             --card: #111;
@@ -16,66 +16,85 @@
             --border: #222;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; user-select: none; -webkit-user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
+        /* --- CORE LAYOUT FIX --- */
         body {
             background: var(--bg);
             color: var(--text);
-            /* FIX: Use dynamic height to handle mobile address bars */
-            height: 100vh; 
-            height: 100dvh; 
+            width: 100vw;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Dynamic Height for Mobile Browsers */
             overflow: hidden;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* --- NAV --- */
         nav {
-            padding: 1.5rem;
-            flex-shrink: 0; /* Don't shrink nav */
+            height: 60px;
+            padding: 0 1.5rem;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--border);
-            background: rgba(5,5,5,0.9); backdrop-filter: blur(10px);
-            z-index: 20;
+            background: rgba(5,5,5,0.95);
+            flex-shrink: 0;
+            z-index: 50;
         }
-        .logo { font-weight: 800; font-size: 1.2rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
+        .logo { font-weight: 800; font-size: 1.1rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
 
-        /* --- APP CONTAINER --- */
+        /* --- THE STAGE --- */
         .app-view {
-            flex: 1; /* Take remaining space */
+            flex: 1;
             position: relative;
-            overflow: hidden;
             width: 100%;
+            overflow: hidden;
         }
 
+        /* --- SCREENS --- */
         .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* FIX: Add padding bottom for safe area + button space */
-            padding: 1.5rem;
-            padding-bottom: max(2rem, env(safe-area-inset-bottom)); 
-            display: flex; flex-direction: column;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg);
-            transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.4s;
-            opacity: 0; pointer-events: none; transform: translateY(20px);
+            display: flex; flex-direction: column;
+            padding: 1.5rem;
+            /* Safe area for iPhone Home Bar */
+            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
+            opacity: 0; 
+            pointer-events: none; 
+            transform: translateY(20px);
             z-index: 1;
         }
 
-        .screen.active { opacity: 1; pointer-events: auto; transform: translateY(0); z-index: 5; }
-        .screen.prev { transform: translateY(-20px); opacity: 0; }
+        .screen.active {
+            opacity: 1; 
+            pointer-events: auto; 
+            transform: translateY(0); 
+            z-index: 10;
+        }
 
-        /* --- CONTENT SCROLL --- */
-        /* If content is too tall, allow scrolling inside the screen, but keep button fixed */
+        .screen.prev {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+
+        /* --- SCROLLABLE CONTENT AREA --- */
         .content-area {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 1rem;
         }
 
-        /* --- TYPOGRAPHY --- */
-        h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.1; }
-        h2 { font-size: 1.5rem; margin-bottom: 1rem; }
-        .sub { color: var(--dim); margin-bottom: 1.5rem; font-size: 0.9rem; }
+        /* --- FIXED BUTTON AREA --- */
+        .btn-area {
+            margin-top: auto;
+            flex-shrink: 0;
+            padding-top: 1rem;
+        }
 
-        /* --- FORMS --- */
+        /* --- COMPONENTS --- */
+        h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; line-height: 1.1; margin-top: 0.5rem; }
+        .sub { color: var(--dim); margin-bottom: 2rem; font-size: 0.9rem; }
+
         select, input {
             width: 100%; background: #111; border: 1px solid var(--border);
             color: #fff; padding: 1rem; border-radius: 12px; font-size: 1rem;
@@ -83,40 +102,30 @@
         }
         select:focus { border-color: var(--accent); }
 
-        /* --- BUTTON FIX --- */
-        .btn-container {
-            margin-top: auto; /* Push to bottom */
-            padding-top: 1rem;
-            background: var(--bg); /* Cover content behind it */
-            z-index: 10;
-        }
-
         .btn-main {
-            width: 100%; padding: 1rem; background: var(--accent);
+            width: 100%; padding: 1.1rem; background: var(--accent);
             color: #000; font-weight: 800; border: none; border-radius: 12px;
-            font-size: 1rem; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-            /* Shadow to pop off screen */
-            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+            font-size: 1rem; cursor: pointer; margin-bottom: 0.5rem;
+            box-shadow: 0 5px 20px rgba(0,255,157,0.15);
         }
         .btn-main:active { transform: scale(0.98); }
 
-        /* --- QUOTE SCREEN --- */
+        /* --- QUOTE BOX --- */
         .quote-box {
             background: rgba(0,255,157,0.05); border: 1px solid var(--accent);
-            padding: 1.5rem; border-radius: 16px; text-align: center; margin-bottom: 1.5rem;
+            padding: 1.5rem; border-radius: 16px; text-align: center; margin-bottom: 2rem;
         }
-        .price-tag { font-size: 3rem; font-weight: 800; color: var(--accent); text-shadow: 0 0 20px rgba(0,255,157,0.3); }
+        .price-tag { font-size: 3rem; font-weight: 800; color: var(--accent); }
 
-        /* --- SCANNER (THE MAGIC) --- */
+        /* --- SCANNER --- */
         #canvas-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.5; pointer-events: none;
+            z-index: 0; pointer-events: none; opacity: 0.6;
         }
         
         .scan-ui {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; z-index: 10;
+            position: relative; z-index: 20;
         }
 
         .fingerprint-zone {
@@ -124,26 +133,22 @@
             border: 2px dashed #333; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 2rem; position: relative;
-            transition: all 0.3s;
-            /* Make touch target bigger */
-            position: relative;
+            transition: 0.3s;
         }
-        /* Invisible larger touch area */
-        .fingerprint-zone::after {
-            content: ''; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
+        
+        /* Invisible Hit Box for easier touching */
+        .fingerprint-zone::before {
+            content: ''; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px;
         }
 
-        .fingerprint-zone.scanning { border-color: var(--accent); border-style: solid; box-shadow: 0 0 30px var(--accent); transform: scale(1.1); }
-
+        .fingerprint-zone.scanning { border-color: var(--accent); border-style: solid; box-shadow: 0 0 40px var(--accent); transform: scale(1.1); }
         .scan-icon { width: 50px; height: 50px; color: #333; transition: 0.3s; }
-        .fingerprint-zone.scanning .scan-icon { color: var(--accent); opacity: 1; }
+        .fingerprint-zone.scanning .scan-icon { color: var(--accent); }
 
-        .progress-bar {
-            width: 200px; height: 4px; background: #222; border-radius: 2px; overflow: hidden;
-        }
+        .progress-bar { width: 60%; height: 4px; background: #222; border-radius: 2px; overflow: hidden; }
         .fill { width: 0%; height: 100%; background: var(--accent); }
 
-        /* --- SUCCESS OVERLAY --- */
+        /* --- SUCCESS SCREEN --- */
         .success-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 100; display: none;
@@ -153,7 +158,6 @@
         @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
     </style>
-    <!-- THREE.JS -->
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
@@ -167,82 +171,98 @@
 
     <div class="app-view">
         
-        <!-- SCREEN 1: SELECTION -->
-<div class="content-area">
-    <h1>Get Cash.</h1>
-    <p class="sub">Instant valuation. No human interaction.</p>
-    <!-- Selects here... -->
-</div>
-<div class="btn-container">
-    <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
-</div>
-
-<!-- INSIDE SCREEN 2 -->
-<div class="content-area">
-    <!-- Quote box here... -->
-</div>
-<div class="btn-container">
-    <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
-    <button style="background: transparent; border: none; color: #666; width: 100%; padding: 1rem;" onclick="reset()">Decline</button>
-</div>
-        <!-- SCREEN 2: VALUATION -->
-        <div class="screen" id="screen2">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <p class="sub">INSTANT OFFER</p>
-                <div class="quote-box">
-                    <div class="price-tag" id="priceDisplay">$0.00</div>
-                    <div style="color: var(--dim); font-size: 0.8rem; margin-top: 0.5rem;">Available via OSKO Immediately</div>
+        <!-- SCREEN 1 -->
+        <div class="screen active" id="screen1">
+            <div class="content-area">
+                <h1>Get Cash.</h1>
+                <p class="sub">Instant valuation. No human interaction.</p>
+                
+                <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">ASSET</label>
+                <select id="itemSelect">
+                    <option value="385">Sony PlayStation 5</option>
+                    <option value="850">MacBook Pro M1</option>
+                    <option value="8400">Rolex Submariner</option>
+                    <option value="620">iPhone 14 Pro</option>
+                </select>
+                
+                <label style="color:#888; font-size:0.8rem; margin-bottom:0.5rem; display:block;">CONDITION</label>
+                <select>
+                    <option>Pristine (Like New)</option>
+                    <option>Good (Minor Wear)</option>
+                    <option>Fair</option>
+                </select>
+                
+                <div style="margin-top:1rem; padding:1rem; background:#111; border-radius:8px; display:flex; align-items:center; gap:0.5rem; color:#666; font-size:0.8rem;">
+                    <i data-feather="shield" style="width:14px"></i> 256-Bit Encrypted
                 </div>
             </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
-                    <div style="color: #666; font-size: 0.7rem;">INTEREST</div>
-                    <div style="font-weight: bold;">5.0% / mo</div>
-                </div>
-                <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
-                    <div style="color: #666; font-size: 0.7rem;">TERM</div>
-                    <div style="font-weight: bold;">30 Days</div>
-                </div>
+            
+            <div class="btn-area">
+                <button class="btn-main" onclick="toScreen2()">GET OFFER</button>
             </div>
-
-            <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
-            <button style="background: transparent; border: none; color: #666; width: 100%; padding: 1rem; margin-top: 0.5rem;" onclick="reset()">Decline</button>
         </div>
 
-        <!-- SCREEN 3: BIOMETRIC SIGNATURE -->
-        <div class="screen" id="screen3">
-            <h2 style="text-align: center; font-family: 'Syncopate'; letter-spacing: 2px; font-size: 1rem;">IDENTITY VERIFICATION</h2>
-            <p style="text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 2rem;">Hold thumb to sign contract</p>
+        <!-- SCREEN 2 -->
+        <div class="screen" id="screen2">
+            <div class="content-area">
+                <div style="text-align: center;">
+                    <p class="sub" style="margin-bottom: 1rem;">INSTANT OFFER</p>
+                    <div class="quote-box">
+                        <div class="price-tag" id="priceDisplay">$0.00</div>
+                        <div style="color: var(--dim); font-size: 0.8rem; margin-top: 0.5rem;">Funds ready for transfer</div>
+                    </div>
+                </div>
 
-            <!-- SCANNER UI -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="color: #666; font-size: 0.7rem;">RATE</div>
+                        <div style="font-weight: bold;">5.0%</div>
+                    </div>
+                    <div style="background: #111; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="color: #666; font-size: 0.7rem;">TERM</div>
+                        <div style="font-weight: bold;">30 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-area">
+                <button class="btn-main" onclick="toScreen3()">ACCEPT & SIGN</button>
+                <button style="width:100%; padding:1rem; background:transparent; border:none; color:#666;" onclick="reset()">Decline Offer</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3 (SCANNER) -->
+        <div class="screen" id="screen3">
+            <h2 style="text-align: center; font-family: 'Syncopate'; letter-spacing: 2px; font-size: 1rem; margin-top: 1rem;">VERIFICATION</h2>
+            <p style="text-align: center; color: #666; font-size: 0.8rem;">Hold thumb to sign contract</p>
+
             <div class="scan-ui">
                 <div class="fingerprint-zone" id="scanZone">
                     <i data-feather="fingerprint" class="scan-icon"></i>
                 </div>
                 <div class="progress-bar"><div class="fill" id="scanFill"></div></div>
-                <div id="scanText" style="margin-top: 1rem; font-size: 0.8rem; color: #444; letter-spacing: 2px;">WAITING FOR BIOMETRICS</div>
+                <div id="scanText" style="margin-top: 1.5rem; font-size: 0.8rem; color: #444; letter-spacing: 2px;">WAITING FOR BIOMETRICS</div>
             </div>
-
-            <!-- PARTICLE CANVAS (Behind UI) -->
+            
             <div id="canvas-container"></div>
         </div>
 
     </div>
 
-    <!-- SUCCESS OVERLAY -->
+    <!-- SUCCESS -->
     <div class="success-overlay" id="successScreen">
-        <i data-feather="check-circle" class="check-anim" style="width: 80px; height: 80px;"></i>
+        <i data-feather="check-circle" class="check-anim"></i>
         <h1 style="margin-top: 2rem;">FUNDS SENT</h1>
-        <p style="color: #666;">Uber Courier Dispatched.</p>
-        <div style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; color: #333; border-radius: 8px;">REF: #9942-X</div>
+        <p style="color: #666;">Courier Dispatched.</p>
+        <div style="margin-top: 2rem; padding: 1rem; border: 1px solid #333; color: #888; border-radius: 8px; font-family: monospace;">TXID: #9942-XF</div>
+        <button style="margin-top: 3rem; background: transparent; border: 1px solid #333; color: #fff; padding: 0.8rem 2rem; border-radius: 20px;" onclick="reset()">DONE</button>
     </div>
 
     <script type="module">
         import * as THREE from 'three';
         feather.replace();
 
-        // --- NAVIGATION LOGIC ---
+        // --- LOGIC ---
         window.toScreen2 = () => {
             const val = document.getElementById('itemSelect').value;
             document.getElementById('priceDisplay').innerText = '$' + val;
@@ -251,127 +271,83 @@
 
         window.toScreen3 = () => {
             switchScreen('screen2', 'screen3');
-            initThreeJS(); // Start particles only when needed
+            initThreeJS();
         };
 
-        window.reset = () => {
-            location.reload();
-        };
+        window.reset = () => location.reload();
 
-        function switchScreen(from, to) {
-            document.getElementById(from).classList.add('prev');
-            document.getElementById(from).classList.remove('active');
-            document.getElementById(to).classList.add('active');
-        }
-
-        // --- THREE.JS PARTICLES (ONYX ENGINE) ---
-        let renderer, scene, camera, particles;
-        let isScanning = false;
-        let scanProgress = 0;
-
-        function initThreeJS() {
-            const container = document.getElementById('canvas-container');
-            if(renderer) return; // Already init
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-            camera.position.z = 30;
-
-            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.offsetWidth, container.offsetHeight);
-            container.appendChild(renderer.domElement);
-
-            // Create Particles
-            const geometry = new THREE.BufferGeometry();
-            const count = 2000;
-            const pos = new Float32Array(count * 3);
-            for(let i=0; i<count*3; i++) pos[i] = (Math.random() - 0.5) * 60;
-            geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 0.15, color: 0x00ff9d, transparent: true, opacity: 0.4
-            });
-
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-
-            animate();
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
+        function switchScreen(fromId, toId) {
+            document.getElementById(fromId).classList.remove('active');
+            document.getElementById(fromId).classList.add('prev');
             
-            // Idle Rotation
-            particles.rotation.y += 0.002;
-            
-            // Scan Effect
-            if(isScanning) {
-                particles.rotation.z += 0.05; // Spin fast
-                particles.material.opacity = 0.8;
-                particles.material.color.setHex(0x00ff9d);
-                camera.position.z = Math.max(10, camera.position.z - 0.2); // Zoom in
-            } else {
-                particles.rotation.z += 0.001;
-                particles.material.opacity = 0.2;
-                particles.material.color.setHex(0x444444);
-                camera.position.z = Math.min(30, camera.position.z + 0.5); // Zoom out
-            }
-
-            renderer.render(scene, camera);
+            document.getElementById(toId).classList.add('active');
         }
 
-        // --- SCANNER LOGIC ---
+        // --- SCANNER ---
         const zone = document.getElementById('scanZone');
         const fill = document.getElementById('scanFill');
         const text = document.getElementById('scanText');
+        let isScanning = false;
+        let progress = 0;
 
-        // Mouse/Touch Events
-        const startScan = (e) => {
-            e.preventDefault();
-            isScanning = true;
-            zone.classList.add('scanning');
-            text.innerText = "VERIFYING IDENTITY...";
-            text.style.color = "#00ff9d";
-        };
+        const start = (e) => { e.preventDefault(); isScanning = true; zone.classList.add('scanning'); text.innerText = "VERIFYING..."; text.style.color = "#00ff9d"; }
+        const stop = () => { isScanning = false; zone.classList.remove('scanning'); text.innerText = "WAITING..."; text.style.color = "#444"; progress = 0; fill.style.width = '0%'; }
 
-        const endScan = (e) => {
-            isScanning = false;
-            zone.classList.remove('scanning');
-            text.innerText = "WAITING FOR BIOMETRICS";
-            text.style.color = "#444";
-            scanProgress = 0;
-            fill.style.width = '0%';
-        };
+        zone.addEventListener('mousedown', start);
+        zone.addEventListener('touchstart', start);
+        window.addEventListener('mouseup', stop);
+        window.addEventListener('touchend', stop);
 
-        zone.addEventListener('mousedown', startScan);
-        zone.addEventListener('touchstart', startScan);
-        zone.addEventListener('mouseup', endScan);
-        zone.addEventListener('touchend', endScan);
-        zone.addEventListener('mouseleave', endScan);
-
-        // Game Loop
         setInterval(() => {
             if(isScanning) {
-                scanProgress += 2;
-                fill.style.width = scanProgress + '%';
-                
-                if(scanProgress >= 100) {
+                progress += 2.5;
+                fill.style.width = progress + '%';
+                if(progress >= 100) {
                     isScanning = false;
                     document.getElementById('successScreen').style.display = 'flex';
                 }
             }
         }, 20);
 
-        // Handle Resize
-        window.addEventListener('resize', () => {
-            if(renderer) {
-                const container = document.getElementById('canvas-container');
-                camera.aspect = container.offsetWidth / container.offsetHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.offsetWidth, container.offsetHeight);
-            }
-        });
+        // --- PARTICLES ---
+        let renderer, scene, camera, particles;
+        function initThreeJS() {
+            if(renderer) return;
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, container.offsetWidth/container.offsetHeight, 0.1, 1000);
+            camera.position.z = 25;
+            
+            renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            container.appendChild(renderer.domElement);
 
+            const geo = new THREE.BufferGeometry();
+            const count = 1500;
+            const pos = new Float32Array(count*3);
+            for(let i=0; i<count*3; i++) pos[i] = (Math.random()-0.5)*50;
+            geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+            
+            const mat = new THREE.PointsMaterial({size:0.2, color:0x00ff9d, transparent:true, opacity:0.3});
+            particles = new THREE.Points(geo, mat);
+            scene.add(particles);
+            
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(isScanning) {
+                particles.rotation.z += 0.05;
+                particles.material.opacity = 0.8;
+                camera.position.z = Math.max(10, camera.position.z - 0.5);
+            } else {
+                particles.rotation.z += 0.002;
+                particles.material.opacity = 0.3;
+                camera.position.z = Math.min(25, camera.position.z + 0.5);
+            }
+            renderer.render(scene, camera);
+        }
     </script>
 </body>
 </html>
