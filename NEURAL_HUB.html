@@ -1,3 +1,22 @@
+SYSTEM STATUS: DEBUG MODE.
+ERROR: SYNTAX ERROR IN fileSystem JSON.
+
+Diagnosis:
+You added lines to the JSON object without adding commas , between them.
+Look at the EXPERIMENTS section.
+
+{ name: "MULTIVERSE.html", type: "file", url: "MULTIVERSE.html" } // Missing comma here
+{ name: "RYLEH.html", type: "file", url: "RYLEH.html" } // Missing comma here
+And in THEORY:
+
+{ name: "MULTIVERSE_EXPANSION.html", type:"file", url"MULTIVERSE_EXPANSION.html" // Syntax error + missing bracket
+THE FIX:
+I will clean and correct the JSON structure for you.
+Also, I see you added RYLEH, SYSTEM_VOID, THE_BLOB etc.
+Make sure you actually have those HTML files in your folder, or clicking them will result in a 404.
+
+Here is the Corrected NEURAL_HUB.html.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,20 +41,20 @@
         #operator-status:hover { color: #00ffea; }
         #operator-status span { color: #00ff44; animation: pulse 2s infinite; }
         @keyframes pulse { 50% { opacity: 0.3; } }
+        
         /* --- MOBILE FORCE LANDSCAPE --- */
-    @media only screen and (max-width: 900px) and (orientation: portrait) {
-        body::before {
-            content: "SYSTEM ERROR: VERTICAL ORIENTATION DETECTED.\00000a\00000a>> ROTATE DEVICE TO LANDSCAPE\00000a>> OR USE DESKTOP TERMINAL.";
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; color: #00ffea; z-index: 999999;
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; pointer-events: all;
+        @media only screen and (max-width: 900px) and (orientation: portrait) {
+            body::before {
+                content: "SYSTEM ERROR: VERTICAL ORIENTATION DETECTED.\00000a\00000a>> ROTATE DEVICE TO LANDSCAPE\00000a>> OR USE DESKTOP TERMINAL.";
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: #000; color: #00ffea; z-index: 999999;
+                display: flex; align-items: center; justify-content: center; text-align: center;
+                white-space: pre-wrap; font-family: monospace; font-size: 12px; padding: 20px; pointer-events: all;
+            }
+            #ui, #viewport, canvas { opacity: 0.1; }
         }
-        /* Hide everything else behind it */
-        #ui, #console, #viewport, canvas { opacity: 0.1; }
-    }
-
-</style>
+    </style>
+    
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
     </script>
@@ -43,9 +62,11 @@
 <body>
 
     <a href="index.html" id="back-btn">&lt; DISCONNECT</a>
-    <div id="title-container"><span id="main-title" class="glitch-text">NEURAL // HUB</span></div>
+    
+    <div id="title-container">
+        <span id="main-title" class="glitch-text">NEURAL // HUB</span>
+    </div>
 
-    <!-- ENTER YOUR EMAIL HERE -->
     <div id="operator-status" onclick="window.location.href='mailto:sales@runedigitalstudio.com?subject=RUNE_CONTRACT_INQUIRY'">
         OPERATOR: <span>ONLINE</span> // [ AVAILABLE_FOR_CONTRACT ]
     </div>
@@ -59,6 +80,7 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
+        // --- GLITCH ENGINE ---
         const titleEl = document.getElementById('main-title');
         const originalText = "NEURAL // HUB";
         function triggerGlitch() {
@@ -77,7 +99,7 @@
         setInterval(triggerGlitch, 6000);
         titleEl.addEventListener('mouseenter', triggerGlitch);
 
-        // --- THE FILE SYSTEM ---
+        // --- THE FILE SYSTEM (CORRECTED) ---
         const fileSystem = {
             name: "ROOT", type: "folder", children: [
                 { name: "OPERATOR_PROFILE.html", type: "file", url: "OPERATOR.html" },
@@ -93,13 +115,13 @@
                         { name: "CHAOS_THEORY.html", type: "file", url: "CHAOS_THEORY.html" },
                         { name: "ENTANGLEMENT.html", type: "file", url: "ENTANGLEMENT.html" },
                         { name: "EVENT_HORIZON.html", type: "file", url: "EVENT_HORIZON.html" },
-                        { name: "MULTIVERSE.html", type: "file", url: "MULTIVERSE.html" }
-                        { name: "RYLEH.html", type: "file", url: "RYLEH.html" }
-                        { name: "SYSTEM_VOID.html", type: "file", url: "SYSTEM_VOID.html" }
-                        { name: "THE_BLOB.html", type: "file", url: "THE_BLOB.html" }
-                        { name: "THE_GAUNTLET.html", type: "file", url: "THE_GAUNTLET.html" }
-                        { name: "THE_HIVE.html", type: "file", url: "THE_HIVE.html" }
-                        { name: "THE_HOLOGRAM.html", type: "file", url: "THE_HOLOGRAM.html" }
+                        { name: "MULTIVERSE.html", type: "file", url: "MULTIVERSE.html" },
+                        { name: "RYLEH.html", type: "file", url: "RYLEH.html" },
+                        { name: "SYSTEM_VOID.html", type: "file", url: "SYSTEM_VOID.html" },
+                        { name: "THE_BLOB.html", type: "file", url: "THE_BLOB.html" },
+                        { name: "THE_GAUNTLET.html", type: "file", url: "THE_GAUNTLET.html" },
+                        { name: "THE_HIVE.html", type: "file", url: "THE_HIVE.html" },
+                        { name: "THE_HOLOGRAM.html", type: "file", url: "THE_HOLOGRAM.html" },
                         { name: "VECTOR_SPACE_NAVIGATOR.html", type: "file", url: "VECTOR_SPACE_NAVIGATOR.html" }
                     ]
                 },
@@ -108,7 +130,9 @@
                         { name: "HYPER.html", type: "file", url: "HYPER.html" },
                         { name: "THE_GOD_FRACTAL.html", type: "file", url: "THE_GOD_FRACTAL.html" },
                         { name: "THE_TESSERACT.html", type: "file", url: "THE_TESSERACT.html" },
-  		        { name: "MULTIVERSE_EXPANSION.html", type:"file", url"MULTIVERSE_EXPANSION.html"
+                        { name: "THEBRAIN.html", type: "file", url: "THEBRAIN.html" },
+                        { name: "VIVALDI_MASTER.html", type: "file", url: "VIVALDI_MASTER.html" },
+                        { name: "MULTIVERSE_EXPANSION.html", type: "file", url: "MULTIVERSE_EXPANSION.html" }
                     ]
                 },
                 { 
@@ -120,6 +144,7 @@
             ]
         };
 
+        // --- ENGINE ---
         const scene = new THREE.Scene(); scene.background = new THREE.Color(0x00050a);
         scene.fog = new THREE.FogExp2(0x00050a, 0.002);
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -127,6 +152,7 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
+        
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true; controls.dampingFactor = 0.05;
         controls.minDistance = 5; controls.maxDistance = 100;
@@ -158,7 +184,11 @@
                 const r = (data.type === 'folder' ? 10 : 5) + Math.random()*3;
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
-                node.position.set(parent.position.x + r * Math.sin(phi) * Math.cos(theta), parent.position.y + r * Math.sin(phi) * Math.sin(theta), parent.position.z + r * Math.cos(phi));
+                node.position.set(
+                    parent.position.x + r * Math.sin(phi) * Math.cos(theta),
+                    parent.position.y + r * Math.sin(phi) * Math.sin(theta),
+                    parent.position.z + r * Math.cos(phi)
+                );
             }
             let geo = fileGeo; let mat = mats.file;
             if (data.type === 'folder') { geo = folderGeo; mat = mats.folder; }
@@ -191,6 +221,7 @@
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         window.addEventListener('mousemove', e => { mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; });
+        
         window.addEventListener('dblclick', () => {
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(nodes.map(n => n.mesh));
