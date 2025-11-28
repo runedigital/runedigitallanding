@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MY ACCOUNT // PAWN PASS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    <style>
+        :root { --bg: #050505; --card: #111; --accent: #00ff9d; --danger: #ff3366; --text: #fff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 1.5rem; }
+
+        /* HEADER */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .user-pill { background: #111; padding: 0.5rem 1rem; border-radius: 20px; display: flex; gap: 0.5rem; align-items: center; font-size: 0.8rem; border: 1px solid #222; }
+
+        /* LOAN CARD */
+        .loan-card {
+            background: var(--card); border: 1px solid #333; border-radius: 16px; padding: 1.5rem;
+            position: relative; overflow: hidden; margin-bottom: 1.5rem;
+        }
+        .loan-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+        .status { background: rgba(0,255,157,0.1); color: var(--accent); padding: 0.2rem 0.8rem; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+
+        .balance-area { text-align: center; margin-bottom: 2rem; }
+        .balance-label { color: #666; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .balance-val { font-size: 3rem; font-weight: 800; color: #fff; }
+        
+        /* PROGRESS CIRCLE */
+        .time-left { display: flex; gap: 1rem; align-items: center; background: #0a0a0a; padding: 1rem; border-radius: 12px; }
+        .ring-container { width: 50px; height: 50px; position: relative; }
+        svg { transform: rotate(-90deg); width: 50px; height: 50px; }
+        circle { fill: none; stroke-width: 4; stroke-linecap: round; }
+        .bg-ring { stroke: #222; }
+        .progress-ring { stroke: var(--danger); stroke-dasharray: 125; stroke-dashoffset: 40; transition: 1s; }
+        
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 1rem; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem; }
+        .btn-pay { background: #fff; color: #000; }
+        .btn-extend { background: transparent; border: 1px solid #333; color: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-weight: 800; font-size: 1.2rem;"><i data-feather="hexagon"></i> PORTAL</div>
+        <div class="user-pill">
+            <div style="width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></div>
+            Michael T.
+        </div>
+    </header>
+
+    <h2 style="margin-bottom: 1rem; font-size: 1rem; color: #888;">ACTIVE LOANS</h2>
+
+    <!-- ACTIVE LOAN CARD -->
+    <div class="loan-card">
+        <div class="loan-header">
+            <div style="font-weight: 600;">Rolex Submariner</div>
+            <div class="status">ACTIVE</div>
+        </div>
+
+        <div class="balance-area">
+            <div class="balance-label">Repayment Amount</div>
+            <div class="balance-val">$8,820.00</div>
+            <div style="font-size: 0.8rem; color: var(--accent); margin-top: 0.5rem;">+ $14.50 Interest Today</div>
+        </div>
+
+        <div class="time-left">
+            <div class="ring-container">
+                <svg>
+                    <circle class="bg-ring" cx="25" cy="25" r="20"></circle>
+                    <circle class="progress-ring" cx="25" cy="25" r="20"></circle>
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 0.7rem; font-weight: bold;">8d</div>
+            </div>
+            <div>
+                <div style="font-size: 0.9rem; font-weight: bold;">8 Days Remaining</div>
+                <div style="font-size: 0.7rem; color: #666;">Due: Dec 12, 2025</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-extend">EXTEND (+14 Days)</button>
+            <button class="btn btn-pay">REPAY & REDEEM</button>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <h2 style="margin-bottom: 1rem; font-size: 1rem; color: #888; margin-top: 2rem;">HISTORY</h2>
+    <div style="display: flex; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #222;">
+        <div>
+            <div style="font-weight: 600; font-size: 0.9rem;">PS5 Disc Edition</div>
+            <div style="font-size: 0.7rem; color: #666;">Redeemed Oct 14</div>
+        </div>
+        <div style="font-weight: bold; color: #666;">PAID</div>
+    </div>
+
+    <script>feather.replace()</script>
+</body>
+</html>
