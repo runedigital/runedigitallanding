@@ -70,7 +70,61 @@
         1: ["// LESSON 1: INITIATION", "Try commands: 'circle', 'square', 'clear'", "Stack them to create art."], 
         2: ["// LESSON 2: CHAOS", "Type 'particles' for kinetic energy.", "Type 'matrix' to see the source."], 
         3: ["// LESSON 3: THE UPLINK", "Type 'signup' to join the RUNE network."] 
+const lessons = {
+      // FREE TIER
+      1: [
+          "// LESSON 1: INITIATION", 
+          "You are an operator. This terminal is your wand.", 
+          "Commands: 'circle', 'square', 'clear'", 
+          "Goal: Stack shapes to create a composition."
+      ],
+      2: [
+          "// LESSON 2: CHAOS", 
+          "Entropy is a tool. Use it.", 
+          "Command: 'particles'", 
+          "Goal: Trigger multiple particle bursts to simulate an explosion.",
+          "Tip: Don't clear the canvas between bursts."
+      ],
+      3: [
+          "// LESSON 3: THE UPLINK", 
+          "You are ready for the network.", 
+          "Command: 'signup'", 
+          "Goal: Register your frequency to save progress and unlock the Architect Tier."
+      ],
+      
+      // PAID TIER (LOCKED BEHIND AUTH)
+      4: [
+          "// LESSON 4: THE MATRIX [ARCHITECT CLEARANCE]", 
+          "We are tearing down the simulation.", 
+          "New Command Unlocked: 'matrix'", 
+          "Concept: Arrays & Loops.", 
+          "The Matrix rain isn't a video. It is thousands of text strings falling in a 'Loop'.",
+          "Each column is an index in an Array. We update the Y position every frame.",
+          "TASK: Type 'matrix' and watch the code flow."
+      ],
+      5: [
+          "// LESSON 5: ENTROPY TEXT [ARCHITECT CLEARANCE]", 
+          "Static text is dead. Make it breathe.", 
+          "New Command Unlocked: 'glitch'", 
+          "Concept: String Manipulation.", 
+          "We swap characters randomly every 50ms before resolving to the final string.",
+          "This creates the 'Decryption' effect you see in the HUB.",
+          "TASK: Type 'glitch' to destabilize the console."
+      ],
+      6: [
+          "// LESSON 6: FREQUENCY [ARCHITECT CLEARANCE]", 
+          "See the sound. Hear the code.", 
+          "New Command Unlocked: 'visualize'", 
+          "Concept: Fast Fourier Transform (FFT).", 
+          "We tap into the microphone, break the audio into frequencies, and map them to bar height.",
+          "TASK: Type 'visualize', allow microphone access, and play music."
+      ]
     };
+    
+
+
+
+};
 
     async function sendData() {
       log("PACKING DATA...", "log-system");
@@ -79,6 +133,74 @@
         const response = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userData) });
         if (response.ok) { log(">> TRANSMISSION SUCCESSFUL.", "log-ok"); } else { log(">> ERROR: SERVER REJECTED.", "log-error"); }
       } catch (error) { log(">> FATAL: CONNECTION FAILED.", "log-error"); }
+    }
+ // --- LESSON 5: GLITCH EFFECT ---
+    function triggerGlitch() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+        const target = "SYSTEM FAILURE // REALITY COMPROMISED // REBOOTING...";
+        const div = document.createElement("div");
+        div.className = "log-error";
+        output.appendChild(div);
+        
+        let iterations = 0;
+        const interval = setInterval(() => {
+            div.textContent = target.split("").map((letter, index) => {
+                if(index < iterations) return target[index];
+                return chars[Math.floor(Math.random() * chars.length)]
+            }).join("");
+            
+            if(iterations >= target.length){ 
+                clearInterval(interval);
+                div.className = "log-ok"; // Turn green on success
+            }
+            iterations += 1/3; // Speed
+            output.scrollTop = output.scrollHeight;
+        }, 30);
+    }
+
+    // --- LESSON 6: AUDIO VISUALIZER ---
+    let audioContext, analyser, source;
+    let visActive = false;
+    
+    async function startVisualizer() {
+        if(visActive) return;
+        log(">> INITIALIZING AUDIO CORE...", "log-warn");
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+            analyser.fftSize = 256;
+            visActive = true;
+            drawVisualizer();
+            log(">> MIC ACTIVE. PLAY MUSIC.", "log-ok");
+        } catch(e) {
+            log(">> ERROR: MIC BLOCKED.", "log-error");
+        }
+    }
+
+    function drawVisualizer() {
+        if(!visActive) return;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(dataArray);
+
+        // Overlay visualization on canvas
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Fade effect
+        ctx.fillRect(0, 0, W, H);
+        
+        const barWidth = (W / bufferLength) * 2.5;
+        let x = 0;
+
+        for(let i = 0; i < bufferLength; i++) {
+            const barHeight = dataArray[i] * 2;
+            ctx.fillStyle = `rgb(0, ${barHeight + 100}, 234)`; // Cyan gradient
+            ctx.fillRect(x, H - barHeight/2, barWidth, barHeight/2);
+            x += barWidth + 1;
+        }
+        requestAnimationFrame(drawVisualizer);
     }
 
     function handleInput(raw) {
@@ -127,6 +249,24 @@
         }
         else { log("Unknown: " + cmd, "log-error"); }
       }
+// ... inside handleInput ...
+        
+        else if (cmd === "glitch") {
+            if(USER_LEVEL === 'GUEST') {
+                log(">> ERROR: LOCKED. UPGRADE TO ARCHITECT.", "log-locked");
+            } else {
+                triggerGlitch();
+            }
+        }
+        
+        else if (cmd === "visualize") {
+            if(USER_LEVEL === 'GUEST') {
+                log(">> ERROR: LOCKED. UPGRADE TO ARCHITECT.", "log-locked");
+            } else {
+                startVisualizer();
+            }
+        }
+
       else if (MODE === 'SIGNUP_NAME') { userData.name = val; MODE = 'SIGNUP_EMAIL'; log("ENTER EMAIL:", "log-system"); promptLabel.textContent = "EMAIL:"; }
       else if (MODE === 'SIGNUP_EMAIL') { userData.email = val; sendData(); MODE = 'CMD'; promptLabel.textContent = ">"; promptLabel.style.color = "#00ffea"; }
       output.scrollTop = output.scrollHeight;
