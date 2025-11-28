@@ -89,7 +89,7 @@
   <script>
     // --- CONFIGURATION ---
     const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeowgdnn"; 
-    const MASTER_KEY = "0xRUNE_MASTER"; 
+    const MASTER_KEY = "0xrune_master"; 
     const LINKS = {
         OPERATOR: "https://buy.stripe.com/5kQeVfesI50iew81HT6Ri01",
         ARCHITECT: "https://buy.stripe.com/8x2dRbbgwcsKbjW2LX6Ri02"
@@ -306,17 +306,15 @@
       if (MODE === 'CMD') {
         const cmd = val.toLowerCase(); const parts = cmd.split(' ');
 
-        // AUTH
+     // AUTHENTICATION
         if (parts[0] === 'auth') {
-            if (parts[1] === MASTER_KEY) { 
-                USER_LEVEL = 'SYNDICATE'; 
-                document.getElementById('access-level').textContent = "ACCESS: SYNDICATE_MASTER"; 
-                document.getElementById('access-level').style.color = "#00ffea"; 
-                log(">> AUTHENTICATION SUCCESSFUL.", "log-ok"); 
-                log(">> BLACK MAGIC MODULES UNLOCKED.", "log-ok");
-            } else { log(">> ERROR: INVALID KEY.", "log-error"); }
-            return;
-        }
+            // Compare the raw input part, NOT the lowercased cmd part
+            // We need to split the original 'val' (raw input)
+            const rawParts = val.trim().split(' ');
+            
+            if (rawParts[1] === MASTER_KEY) {
+                 // ... success
+            }
 
         // COMMANDS
         if (cmd === "help") { log("signup, reactor, auth, lesson [n], circle, square, matrix, glitch, visualize", "log-system"); }
