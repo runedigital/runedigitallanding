@@ -10,29 +10,35 @@
         :root { --bg: #050505; --accent: #00ff9d; --text: #fff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; width: 100vw; }
 
+        /* NAVIGATION */
         nav {
-            padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center;
-            position: fixed; width: 100%; z-index: 100; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px);
+            padding: 2rem 4rem; 
+            display: flex; justify-content: space-between; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; 
+            z-index: 100; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px);
         }
-        .logo { font-weight: 800; font-size: 1.2rem; display: flex; gap: 0.5rem; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.2rem; display: flex; gap: 0.5rem; align-items: center; color: var(--accent); }
         .nav-btn { padding: 0.8rem 1.5rem; border: 1px solid #333; border-radius: 30px; color: #fff; text-decoration: none; font-size: 0.8rem; transition: 0.3s; }
         .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-        /* HERO */
+        /* HERO SECTION */
         .hero {
-            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100vh; 
+            width: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; position: relative;
+            overflow: hidden;
         }
         
         h1 {
-            font-size: 6vw; line-height: 0.9; font-weight: 800; letter-spacing: -2px;
+            font-size: 7vw; line-height: 0.9; font-weight: 800; letter-spacing: -3px;
             background: linear-gradient(to bottom, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 2rem; z-index: 2;
         }
 
-        .hero p { font-size: 1.2rem; color: #888; max-width: 500px; margin-bottom: 3rem; z-index: 2; }
+        .hero p { font-size: 1.2rem; color: #888; max-width: 500px; margin-bottom: 3rem; z-index: 2; line-height: 1.5; }
 
         .cta-container { display: flex; gap: 1rem; z-index: 2; }
         
@@ -53,26 +59,43 @@
             transform-origin: center top;
             opacity: 0.3; z-index: 1;
             animation: gridMove 20s linear infinite;
+            pointer-events: none;
         }
 
         @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 0 1000px; } }
 
-        /* FLOATING PHONE MOCKUP (CSS ONLY) */
+        /* FLOATING PHONE MOCKUP - CENTERED FIX */
         .mockup {
-            position: absolute; bottom: -10vh; width: 300px; height: 500px;
-            background: #111; border: 2px solid #333; border-radius: 40px;
-            z-index: 1; box-shadow: 0 0 100px rgba(0,255,157,0.1);
+            position: absolute; 
+            bottom: -15vh; 
+            left: 50%; 
+            transform: translateX(-50%); /* THIS FIXES THE ALIGNMENT */
+            width: 320px; height: 600px;
+            background: #0a0a0a; border: 4px solid #222; border-radius: 40px;
+            z-index: 1; box-shadow: 0 -20px 100px rgba(0,255,157,0.15);
             display: flex; justify-content: center; padding-top: 4rem;
+            overflow: hidden;
         }
-        .notch { width: 120px; height: 25px; background: #000; border-radius: 0 0 15px 15px; position: absolute; top: 0; }
+        .notch { width: 140px; height: 30px; background: #000; border-radius: 0 0 15px 15px; position: absolute; top: 0; z-index: 2; }
+        
+        /* SCREEN CONTENT INSIDE MOCKUP */
+        .mock-screen { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 2rem; opacity: 0.8; }
 
-        /* STATS */
+        /* STATS BAR */
         .stats-bar {
-            display: flex; justify-content: center; gap: 4rem; padding: 4rem;
-            border-top: 1px solid #222; background: #0a0a0a;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 4rem; padding: 4rem;
+            border-top: 1px solid #222; background: #0a0a0a; position: relative; z-index: 10;
         }
-        .stat h3 { font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem; }
+        .stat { text-align: center; }
+        .stat h3 { font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 800; }
         .stat p { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3.5rem; }
+            nav { padding: 1.5rem; }
+            .stats-bar { gap: 2rem; }
+            .mockup { width: 280px; bottom: -10vh; }
+        }
 
     </style>
 </head>
@@ -88,19 +111,23 @@
 
     <div class="hero">
         <div class="grid-bg"></div>
-        <h1>LIQUIDITY<br>ON DEMAND.</h1>
-        <p>Unlock the capital trapped in your assets. 
-        Instant valuation. Zero friction. Same-day payout.</p>
         
-        <div class="cta-container">
-            <a href="PAWN_PASS_ULTIMATE.html" class="primary-btn">GET A QUOTE <i data-feather="arrow-right"></i></a>
+        <div style="position: relative; z-index: 5;">
+            <h1>LIQUIDITY<br>ON DEMAND.</h1>
+            <p>Unlock the capital trapped in your assets.<br>Instant valuation. Zero friction. Same-day payout.</p>
+            
+            <div class="cta-container" style="justify-content: center;">
+                <a href="#" class="primary-btn">GET A QUOTE <i data-feather="arrow-right"></i></a>
+            </div>
         </div>
 
         <div class="mockup">
             <div class="notch"></div>
-            <div style="text-align:center; width:100%;">
-                <h3 style="color:#fff; margin-top:2rem;">$850.00</h3>
-                <p style="color:#00ff9d; font-size:0.8rem;">Funds Received</p>
+            <div class="mock-screen">
+                <h3 style="color:#fff; margin-top:2rem; font-size: 2.5rem; font-weight: 800;">$850.00</h3>
+                <p style="color:#00ff9d; font-size:0.8rem; text-transform: uppercase; letter-spacing: 1px;">Funds Received</p>
+                <div style="margin-top: 2rem; width: 80%; height: 100px; background: rgba(255,255,255,0.05); border-radius: 12px;"></div>
+                <div style="margin-top: 1rem; width: 80%; height: 60px; background: rgba(255,255,255,0.05); border-radius: 12px;"></div>
             </div>
         </div>
     </div>
