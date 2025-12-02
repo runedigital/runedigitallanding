@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RUNE // KINETIC</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; touch-action: none; }
+        canvas { display: block; width: 100%; height: 100%; transform: scaleX(-1); /* Mirror Effect */ }
+        
+        #debug {
+            position: absolute; top: 10px; left: 10px; color: #00ffea; 
+            font-family: monospace; font-size: 12px; pointer-events: none;
+            background: rgba(0,0,0,0.5); padding: 5px;
+        }
+        
+        /* FULLSCREEN BUTTON */
+        #fs-btn {
+            position: absolute; bottom: 20px; right: 20px;
+            background: #333; color: #fff; border: 1px solid #555;
+            padding: 10px 20px; font-family: monospace; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="debug">INIT SYSTEM...</div>
+    <button id="fs-btn">FULLSCREEN</button>
+    <canvas id="output"></canvas>
+
+    <script>
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            diffThreshold: 30, // Sensitivity (Lower = More sensitive)
+            gridSize: 12,      // Pixelation Level (Higher = Faster, Blockier)
+            decay: 0.92,       // Smoke fade speed
+            color: [0, 255, 234] // Rune Cyan
+        };
+
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimization
+        const debug = document.getElementById('debug');
+        
+        let video, videoCanvas, videoCtx;
+        let prevFrameData = null;
+        let width, height;
+        let particles = [];
+
+        // --- 1. CAMERA SETUP ---
+        async function initCamera() {
+            video = document.createElement('video');
+            video.playsInline = true;
+            video.muted = true;
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                video.srcObject = stream;
+                await video.play();
+                
+                initCanvas();
+                requestAnimationFrame(loop);
+            } catch (e) {
+                debug.innerText = "CAMERA ERROR: " + e.message;
+            }
+        }
+
+        function initCanvas() {
+            width = Math.floor(window.innerWidth / CONFIG.gridSize);
+            height = Math.floor(window.innerHeight / CONFIG.gridSize);
+            
+            // Set visual canvas to full res
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Internal processing canvas (Tiny)
+            videoCanvas = document.createElement('canvas');
+            videoCanvas.width = width;
+            videoCanvas.height = height;
+            videoCtx = videoCanvas.getContext('2d', { willReadFrequently: true });
+            
+            debug.innerText = `RES: ${width}x${height} // READY`;
+        }
+
+        // --- 2. THE PIXEL DIFF ENGINE ---
+        function processFrame() {
+            if (video.readyState !== 4) return;
+
+            // Draw tiny video frame
+            videoCtx.drawImage(video, 0, 0, width, height);
+            
+            const frame = videoCtx.getImageData(0, 0, width, height);
+            const data = frame.data;
+            const len = data.length;
+
+            // First frame init
+            if (!prevFrameData) {
+                prevFrameData = new Uint8ClampedArray(data);
+                return;
+            }
+
+            // Compare loop
+            for (let i = 0; i < len; i += 4) {
+                // Calculate diff (R+G+B)
+                const diff = Math.abs(data[i] - prevFrameData[i]) +
+                             Math.abs(data[i+1] - prevFrameData[i+1]) +
+                             Math.abs(data[i+2] - prevFrameData[i+2]);
+
+                if (diff > CONFIG.diffThreshold * 3) {
+                    // MOTION DETECTED at Pixel Index 'i'
+                    // Convert back to X/Y
+                    const pIndex = i / 4;
+                    const x = (pIndex % width) * CONFIG.gridSize;
+                    const y = Math.floor(pIndex / width) * CONFIG.gridSize;
+                    
+                    // Add visual particle (Smoke)
+                    // Only add if random chance (Optimization)
+                    if (Math.random() > 0.5) {
+                        particles.push({
+                            x: x, y: y,
+                            vx: (Math.random() - 0.5) * 2,
+                            vy: (Math.random() - 1) * 2 - 1, // Float up
+                            life: 1.0,
+                            size: Math.random() * 20 + 10
+                        });
+                    }
+                }
+                
+                // Store current pixel for next frame
+                prevFrameData[i] = data[i];     // R
+                prevFrameData[i+1] = data[i+1]; // G
+                prevFrameData[i+2] = data[i+2]; // B
+            }
+        }
+
+        // --- 3. VISUALIZER ---
+        function draw() {
+            // Fade out effect
+            ctx.fillStyle = 'rgba(0, 5, 10, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = `rgb(${CONFIG.color.join(',')})`;
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life *= CONFIG.decay;
+                p.size *= 0.95;
+
+                if (p.life < 0.1) {
+                    particles.splice(i, 1);
+                } else {
+                    ctx.globalAlpha = p.life;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        // --- LOOP ---
+        let lastTime = 0;
+        function loop(timestamp) {
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+            
+            processFrame();
+            draw();
+            
+            requestAnimationFrame(loop);
+        }
+
+        // --- UI ---
+        document.getElementById('fs-btn').addEventListener('click', () => {
+            document.documentElement.requestFullscreen();
+            document.getElementById('fs-btn').style.display = 'none';
+        });
+
+        window.addEventListener('resize', initCanvas);
+        initCamera();
+
+    </script>
+</body>
+</html>

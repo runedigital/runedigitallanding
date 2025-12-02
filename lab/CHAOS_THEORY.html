@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RUNE // THE BUTTERFLY EFFECT</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #ui {
+            position: absolute; bottom: 30px; width: 100%; text-align: center;
+            color: #d4af37; font-family: monospace; letter-spacing: 3px; pointer-events: none;
+        }
+    </style>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+</head>
+<body>
+
+    <div id="ui">SENSITIVITY TO INITIAL CONDITIONS</div>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // 1. SETUP
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 60);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 2. THE LORENZ PARAMETERS (The Weather Rules)
+        const sigma = 10;
+        const rho = 28;
+        const beta = 8/3;
+        const dt = 0.01; // Time step
+
+        // 3. CREATE TRAILS
+        // We will create 2 lines.
+        // Line A starts at (0.1, 0, 0)
+        // Line B starts at (0.1001, 0, 0) -> A TINY difference.
+        
+        function createTrail(color, startOffset) {
+            const maxPoints = 3000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(maxPoints * 3);
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const material = new THREE.LineBasicMaterial({ 
+                color: color, 
+                linewidth: 2,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const line = new THREE.Line(geometry, material);
+            scene.add(line);
+
+            return {
+                mesh: line,
+                positions: positions,
+                x: 0.1 + startOffset,
+                y: 0,
+                z: 0,
+                count: 0
+            };
+        }
+
+        const trailA = createTrail(0x00ffea, 0);       // Cyan
+        const trailB = createTrail(0xff0055, 0.001);   // Red (The Deviation)
+
+        // 4. PHYSICS LOOP
+        function updateTrail(t) {
+            // The Lorenz Equations
+            // dx/dt = sigma * (y - x)
+            // dy/dt = x * (rho - z) - y
+            // dz/dt = x * y - beta * z
+
+            const dx = sigma * (t.y - t.x) * dt;
+            const dy = (t.x * (rho - t.z) - t.y) * dt;
+            const dz = (t.x * t.y - beta * t.z) * dt;
+
+            t.x += dx;
+            t.y += dy;
+            t.z += dz;
+
+            // Shift array to make room for new point (Trail Effect)
+            for (let i = t.positions.length - 1; i >= 3; i--) {
+                t.positions[i] = t.positions[i - 3];
+            }
+            
+            // Add new point
+            t.positions[0] = t.x;
+            t.positions[1] = t.y;
+            t.positions[2] = t.z;
+
+            t.mesh.geometry.attributes.position.needsUpdate = true;
+        }
+
+        // 5. ANIMATION
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Update Physics
+            // Run multiple steps per frame for smoothness
+            for(let i=0; i<5; i++) {
+                updateTrail(trailA);
+                updateTrail(trailB);
+            }
+
+            // Rotate World
+            scene.rotation.z += 0.005;
+            scene.rotation.x += 0.005;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>THE GAUNTLET // SURVIVE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto+Mono:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            background: #050000;
+            overflow: hidden;
+            font-family: 'Roboto Mono', monospace;
+            user-select: none;
+        }
+
+        /* UI OVERLAY */
+        #ui {
+            position: fixed;
+            top: 20px; left: 20px;
+            color: #ff0000;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        h1 { font-family: 'Black Ops One', cursive; font-size: 2rem; margin: 0; text-shadow: 0 0 10px red; }
+        .stats { font-size: 0.9rem; opacity: 0.8; margin-top: 5px; }
+
+        #death-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 0, 0, 0.9);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 20; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #death-screen.visible { opacity: 1; pointer-events: auto; }
+
+        .death-msg { font-size: 4rem; color: red; font-family: 'Black Ops One'; letter-spacing: 5px; }
+        .btn { 
+            background: transparent; border: 2px solid red; color: red;
+            padding: 15px 40px; font-size: 1.5rem; margin-top: 20px;
+            cursor: pointer; font-family: 'Black Ops One';
+            transition: all 0.2s;
+        }
+        .btn:hover { background: red; color: black; box-shadow: 0 0 30px red; }
+
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <h1>THE GAUNTLET</h1>
+        <div class="stats">DISTANCE: <span id="score">0</span>m // ATTEMPTS: <span id="deaths">0</span></div>
+    </div>
+
+    <div id="death-screen">
+        <div class="death-msg">TERMINATED</div>
+        <button class="btn" onclick="resetGame()">RETRY</button>
+    </div>
+
+    <canvas id="game"></canvas>
+
+    <script>
+        /* 
+         * GAUNTLET ENGINE v1.0 
+         * A Physics-based Obstacle Course
+         */
+        
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const uiScore = document.getElementById('score');
+        const uiDeaths = document.getElementById('deaths');
+        const deathScreen = document.getElementById('death-screen');
+
+        let width, height;
+        let cameraX = 0;
+        let deathCount = 0;
+        let gameActive = true;
+        let shake = 0;
+
+        // INPUT
+        const keys = { w: false, a: false, s: false, d: false };
+        window.addEventListener('keydown', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = false; });
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- GAME ENTITIES ---
+
+        const player = {
+            x: 100, y: 0, // Y set in init
+            w: 30, h: 30,
+            vx: 0, vy: 0,
+            speed: 1.5,
+            friction: 0.9,
+            color: '#00ffff',
+            trail: []
+        };
+
+        const obstacles = [];
+        const particles = [];
+        
+        // LEVEL GENERATION
+        function buildLevel() {
+            obstacles.length = 0;
+            const laneHeight = height; 
+
+            // 1. THE WALLS (Top and Bottom bounds)
+            obstacles.push({ type: 'wall', x: -100, y: -50, w: 20000, h: 100 }); // Top Border
+            obstacles.push({ type: 'wall', x: -100, y: height - 50, w: 20000, h: 100 }); // Bottom Border
+
+            // 2. THE PISTONS (Vertical Crushers)
+            for(let i=0; i<10; i++) {
+                obstacles.push({
+                    type: 'piston',
+                    x: 800 + (i * 300),
+                    y: 0,
+                    w: 80, h: 300,
+                    speed: 3 + (i*0.5),
+                    dir: 1,
+                    baseY: 50,
+                    range: 300
+                });
+            }
+
+            // 3. THE BLADES (Spinners)
+            for(let i=0; i<15; i++) {
+                obstacles.push({
+                    type: 'blade',
+                    x: 4000 + (i * 400),
+                    y: height/2,
+                    w: 0, h: 0, // Handled by radius
+                    radius: 100,
+                    angle: 0,
+                    speed: 0.1 + (Math.random() * 0.1)
+                });
+            }
+
+            // 4. THE LASER GRID (Moving Gaps)
+            for(let i=0; i<20; i++) {
+                obstacles.push({
+                    type: 'laser',
+                    x: 10000 + (i * 250),
+                    y: Math.random() * (height - 200) + 50,
+                    w: 20, h: height, // Vertical beam
+                    speed: 5,
+                    dir: 1
+                });
+            }
+
+            // 5. FINISH LINE
+            obstacles.push({ type: 'finish', x: 16000, y: 0, w: 100, h: height });
+        }
+
+        function init() {
+            player.x = 100;
+            player.y = height / 2;
+            player.vx = 0;
+            player.vy = 0;
+            player.trail = [];
+            cameraX = 0;
+            gameActive = true;
+            deathScreen.classList.remove('visible');
+            buildLevel();
+        }
+
+        // --- PHYSICS ENGINE ---
+
+        function update() {
+            if(!gameActive) return;
+
+            // 1. Player Movement (Acceleration)
+            if(keys.w) player.vy -= player.speed;
+            if(keys.s) player.vy += player.speed;
+            if(keys.a) player.vx -= player.speed;
+            if(keys.d) player.vx += player.speed;
+
+            player.vx *= player.friction;
+            player.vy *= player.friction;
+            player.x += player.vx;
+            player.y += player.vy;
+
+            // Trail logic
+            player.trail.push({x: player.x, y: player.y, alpha: 1.0});
+            if(player.trail.length > 20) player.trail.shift();
+
+            // Camera Follow (Smooth)
+            const targetCamX = player.x - (width * 0.3);
+            cameraX += (targetCamX - cameraX) * 0.1;
+            if(cameraX < 0) cameraX = 0;
+
+            // Update Obstacles
+            obstacles.forEach(obs => {
+                if(obs.type === 'piston') {
+                    obs.y += obs.speed * obs.dir;
+                    if(obs.y > obs.baseY + obs.range || obs.y < obs.baseY) obs.dir *= -1;
+                }
+                if(obs.type === 'blade') {
+                    obs.angle += obs.speed;
+                }
+                if(obs.type === 'laser') {
+                    // Laser logic? Maybe static for now or moving
+                }
+            });
+
+            // Collision Detection
+            checkCollisions();
+
+            // Score Update
+            uiScore.innerText = Math.floor(player.x / 10);
+
+            // Screen Shake Decay
+            if(shake > 0) shake *= 0.9;
+        }
+
+        function checkCollisions() {
+            // AABB (Axis Aligned Bounding Box)
+            obstacles.forEach(obs => {
+                
+                // HITBOX CALCULATIONS
+                let hit = false;
+
+                if(obs.type === 'wall' || obs.type === 'piston' || obs.type === 'laser' || obs.type === 'finish') {
+                    // Rect vs Rect
+                    if (player.x < obs.x + obs.w &&
+                        player.x + player.w > obs.x &&
+                        player.y < obs.y + obs.h &&
+                        player.y + player.h > obs.y) {
+                        hit = true;
+                    }
+                } else if (obs.type === 'blade') {
+                    // Circle vs Rect (Simplified to Center Distance)
+                    const dist = Math.hypot(player.x - obs.x, player.y - obs.y);
+                    if(dist < obs.radius + (player.w/2)) hit = true;
+                }
+
+                if(hit) {
+                    if(obs.type === 'finish') {
+                        alert("YOU ESCAPED HELL. GOD MODE UNLOCKED.");
+                        resetGame();
+                    } else {
+                        die();
+                    }
+                }
+            });
+        }
+
+        function die() {
+            if(!gameActive) return;
+            gameActive = false;
+            deathCount++;
+            uiDeaths.innerText = deathCount;
+            shake = 20;
+            
+            // EXPLOSION PARTICLES
+            for(let i=0; i<50; i++) {
+                particles.push({
+                    x: player.x, y: player.y,
+                    vx: (Math.random()-0.5) * 20,
+                    vy: (Math.random()-0.5) * 20,
+                    life: 1.0,
+                    color: Math.random() > 0.5 ? '#00ffff' : '#fff'
+                });
+            }
+
+            deathScreen.classList.add('visible');
+        }
+
+        function resetGame() {
+            init();
+        }
+
+        // --- RENDERER ---
+
+        function draw() {
+            // Clear Screen (with Shake)
+            const sx = (Math.random() - 0.5) * shake;
+            const sy = (Math.random() - 0.5) * shake;
+            ctx.setTransform(1, 0, 0, 1, -cameraX + sx, sy);
+            
+            // Background (Hell Gradient)
+            const gradient = ctx.createLinearGradient(cameraX, 0, cameraX + width, height);
+            gradient.addColorStop(0, '#050000');
+            gradient.addColorStop(1, '#1a0000');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(cameraX - sx, -sy, width, height);
+
+            // Draw Particles
+            particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life;
+                ctx.fillRect(p.x, p.y, 4, 4);
+                if(p.life <= 0) particles.splice(i, 1);
+            });
+            ctx.globalAlpha = 1;
+
+            // Draw Obstacles
+            obstacles.forEach(obs => {
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = 'red';
+                ctx.fillStyle = '#ff0000';
+
+                if(obs.type === 'wall') {
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                }
+                if(obs.type === 'piston') {
+                    ctx.fillStyle = '#880000';
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    // Piston Head
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(obs.x, obs.dir > 0 ? obs.y + obs.h - 20 : obs.y, obs.w, 20);
+                }
+                if(obs.type === 'blade') {
+                    ctx.translate(obs.x, obs.y);
+                    ctx.rotate(obs.angle);
+                    ctx.fillRect(-obs.radius, -10, obs.radius*2, 20);
+                    ctx.fillRect(-10, -obs.radius, 20, obs.radius*2);
+                    ctx.setTransform(1, 0, 0, 1, -cameraX + sx, sy); // Reset transform
+                }
+                if(obs.type === 'laser') {
+                    ctx.fillStyle = 'white';
+                    ctx.shadowColor = 'white';
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                }
+                if(obs.type === 'finish') {
+                    ctx.fillStyle = '#00ff00';
+                    ctx.shadowColor = '#00ff00';
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                }
+            });
+
+            if(gameActive) {
+                // Draw Player Trail
+                player.trail.forEach(t => {
+                    t.alpha -= 0.05;
+                    ctx.fillStyle = player.color;
+                    ctx.globalAlpha = t.alpha;
+                    ctx.fillRect(t.x, t.y, player.w, player.h);
+                });
+                ctx.globalAlpha = 1;
+
+                // Draw Player
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = player.color;
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x, player.y, player.w, player.h);
+            }
+
+            requestAnimationFrame(() => { update(); draw(); });
+        }
+
+        // START
+        init();
+        draw();
+
+    </script>
+</body>
+</html>

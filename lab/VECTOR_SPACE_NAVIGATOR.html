@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SEMANTIC_RADAR // VECTOR_SPACE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #050505;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            cursor: crosshair;
+        }
+
+        /* HUD OVERLAY */
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ffea;
+            z-index: 10;
+            pointer-events: none;
+        }
+        h1 { margin: 0; letter-spacing: 2px; font-size: 1.5rem; }
+        p { margin: 5px 0 0 0; color: #888; font-size: 0.9rem; }
+
+        #target-info {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: white;
+            text-shadow: 0 0 10px #00ffea;
+        }
+
+        /* THE UNIVERSE */
+        .space {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        /* A WORD NODE */
+        .node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            color: #444;
+            font-size: 0.8rem;
+            transition: color 0.2s, text-shadow 0.2s;
+            pointer-events: none; /* JS handles distance */
+            white-space: nowrap;
+        }
+
+        /* ACTIVE STATES */
+        .node.active {
+            color: #fff;
+            font-weight: bold;
+            z-index: 10;
+            text-shadow: 0 0 5px white;
+        }
+
+        .node.related {
+            color: #00ffea;
+            z-index: 5;
+            text-shadow: 0 0 8px #00ffea;
+        }
+
+        /* CONNECTION LINES (Canvas) */
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="hud">
+        <h1>VECTOR_SPACE_NAVIGATOR</h1>
+        <p>HOVER TO TRIANGULATE MEANING</p>
+        <div id="target-info">-- NO TARGET --</div>
+    </div>
+
+    <canvas id="lines"></canvas>
+    <div class="space" id="universe"></div>
+
+    <script>
+        const universe = document.getElementById('universe');
+        const canvas = document.getElementById('lines');
+        const ctx = canvas.getContext('2d');
+        const info = document.getElementById('target-info');
+
+        let width, height;
+
+        // 1. THE DATASET (Concepts)
+        // In a real AI, these are math vectors. Here, we fake "categories" for the visual.
+        const vocabulary = [
+            { word: "Apple", cat: "fruit" }, { word: "Banana", cat: "fruit" }, { word: "Cherry", cat: "fruit" }, { word: "Mango", cat: "fruit" },
+            { word: "Code", cat: "tech" }, { word: "Python", cat: "tech" }, { word: "Algorithm", cat: "tech" }, { word: "Server", cat: "tech" }, { word: "Cyber", cat: "tech" },
+            { word: "Dog", cat: "animal" }, { word: "Wolf", cat: "animal" }, { word: "Cat", cat: "animal" }, { word: "Tiger", cat: "animal" },
+            { word: "Happy", cat: "emotion" }, { word: "Joy", cat: "emotion" }, { word: "Sad", cat: "emotion" }, { word: "Anger", cat: "emotion" },
+            { word: "Galaxy", cat: "space" }, { word: "Star", cat: "space" }, { word: "Nebula", cat: "space" }, { word: "Void", cat: "space" }
+        ];
+
+        let nodes = [];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            initUniverse();
+        }
+        window.addEventListener('resize', resize);
+
+        // 2. SCATTER THE WORDS
+        function initUniverse() {
+            universe.innerHTML = '';
+            nodes = [];
+
+            vocabulary.forEach(item => {
+                // Random Position
+                const x = Math.random() * (width - 100) + 50;
+                const y = Math.random() * (height - 100) + 50;
+
+                // Create DOM Element
+                const el = document.createElement('div');
+                el.className = 'node';
+                el.innerText = item.word;
+                el.style.left = `${x}px`;
+                el.style.top = `${y}px`;
+                universe.appendChild(el);
+
+                // Store data
+                nodes.push({
+                    x, y, 
+                    word: item.word, 
+                    cat: item.cat, 
+                    el
+                });
+            });
+        }
+
+        // 3. THE "BRAIN" (Distance Calculation)
+        window.addEventListener('mousemove', (e) => {
+            const mx = e.clientX;
+            const my = e.clientY;
+
+            ctx.clearRect(0, 0, width, height);
+            let closestNode = null;
+            let minDist = 50; // Activation Radius
+
+            // Find closest word to mouse
+            nodes.forEach(n => {
+                n.el.className = 'node'; // Reset
+                const dist = Math.hypot(n.x - mx, n.y - my);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestNode = n;
+                }
+            });
+
+            if (closestNode) {
+                activateNetwork(closestNode);
+            } else {
+                info.innerText = "-- SEARCHING --";
+            }
+        });
+
+        // 4. ACTIVATE CONNECTIONS
+        function activateNetwork(target) {
+            info.innerText = `TARGET: ${target.word.toUpperCase()} [${target.cat.toUpperCase()}]`;
+            target.el.classList.add('active');
+
+            // Find "Related" words (Same Category)
+            // In real AI, this would be "Vector Cosine Similarity > 0.8"
+            nodes.forEach(n => {
+                if (n === target) return;
+
+                if (n.cat === target.cat) {
+                    // VISUALIZE THE CONNECTION
+                    n.el.classList.add('related');
+                    
+                    // Draw Line
+                    ctx.beginPath();
+                    ctx.moveTo(target.x, target.y);
+                    ctx.lineTo(n.x, n.y);
+                    ctx.strokeStyle = 'rgba(0, 255, 234, 0.4)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    // Draw Dot
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, 3, 0, Math.PI*2);
+                    ctx.fillStyle = '#00ffea';
+                    ctx.fill();
+                }
+            });
+        }
+
+        resize();
+
+    </script>
+</body>
+</html>

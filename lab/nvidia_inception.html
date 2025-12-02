@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE DIGITAL // NVIDIA DECK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Rajdhani:wght@500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --text: #e0e0e0;
+            --accent: #00ff9d; /* Rune Green */
+            --gold: #d4af37;
+            --blood: #ff0055;
+            --panel: #111;
+            --border: #333;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- SLIDE CONTAINER --- */
+        .deck-container {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 4rem 6rem;
+            background: var(--bg);
+            border-bottom: 1px solid #222;
+            overflow: hidden;
+        }
+
+        /* --- PRINT SETTINGS (PDF EXPORT) --- */
+        @media print {
+            body { overflow: visible; }
+            .deck-container { height: auto; overflow: visible; display: block; }
+            section { 
+                height: 100vh; 
+                page-break-after: always; 
+                border-bottom: none;
+                print-color-adjust: exact;
+            }
+            .controls { display: none !important; }
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        h3 {
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        p, li {
+            font-size: 1.1rem;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        ul { list-style: none; }
+        li::before { content: "> "; color: var(--accent); margin-right: 10px; font-family: 'Fira Code'; }
+
+        /* --- LAYOUT UTILS --- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            height: 100%;
+            align-items: center;
+        }
+
+        .image-box {
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+
+        /* Crop adjustments */
+        .crop-top img { object-position: top center; }
+        .crop-center img { object-position: center center; }
+        .crop-bottom img { object-position: bottom center; }
+
+        .image-label {
+            position: absolute;
+            bottom: 10px; right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: var(--accent);
+            padding: 5px 10px;
+            font-family: 'Fira Code';
+            font-size: 0.7rem;
+            border: 1px solid var(--accent);
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- DECORATION --- */
+        .scanline {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.2) 51%);
+            background-size: 100% 4px; pointer-events: none; z-index: 10;
+        }
+
+        .slide-number {
+            position: absolute; bottom: 2rem; right: 2rem;
+            font-family: 'Fira Code'; color: #333; font-size: 0.8rem;
+        }
+
+        .logo-mark {
+            position: absolute; top: 2rem; right: 2rem;
+            font-family: 'Rajdhani'; font-weight: bold; color: #333; letter-spacing: 2px;
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px;
+            border: 1px solid #333; color: #fff; font-family: 'Inter'; font-size: 0.8rem;
+            z-index: 100; display: flex; gap: 20px; pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <span>USE ARROW KEYS TO NAVIGATE</span>
+    <span style="color: var(--accent)">CTRL+P TO EXPORT PDF</span>
+</div>
+
+<div class="deck-container" id="deck">
+
+    <!-- SLIDE 1: TITLE -->
+    <section id="slide-1">
+        <div class="scanline"></div>
+        <div class="logo-mark">RUNE DIGITAL</div>
+        
+        <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <h3 style="color: var(--accent)">// PROTOCOL_INIT</h3>
+            <h1 style="font-size: 6rem; line-height: 0.9;">RUNE DIGITAL</h1>
+            <p style="font-size: 1.5rem; color: #fff; max-width: 800px;">The "Input-to-Reality" Protocol:<br>Zero-Latency Interaction for Generative 3D.</p>
+            
+            <div style="margin-top: 4rem; border-left: 2px solid var(--accent); padding-left: 2rem;">
+                <p style="margin: 0; color: var(--gold);">APPLIED FOR: NVIDIA INCEPTION PROGRAM</p>
+                <p style="margin: 0; font-size: 0.9rem; font-family: 'Fira Code';">CLOUD CREDIT ALLOCATION // A100 TIER</p>
+            </div>
+        </div>
+
+        <!-- BG IMAGE OVERLAY -->
+        <div style="position: absolute; top: 0; right: 0; width: 55%; height: 100%; z-index: -1; opacity: 0.4;">
+            <img src="assets/genesis_shot.png" style="width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to right, transparent, black);">
+        </div>
+        
+        <div class="slide-number">01 / 07</div>
+    </section>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <section id="slide-2">
+        <div class="logo-mark">RUNE DIGITAL</div>
+        <div class="grid-2">
+            <div>
+                <h2>THE "BLACK BOX" OF<br>GENERATIVE AI</h2>
+                <ul>
+                    <li><strong>The Disconnect:</strong> LLMs generate code/text instantly, but web interfaces remain static, 2D chatbots.</li>
+                    <li><strong>The Bottleneck:</strong> Rendering dynamic 3D assets usually requires downloading a 500MB Unity engine.</li>
+                    <li><strong>The Cost:</strong> High latency and massive friction prevent AI from feeling "alive" or immersive on the web.</li>
+                </ul>
+            </div>
+            <div class="image-box crop-top">
+                <!-- Showing raw code to symbolize the un-visualized data -->
+                <img src="assets/code_shot.png">
+                <div class="image-label">CURRENT STATE: RAW DATA</div>
+            </div>
+        </div>
+        <div class="slide-number">02 / 07</div>
+    </section>
+
+    <!-- SLIDE 3: THE SOLUTION -->
+    <section id="slide-3">
+        <div class="logo-mark">RUNE DIGITAL</div>
+        <div class="grid-2">
+            <div class="image-box crop-center">
+                <img src="assets/clair_obscur_shot.png" alt="Clair Obscur Interface">
+                <div class="image-label">RUNE GENESIS ENGINE</div>
+            </div>
+            <div>
+                <h2>THE "GENESIS"<br>RENDERING ENGINE</h2>
+                <ul>
+                    <li><strong>Procedural Geometry:</strong> We utilize Three.js and custom GLSL shaders to construct complex 3D assets from raw code instructions in milliseconds.</li>
+                    <li><strong>"Pixel-Diff" Input:</strong> Our proprietary motion engine allows users to manipulate 3D assets with hand gestures using <1% GPU (Computer Vision without the overhead).</li>
+                    <li><strong>Result:</strong> High-fidelity, interactive 3D experiences that load instantly.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-number">03 / 07</div>
+    </section>
+
+    <!-- SLIDE 4: VALIDATION -->
+    <section id="slide-4">
+        <div class="logo-mark">RUNE DIGITAL</div>
+        <h2 style="text-align: center;">PROVEN SHADER MASTERY</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; height: 60%; margin-top: 2rem;">
+            <div class="image-box crop-center">
+                <img src="assets/hunter_wireframe.png">
+                <div class="image-label">GENESIS (PROCEDURAL)</div>
+            </div>
+            <div class="image-box crop-center">
+                <img src="assets/cthulhu_shot.png">
+                <div class="image-label">RAYMARCHING (VOLUMETRIC)</div>
+            </div>
+            <div class="image-box crop-center">
+                <img src="assets/pawn_scanner.png">
+                <div class="image-label">PAWN PASS (BIOMETRIC)</div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 2rem;">Rune Digital has deployed high-complexity WebGL assets demonstrating capabilities in Raymarching, Instanced Mesh Particles, and Real-time Clipping.</p>
+        <div class="slide-number">04 / 07</div>
+    </section>
+
+    <!-- SLIDE 5: MARKET -->
+    <section id="slide-5">
+        <div class="logo-mark">RUNE DIGITAL</div>
+        <div class="grid-2">
+            <div>
+                <h2>THE "IMMERSIVE WEB"<br>SECTOR</h2>
+                <p>Targeting the $100B shift towards Spatial Computing and the 3D Web.</p>
+                <ul>
+                    <li><strong>Fintech (Pawn Pass):</strong> Visualizing high-value assets as "Digital Twins" for instant lending and verification.</li>
+                    <li><strong>Luxury Retail:</strong> "Clair Obscur" tech for high-end brand storytelling and product configurators.</li>
+                    <li><strong>Edge AI:</strong> Using our "Pixel Diff" engine to enable gesture control on low-power kiosks.</li>
+                </ul>
+            </div>
+            <div class="image-box crop-top" style="border-color: var(--gold);">
+                <img src="assets/pawn_dashboard.png">
+                <div class="image-label">LIVE FINTECH PRODUCT</div>
+            </div>
+        </div>
+        <div class="slide-number">05 / 07</div>
+    </section>
+
+    <!-- SLIDE 6: THE ASK -->
+    <section id="slide-6">
+        <div class="logo-mark">RUNE DIGITAL</div>
+        <div style="text-align: center; max-width: 800px; margin: 0 auto; position: relative; z-index: 2;">
+            <h3 style="color: var(--accent)">// ACCELERATING THE BACKEND</h3>
+            <h2>WHY NVIDIA?</h2>
+            <p style="color: #fff;">Objective: We are seeking Compute Credits to build the <strong>Generative Backend</strong>.</p>
+        </div>
+
+        <!-- Background Wireframe for Tech Vibe -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.2;">
+            <img src="assets/genesis_wireframe.png" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-top: 4rem; position: relative; z-index: 2;">
+            <div style="border: 1px solid #333; padding: 2rem; border-radius: 12px; width: 250px; background: #000;">
+                <h3 style="color: #fff">USER PROMPT</h3>
+                <p>"Make a Cyberpunk Helmet"</p>
+            </div>
+            <div style="font-size: 2rem; color: var(--accent);">→</div>
+            <div style="border: 1px solid var(--accent); padding: 2rem; border-radius: 12px; width: 250px; background: rgba(0, 255, 157, 0.1);">
+                <h3 style="color: var(--accent)">NVIDIA A100</h3>
+                <p>Geometry Inference Model</p>
+            </div>
+            <div style="font-size: 2rem; color: var(--accent);">→</div>
+            <div style="border: 1px solid #333; padding: 2rem; border-radius: 12px; width: 250px; background: #000;">
+                <h3 style="color: #fff">GENESIS ENGINE</h3>
+                <p>Real-time 3D Construction</p>
+            </div>
+        </div>
+        
+        <div class="slide-number">06 / 07</div>
+    </section>
+
+    <!-- SLIDE 7: TRACTION -->
+    <section id="slide-7">
+        <div class="logo-mark">RUNE DIGITAL</div>
+        <div class="grid-2">
+            <div>
+                <h2>OPERATING IN<br>"GOD MODE"</h2>
+                <ul>
+                    <li><strong>Structure:</strong> Technical Product Studio.</li>
+                    <li><strong>Status:</strong> Self-funded, profitable, executing on a "Code-as-Leverage" model.</li>
+                    <li><strong>Current Deployment:</strong> Multiple live prototypes (Pawn Pass, Genesis) demonstrating Tier-3 WebGL capabilities.</li>
+                </ul>
+                <div style="margin-top: 4rem;">
+                    <h3 style="color: #fff">CONTACT</h3>
+                    <p>The Operator<br>runedigitalstudio.com</p>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                
+                <!-- THE BUTTON (NO QR) -->
+                <a href="https://www.runedigitalstudio.com" target="_blank" style="text-decoration: none;">
+                    <div style="
+                        width: 250px; 
+                        height: 250px; 
+                        background: #000; 
+                        border: 2px solid var(--accent); 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        color: var(--accent); 
+                        font-family: 'Rajdhani'; 
+                        font-size: 1.5rem; 
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                        box-shadow: 0 0 30px rgba(0, 255, 157, 0.2);
+                        text-align: center;
+                    " onmouseover="this.style.background=var(--accent); this.style.color='#000'; this.style.boxShadow='0 0 60px var(--accent)'"
+                      onmouseout="this.style.background='#000'; this.style.color=var(--accent); this.style.boxShadow='0 0 30px rgba(0, 255, 157, 0.2)'">
+                        LAUNCH<br>DEMO
+                    </div>
+                </a>
+
+                <p style="font-family: 'Fira Code'; font-size: 0.8rem; margin-top: 2rem; color: #666;">CLICK TO INITIALIZE</p>
+            </div>
+        </div>
+        <div class="slide-number">07 / 07</div>
+    </section>
+</div>
+
+<script>
+    // Simple Navigation
+    const container = document.getElementById('deck');
+    const sectionHeight = window.innerHeight;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            container.scrollBy({ top: sectionHeight, behavior: 'smooth' });
+        }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            container.scrollBy({ top: -sectionHeight, behavior: 'smooth' });
+        }
+    });
+</script>
+
+</body>
+</html>
