@@ -60,18 +60,12 @@ const ASSETS = {
 }
 
 // --- FONT PROTOCOLS (STABLE CDN) ---
+
 const FONTS = {
-  // OSWALD (Bold/Industrial)
-  'INDUSTRIAL': 'https://cdn.jsdelivr.net/npm/@fontsource/oswald@5.0.0/files/oswald-latin-400-normal.woff',
-  
-  // ORBITRON (Black/Cyber)
-  'CYBER': 'https://cdn.jsdelivr.net/npm/@fontsource/orbitron@5.0.0/files/orbitron-latin-900-normal.woff',
-  
-  // PLAYFAIR (Serif/Luxury)
-  'LUXURY': 'https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.0/files/playfair-display-latin-400-normal.woff',
-  
-  // INTER (Clean/Minimal - Fallback)
-  'MINIMAL': 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/files/inter-latin-400-normal.woff' 
+ 'INDUSTRIAL': 'https://cdn.jsdelivr.net/npm/@fontsource/oswald@5.0.0/files/oswald-latin-400-normal.woff',
+ 'CYBER': 'https://cdn.jsdelivr.net/npm/@fontsource/orbitron@5.0.0/files/orbitron-latin-900-normal.woff',
+ 'LUXURY': 'https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.0/files/playfair-display-latin-400-normal.woff',
+ 'MINIMAL': 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/files/inter-latin-400-normal.woff' 
 }
 // --- GLOBAL STYLES ---
 const GlobalStyles = () => (
@@ -495,132 +489,92 @@ const InterventionModal = ({ onClose, onReset, onClaimOffer }) => (
 )
 // --- MAIN APP ---
 export default function Showroom() {
-  const [introFinished, setIntroFinished] = useState(false)
-  const [mode, setMode] = useState('DARK_MATTER') // Placeholder, overwritten by random
-  const [viewMode, setViewMode] = useState('IDLE')
-  const [activeColor, setActiveColor] = useState('#ffffff')
-  const [activeText, setActiveText] = useState('RUNE')
-  const [activeFont, setActiveFont] = useState('INDUSTRIAL')
-  const [showIntervention, setShowIntervention] = useState(false)
-  const [discountApplied, setDiscountApplied] = useState(false)
+ // ... (Keep all state logic: introFinished, mode, activeColor, etc.) ...
+ const [introFinished, setIntroFinished] = useState(false)
+ const [mode, setMode] = useState('DARK_MATTER') 
+ const [viewMode, setViewMode] = useState('IDLE')
+ const [activeColor, setActiveColor] = useState('#ffffff')
+ const [activeText, setActiveText] = useState('RUNE')
+ const [activeFont, setActiveFont] = useState('INDUSTRIAL')
+ const [showIntervention, setShowIntervention] = useState(false)
+ const [discountApplied, setDiscountApplied] = useState(false)
+  
+ const isMobile = useIsMobile()
 
-  // RANDOM START + DEFAULT VALUES
-  useEffect(() => {
-    const keys = Object.keys(ASSETS)
-    const randomKey = keys[Math.floor(Math.random() * keys.length)]
-    setMode(randomKey)
-    setActiveColor(ASSETS[randomKey].defaultColor)
-    setActiveText(randomKey)
-  }, []) // Runs once on mount
+ useEffect(() => {
+  const keys = Object.keys(ASSETS)
+  const randomKey = keys[Math.floor(Math.random() * keys.length)]
+  setMode(randomKey)
+  setActiveColor(ASSETS[randomKey].defaultColor)
+  setActiveText(randomKey)
+ }, [])
 
-  const defaultColor = ASSETS[mode]?.defaultColor || '#ffffff'
-  const defaultText = mode
-  const isModified = (activeColor !== defaultColor) || (activeText !== defaultText) || (activeFont !== 'INDUSTRIAL')
+ const handleModeChange = (newMode) => {
+  setMode(newMode)
+  setActiveColor(ASSETS[newMode].defaultColor)
+  setActiveText(newMode)
+  setActiveFont('INDUSTRIAL')
+  setDiscountApplied(false)
+ }
+ 
+ const handleReset = () => {
+  setActiveColor(ASSETS[mode]?.defaultColor || '#ffffff')
+  setActiveText(mode)
+  setActiveFont('INDUSTRIAL')
+  setShowIntervention(false)
+ }
 
-  // UPDATE STATE WHEN MODE CHANGES (Except on initial random load)
-  const handleModeChange = (newMode) => {
-    setMode(newMode)
-    setActiveColor(ASSETS[newMode].defaultColor)
-    setActiveText(newMode)
-    setActiveFont('INDUSTRIAL')
-    setDiscountApplied(false)
-  }
+ const handleClaimOffer = () => { setDiscountApplied(true); setShowIntervention(false); setViewMode('CONFIG_T2') }
+ const handleCloseSuccess = () => { setViewMode('IDLE'); window.history.replaceState({}, document.title, window.location.pathname) }
+ const fontUrl = FONTS[activeFont]
+ const defaultColor = ASSETS[mode]?.defaultColor || '#ffffff'
+ const defaultText = mode
+ const isModified = (activeColor !== defaultColor) || (activeText !== defaultText) || (activeFont !== 'INDUSTRIAL')
 
-  const handleReset = () => {
-    setActiveColor(defaultColor)
-    setActiveText(defaultText)
-    setActiveFont('INDUSTRIAL')
-    setShowIntervention(false)
-  }
+ return (
+  <>
+   {/* <GlobalStyles /> and other UI components go here */}
+   {!introFinished && <div style={{ opacity: introFinished ? 0 : 1, transition: 'opacity 1s ease' }}><ChiralGate onEnter={() => setIntroFinished(true)} /></div>}
 
-  const handleClaimOffer = () => {
-    setDiscountApplied(true)
-    setShowIntervention(false)
-    setViewMode('CONFIG_T2')
-  }
+   {/* === THE FIX: NO GLOBAL CANVAS === */}
+   {/* We just render the Asset Component directly. It brings its own Canvas. */}
+   <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: introFinished ? 1 : 0, transition: 'opacity 2s ease', zIndex: 1 }}>
+      <Suspense fallback={null}>
+          {mode === 'DARK_MATTER' && <DARK_MATTER primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'CRYSTALIX' && <DEEPTHINK1 primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'GATEWAY' && <GATEWAY primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'INFERNO' && <INFERNO primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'KINETIC' && <KINETIC primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'MERCURY' && <MERCURY primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'NARCISSIST' && <NARCISSIST primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'OBSERVER' && <OBSERVER primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'AUTOPSY' && <AUTOPSY primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'OBELISK' && <OBELISK primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'SWARM' && <SWARM primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'PARADOX' && <PARADOX primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'HORIZON' && <HORIZON primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'ECHO' && <ECHO primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'REACTOR' && <REACTOR primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'GLITCH_GOD' && <GLITCH_GOD primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'SILK' && <SILK primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'VOGUE' && <VOGUE primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'LIQUID_GOLD' && <LIQUID_GOLD primaryColor={activeColor} text={activeText} font={fontUrl} />}
+          {mode === 'SOUL_COIL' && <SOUL_COIL primaryColor={activeColor} text={activeText} font={fontUrl} />}
+      </Suspense>
+   </div>
+   {/* ================================ */}
 
-  const handleCloseSuccess = () => {
-    setViewMode('IDLE')
-    window.history.replaceState({}, document.title, window.location.pathname)
-  }
-
-  // FONT PROP PASSING: Assets need to accept 'font' prop now!
-  const fontUrl = FONTS[activeFont]
-
-  return (
-    <>
-      <GlobalStyles />
-      
-{!introFinished && (
-      <div style={{ opacity: introFinished ? 0 : 1, transition: 'opacity 1s ease' }}>
-        <ChiralGate onEnter={() => setIntroFinished(true)} />
-      </div>
-    )}
-
-      {/* SCENE */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: introFinished ? 1 : 0, transition: 'opacity 2s ease' }}>
-        {mode === 'DARK_MATTER' && <DARK_MATTER primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'CRYSTALIX' && <DEEPTHINK1 primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'GATEWAY' && <GATEWAY primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'INFERNO' && <INFERNO primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'KINETIC' && <KINETIC primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'MERCURY' && <MERCURY primaryColor={activeColor} text={activeText} font={fontUrl} />}
-     	  {mode === 'NARCISSIST' && <NARCISSIST primaryColor={activeColor} text={activeText} font={fontUrl} />}
-  	    {mode === 'OBSERVER' && <OBSERVER primaryColor={activeColor} text={activeText} font={fontUrl} />}
-  	    {mode === 'AUTOPSY' && <AUTOPSY primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'OBELISK' && <OBELISK primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'SWARM' && <SWARM primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'PARADOX' && <PARADOX primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'HORIZON' && <HORIZON primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'ECHO' && <ECHO primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'REACTOR' && <REACTOR primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'GLITCH_GOD' && <GLITCH_GOD primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'SILK' && <SILK primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'VOGUE' && <VOGUE primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'LIQUID_GOLD' && <LIQUID_GOLD primaryColor={activeColor} text={activeText} font={fontUrl} />}
-        {mode === 'SOUL_COIL' && <SOUL_COIL primaryColor={activeColor} text={activeText} font={fontUrl} />}
- </div>
-
-      {/* UI LAYER */}
-      <div style={{ opacity: (viewMode === 'IDLE' && introFinished) ? 1 : 0, transition: 'opacity 0.5s ease', pointerEvents: (viewMode === 'IDLE' && introFinished) ? 'auto' : 'none' }}>
-        <BrandWatermark />
-        <InfoCard mode={mode} />
-        
-        {/* TOP RIGHT CLUSTER */}
-        <div style={{ position: 'fixed', top: '40px', right: '40px', display: 'flex', gap: '20px', zIndex: 100 }}>
-          <div style={{ position: 'relative', width: '220px' }}>
-            <select className="rune-select" value={mode} onChange={(e) => handleModeChange(e.target.value)}>
-              {Object.keys(ASSETS).map(k => <option key={k} value={k}>{k}</option>)}
-            </select>
-            <div style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#00ffea', fontSize: '10px' }}>▼</div>
-          </div>
-          <button onClick={() => setViewMode('ACQUIRE')} className="rune-btn" style={{ background: '#fff', color: '#000', border: '1px solid #fff', padding: '0 40px', fontSize: '14px', letterSpacing: '3px', fontFamily: "'Oswald', sans-serif", fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>ACQUIRE ASSET</button>
-        </div>
-        
-        <ControlDeck 
-          activeColor={activeColor} setColor={setActiveColor} 
-          activeText={activeText} setText={setActiveText} 
-          activeFont={activeFont} setFont={setActiveFont}
-          defaultColor={defaultColor} defaultText={defaultText} 
-          isModified={isModified} 
-        />
-      </div>
-
-      {/* MODALS */}
-      {viewMode === 'ACQUIRE' && (
-        <AcquisitionMatrix 
-          mode={mode} onClose={() => setViewMode('IDLE')} 
-          onConfigTier2={() => setViewMode('CONFIG_T2')} 
-          onConfigTier3={() => setViewMode('CONFIG_T3')} 
-          isModified={isModified} onResetRequest={() => setShowIntervention(true)} 
-        />
-      )}
-      
-      {showIntervention && <InterventionModal onClose={() => setShowIntervention(false)} onReset={handleReset} onClaimOffer={handleClaimOffer} />}
-      
-      {viewMode === 'CONFIG_T2' && <ConfigTier2 mode={mode} onClose={() => setViewMode('IDLE')} activeColor={activeColor} setColor={setActiveColor} activeText={activeText} setText={setActiveText} discountApplied={discountApplied} />}
-      {viewMode === 'CONFIG_T3' && <ConfigTier3 mode={mode} onClose={() => setViewMode('IDLE')} />}
-      {viewMode === 'SUCCESS' && <SuccessScreen onClose={handleCloseSuccess} />}
-    </>
-  )
+   <div style={{ opacity: (viewMode === 'IDLE' && introFinished) ? 1 : 0, transition: 'opacity 0.5s ease', pointerEvents: (viewMode === 'IDLE' && introFinished) ? 'auto' : 'none', position: 'relative', zIndex: 10 }}>
+    <BrandWatermark isMobile={isMobile} />
+    <InfoCard mode={mode} isMobile={isMobile} />
+    {/* ... REST OF UI ... */}
+   </div>
+   
+   {showIntervention && <InterventionModal onClose={() => setShowIntervention(false)} onReset={handleReset} onClaimOffer={handleClaimOffer} />}
+   
+   {viewMode === 'CONFIG_T2' && <ConfigTier2 mode={mode} onClose={() => setViewMode('IDLE')} activeColor={activeColor} setColor={setActiveColor} activeText={activeText} setText={setActiveText} discountApplied={discountApplied} />}
+   {viewMode === 'CONFIG_T3' && <ConfigTier3 mode={mode} onClose={() => setViewMode('IDLE')} />}
+   {viewMode === 'SUCCESS' && <SuccessScreen onClose={handleCloseSuccess} />}
+  </>
+ )
 }
