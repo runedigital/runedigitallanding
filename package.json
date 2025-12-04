@@ -9,14 +9,14 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "leva": "latest",
+    "leva": "^0.9.35",
     "three": "^0.160.0",
     "@react-three/fiber": "^8.15.16",
-    "@react-three/drei": "latest",
-    "@react-three/postprocessing": "latest",
-    "maath": "latest",
-    "lamina": "latest",
-    "uuid": "latest"
+    "@react-three/drei": "^9.99.0",
+    "@react-three/postprocessing": "^2.16.0",
+    "maath": "0.10.7",
+    "lamina": "1.1.23",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
