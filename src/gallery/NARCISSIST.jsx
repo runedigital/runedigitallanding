@@ -1,13 +1,13 @@
 
             import React from 'react'
-            export default function Placeholder(props) {{
+            export default function Placeholder(props) {
                 return (
-                    <group {{...props}}>
+                    <group {...props}>
                         <mesh>
-                            <boxGeometry args={{[1, 1, 1]}} />
+                            <boxGeometry args={[1, 1, 1]} />
                             <meshStandardMaterial color="red" wireframe />
                         </mesh>
                     </group>
                 )
-            }}
+            }
             
