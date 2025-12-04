@@ -14,7 +14,7 @@ import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocess
 import * as THREE from 'three'
 
 // --- RUNE DIGITAL // ASSET GALLERY ---
-// Note: If any of these files are missing, the build will alert you.
+// The system will look for ./gallery/NAME/index.jsx automatically.
 import DARK_MATTER from './gallery/DARK_MATTER'
 import DEEPTHINK1 from './gallery/DEEPTHINK1'
 import GATEWAY from './gallery/GATEWAY'
