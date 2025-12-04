@@ -1,0 +1,414 @@
+import React, { useState, useEffect, useMemo } from 'react'
+import { Leva, useControls } from 'leva'
+
+// --- RUNE DIGITAL // ASSET GALLERY ---
+// ENSURE ALL THESE FILES EXIST IN YOUR src/gallery/ FOLDER
+import DARK_MATTER from './gallery/DARK_MATTER'
+import DEEPTHINK1 from './gallery/DEEPTHINK1' // Renamed Crystalix
+import GATEWAY from './gallery/GATEWAY'
+import INFERNO from './gallery/INFERNO'
+import KINETIC from './gallery/KINETIC'
+import MERCURY from './gallery/MERCURY'
+
+// --- DATA MATRIX ---
+// Added 'defaultColor' to track modifications
+const ASSETS = {
+  'DARK_MATTER': { tier: 'VOID CLASS', id: '001', price: '5,000 USD', licensePrice: '$499', defaultColor: '#00ffff', stripeLink: 'https://buy.stripe.com/8x200l1FWakCbjW1HT6Ri03' },
+  'CRYSTALIX':   { tier: 'AGI CLASS',  id: '002', price: '7,500 USD', licensePrice: '$499', defaultColor: '#ff0055', stripeLink: 'https://buy.stripe.com/6oUdRb2K064mbjW4U56Ri04' },
+  'GATEWAY':     { tier: 'WEB CLASS',  id: '003', price: '4,000 USD', licensePrice: '$499', defaultColor: '#00ffea', stripeLink: 'https://buy.stripe.com/7sY00l84kdwObjW5Y96Ri05' },
+  'INFERNO':     { tier: 'VFX CLASS',  id: '004', price: '6,000 USD', licensePrice: '$499', defaultColor: '#ff3300', stripeLink: 'https://buy.stripe.com/5kQ3cxckA1O6ds4euF6Ri07' },
+  'KINETIC':     { tier: 'PHYS CLASS', id: '005', price: '4,500 USD', licensePrice: '$499', defaultColor: '#ffcc00', stripeLink: 'https://buy.stripe.com/aFa28t70g3We87K2LX6Ri08' },
+  'MERCURY':     { tier: 'MAT CLASS',  id: '006', price: '3,500 USD', licensePrice: '$499', defaultColor: '#ffffff', stripeLink: 'https://buy.stripe.com/aFa14p2K078q1Jm2LX6Ri06' }
+}
+
+// --- GLOBAL STYLES ---
+const GlobalStyles = () => (
+  <>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600&display=swap');</style>
+    <style>{`
+      div[id^="leva__root"] { display: none !important; } /* HIDE LEVA, WE BUILT OUR OWN HUD */
+      * { border-radius: 0px !important; box-sizing: border-box; }
+      body { margin: 0; overflow: hidden; background: #000; font-family: 'Oswald', sans-serif; }
+      .rune-btn { transition: all 0.3s ease; position: relative; overflow: hidden; }
+      .rune-btn:hover { letter-spacing: 4px !important; }
+      .rune-btn:active { transform: scale(0.98); }
+      
+      .rune-input { 
+        background: rgba(0,0,0,0.8); border: 1px solid #333; color: #fff; 
+        padding: 15px; font-family: 'Oswald'; font-size: 16px; width: 100%; 
+        margin-bottom: 10px; outline: none; transition: border 0.3s; 
+      }
+      .rune-input:focus { border-color: #00ffea; }
+      
+      .scope-item { display: flex; justify-content: space-between; padding: 15px; border: 1px solid #222; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+      .scope-item:hover { background: #111; }
+      .scope-item.active { border-color: #ff0055; background: rgba(255,0,85,0.1); }
+      
+      /* SCROLLBARS */
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: #000; }
+      ::-webkit-scrollbar-thumb { background: #333; }
+      ::-webkit-scrollbar-thumb:hover { background: #fff; }
+    `}</style>
+  </>
+)
+
+const RuneLogo = ({ size = 40 }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 20 L10 50 L30 80 H50 L70 50 L50 20 H30 Z" fill="none" stroke="white" strokeWidth="4" />
+    <path d="M35 20 L15 50 L35 80" stroke="#00ffea" strokeWidth="4" style={{ mixBlendMode: 'screen' }} />
+    <circle cx="40" cy="50" r="4" fill="#ff0055" />
+  </svg>
+)
+
+const BrandWatermark = () => (
+  <div style={{ position: 'fixed', top: '40px', left: '40px', zIndex: 50, pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: '15px' }}>
+    <RuneLogo size={50} />
+    <div><div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 600, fontSize: '20px', color: '#fff', letterSpacing: '4px', lineHeight: '1' }}>RUNE</div><div style={{ fontFamily: "'Oswald', sans-serif", fontWeight: 300, fontSize: '10px', color: '#666', letterSpacing: '3px' }}>DIGITAL // STUDIO</div></div>
+  </div>
+)
+
+const InfoCard = ({ mode }) => {
+  const data = ASSETS[mode] || { tier: 'UNKNOWN', id: '---', price: '---' }
+  return (
+    <div style={{ position: 'fixed', bottom: '50px', left: '50px', width: '300px', color: '#fff', fontFamily: "'Oswald', sans-serif", zIndex: 50, pointerEvents: 'none' }}>
+      <div style={{ height: '1px', width: '100%', background: 'rgba(255,255,255,0.3)', marginBottom: '15px' }} />
+      <h2 style={{ margin: 0, fontSize: '14px', letterSpacing: '3px', color: '#888', fontWeight: 400 }}>ASSET_ID // {data.id}</h2>
+      <h1 style={{ margin: '5px 0 0 0', fontSize: '32px', letterSpacing: '1px', fontWeight: 500, textTransform: 'uppercase' }}>{mode}</h1>
+      <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', fontSize: '14px', letterSpacing: '2px', color: '#aaa' }}><span>{data.tier}</span><span style={{ color: '#00ffea', fontWeight: 600 }}>MARKET VAL: {data.price}</span></div>
+    </div>
+  )
+}
+
+// --- THE CONTROL DECK (HUD) ---
+const ControlDeck = ({ activeColor, setColor, activeText, setText, defaultColor, defaultText, isModified }) => {
+  return (
+    <div style={{ 
+      position: 'fixed', bottom: '50px', right: '50px', width: '350px', 
+      background: 'rgba(5,5,5,0.85)', border: '1px solid #333', 
+      backdropFilter: 'blur(10px)', padding: '25px', zIndex: 100 
+    }}>
+      <h3 style={{ color: '#fff', fontSize: '12px', letterSpacing: '2px', margin: '0 0 20px 0', display: 'flex', justifyContent: 'space-between' }}>
+        <span>OPERATOR CONTROLS</span>
+        {isModified && <span style={{ color: '#ff0055', animation: 'pulse 1s infinite' }}>● MODIFIED</span>}
+      </h3>
+      
+      {/* TEXT INPUT */}
+      <label style={{ color: '#666', fontSize: '10px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>DISPLAY TEXT</label>
+      <input 
+        className="rune-input" 
+        value={activeText} 
+        onChange={(e) => setText(e.target.value)} 
+        maxLength={12}
+        style={{ textAlign: 'right', fontSize: '20px', letterSpacing: '2px' }}
+      />
+
+      {/* COLOR INPUT */}
+      <label style={{ color: '#666', fontSize: '10px', letterSpacing: '1px', display: 'block', marginBottom: '5px' }}>PRIMARY ENERGY</label>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <input 
+          type="color" 
+          value={activeColor} 
+          onChange={(e) => setColor(e.target.value)} 
+          style={{ height: '45px', width: '45px', border: '1px solid #333', background: 'none', cursor: 'pointer', padding: 0 }} 
+        />
+        <input 
+          className="rune-input" 
+          value={activeColor.toUpperCase()} 
+          onChange={(e) => setColor(e.target.value)} 
+          style={{ marginBottom: 0, flexGrow: 1 }}
+        />
+      </div>
+
+      {/* RESET BUTTON (If Modified) */}
+      {isModified && (
+        <div 
+          onClick={() => { setColor(defaultColor); setText(defaultText); }}
+          style={{ 
+            textAlign: 'center', fontSize: '10px', color: '#888', letterSpacing: '1px', 
+            cursor: 'pointer', borderBottom: '1px dashed #555', paddingBottom: '2px', 
+            display: 'inline-block', width: '100%' 
+          }}
+        >
+          // RESET TO FACTORY DEFAULTS
+        </div>
+      )}
+    </div>
+  )
+}
+
+const AcquisitionMatrix = ({ mode, onClose, onConfigTier2, onConfigTier3, isModified, onReset }) => {
+  const data = ASSETS[mode]
+  
+  const Card = ({ title, price, features, color, link, action, recommended, disabled, warning }) => (
+    <div style={{ 
+      border: `1px solid ${disabled ? '#333' : color}`, 
+      background: recommended ? 'rgba(20,20,20,0.95)' : 'rgba(0,0,0,0.95)', 
+      padding: '30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', 
+      height: '480px', width: '320px', transition: 'all 0.3s ease', 
+      boxShadow: recommended ? `0 0 30px ${color}40` : `0 0 20px rgba(0,0,0,0.5)`, 
+      transform: recommended ? 'scale(1.05)' : 'scale(1)',
+      opacity: disabled ? 0.5 : 1,
+      filter: disabled ? 'grayscale(100%)' : 'none'
+    }}>
+      <div>
+        <h3 style={{ color: disabled ? '#555' : color, fontSize: '16px', letterSpacing: '3px', marginBottom: '10px', fontWeight: 400 }}>{title}</h3>
+        <h1 style={{ color: disabled ? '#555' : '#fff', fontSize: '48px', margin: '0 0 20px 0', fontFamily: "'Oswald', sans-serif", fontWeight: 600 }}>{price}</h1>
+        <div style={{ height: '1px', width: '100%', background: '#222', marginBottom: '25px' }} />
+        {features.map((f, i) => (
+          <div key={i} style={{ color: '#888', fontSize: '14px', marginBottom: '12px', letterSpacing: '1px', display: 'flex', alignItems: 'center' }}>
+            <span style={{ color: disabled ? '#444' : color, marginRight: '10px' }}>►</span> {f}
+          </div>
+        ))}
+      </div>
+      
+      <div>
+        {warning && <div style={{ color: '#ff0055', fontSize: '10px', letterSpacing: '1px', marginBottom: '10px', textAlign: 'center' }}>{warning}</div>}
+        
+        <button 
+          onClick={disabled ? null : action} 
+          className="rune-btn" 
+          style={{ 
+            background: recommended ? color : 'transparent', 
+            border: `1px solid ${disabled ? '#444' : color}`, 
+            color: recommended ? '#000' : (disabled ? '#444' : color), 
+            width: '100%', padding: '20px', cursor: disabled ? 'not-allowed' : 'pointer', 
+            fontSize: '14px', letterSpacing: '2px', fontFamily: "'Oswald', sans-serif", 
+            fontWeight: 600, textTransform: 'uppercase' 
+          }} 
+          onMouseEnter={(e) => { if(!recommended && !disabled) { e.target.style.background = color; e.target.style.color = '#000' } }} 
+          onMouseLeave={(e) => { if(!recommended && !disabled) { e.target.style.background = 'transparent'; e.target.style.color = color } }}
+        >
+          {disabled ? 'LOCKED' : link}
+        </button>
+        
+        {disabled && (
+           <div onClick={onReset} style={{ textAlign: 'center', marginTop: '15px', fontSize: '10px', color: '#fff', cursor: 'pointer', textDecoration: 'underline' }}>RESET TO UNLOCK</div>
+        )}
+      </div>
+    </div>
+  )
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 200, backdropFilter: 'blur(20px)', background: 'rgba(0,0,0,0.7)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <div onClick={onClose} style={{ position: 'absolute', top: '40px', right: '50px', cursor: 'pointer', color: '#fff', fontSize: '24px', opacity: 0.5 }}>✕ CLOSE</div>
+      <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+        <RuneLogo size={60} />
+        <h1 style={{ color: '#fff', fontFamily: "'Oswald', sans-serif", letterSpacing: '8px', marginTop: '20px', fontSize: '24px', fontWeight: 300 }}>ACQUISITION PROTOCOL</h1>
+      </div>
+      <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+        
+        {/* TIER 1: LOCKED IF MODIFIED */}
+        <Card 
+          title="PROTOCOL 1 // SOURCE" 
+          price={data.licensePrice} 
+          color="#00ffea" 
+          link="INITIATE DOWNLOAD" 
+          action={() => window.open(data.stripeLink, '_blank')} 
+          features={['REACT COMPONENT', 'GLSL SOURCE CODE', 'COMMERCIAL LICENSE', 'SELF-HOSTED']} 
+          disabled={isModified}
+          warning={isModified ? "CANNOT BUY SOURCE FOR CUSTOM ASSET" : null}
+        />
+
+        {/* TIER 2: RECOMMENDED IF MODIFIED */}
+        <Card 
+          title="PROTOCOL 2 // DEPLOY" 
+          price="$1,499" 
+          color="#fff" 
+          link={isModified ? "DEPLOY CONFIGURATION" : "START CONFIGURATION"} 
+          recommended={true} 
+          action={onConfigTier2} 
+          features={['HOSTED SOLUTION (VERCEL)', 'YOUR CUSTOM CONFIG', 'CUSTOM DOMAIN SETUP', '1 REVISION ROUND']} 
+        />
+
+        {/* TIER 3: AGENCY */}
+        <Card 
+          title="PROTOCOL 3 // AGENCY" 
+          price="$3,800+" 
+          color="#ff0055" 
+          link="BUILD SCOPE" 
+          action={onConfigTier3} 
+          features={['FULL SITE ARCHITECTURE', 'CMS & COMMERCE ADD-ONS', 'SEO & ANALYTICS SUITE', 'DEDICATED SUPPORT']} 
+        />
+      </div>
+    </div>
+  )
+}
+
+const ConfigTier2 = ({ mode, onClose, activeColor, setColor, activeText, setText }) => {
+  const [formData, setFormData] = useState({ companyName: '', domain: '', email: '' })
+  const [agreed, setAgreed] = useState(false)
+  
+  const handleNameChange = (e) => {
+    const val = e.target.value
+    setFormData({...formData, companyName: val})
+    setText(val) 
+  }
+
+  const handleSubmit = () => {
+    if(!agreed) return alert("PLEASE ACKNOWLEDGE THE SCOPE TO PROCEED.")
+    const subject = `RUNE DEPLOYMENT: ${mode}`
+    const body = JSON.stringify({ ...formData, color: activeColor, text: activeText, tier: 'PROTOCOL 2 ($1499)', asset: mode }, null, 2)
+    window.location.href = `mailto:quotes@runedigitalstudio.com?subject=${subject}&body=${encodeURIComponent(body)}`
+  }
+  return (
+    <div style={{ position: 'fixed', top: 0, right: 0, width: '500px', height: '100%', background: 'rgba(10,10,10,0.95)', borderLeft: '1px solid #333', zIndex: 300, backdropFilter: 'blur(30px)', padding: '60px', display: 'flex', flexDirection: 'column', transform: 'translateX(0)' }}>
+      <div onClick={onClose} style={{ position: 'absolute', top: '40px', left: '-60px', cursor: 'pointer', color: '#fff', fontSize: '24px', opacity: 0.5 }}>✕</div>
+      <h3 style={{ color: '#888', fontSize: '14px', letterSpacing: '3px', marginBottom: '10px' }}>PROTOCOL 2 // CONFIGURATION</h3>
+      <h1 style={{ color: '#fff', fontSize: '36px', margin: '0 0 40px 0', fontWeight: 500 }}>DEPLOYMENT MANIFEST</h1>
+      
+      <label style={{ color: '#888', fontSize: '12px', marginBottom: '10px', letterSpacing: '2px' }}>COMPANY NAME (UPDATES 3D)</label>
+      <input className="rune-input" placeholder="e.g. ALPHA CORP" value={formData.companyName || activeText} onChange={handleNameChange} />
+      
+      <label style={{ color: '#888', fontSize: '12px', marginBottom: '10px', letterSpacing: '2px' }}>TARGET DOMAIN</label>
+      <input className="rune-input" placeholder="www.your-project.com" value={formData.domain} onChange={(e) => setFormData({...formData, domain: e.target.value})} />
+      <label style={{ color: '#888', fontSize: '12px', marginBottom: '10px', letterSpacing: '2px' }}>OPERATOR EMAIL</label>
+      <input className="rune-input" placeholder="you@company.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+      
+      <label style={{ color: '#888', fontSize: '12px', marginBottom: '10px', letterSpacing: '2px' }}>BRAND COLOR HEX</label>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '40px' }}><input type="color" value={activeColor} onChange={(e) => setColor(e.target.value)} style={{ height: '50px', width: '50px', border: 'none', background: 'none', cursor: 'pointer' }} /><input className="rune-input" style={{ marginBottom: 0 }} value={activeColor} onChange={(e) => setColor(e.target.value)} /></div>
+      
+      <div style={{ flexGrow: 1 }} />
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'flex-start' }}><input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} style={{ marginTop: '5px', cursor: 'pointer' }} /><div style={{ color: '#666', fontSize: '12px', lineHeight: '1.4' }}>I ACKNOWLEDGE THIS SERVICE IS A "AS-IS" DEPLOYMENT OF THE SELECTED ASSET. INCLUDES 1 ROUND OF REVISIONS FOR COLOR/TEXT ADJUSTMENTS.</div></div>
+      <div style={{ borderTop: '1px solid #333', paddingTop: '30px' }}><div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', marginBottom: '20px', fontSize: '14px' }}><span>DEPLOYMENT FEE</span><span>$1,499.00</span></div><button onClick={handleSubmit} className="rune-btn" style={{ background: agreed ? '#fff' : '#333', color: agreed ? '#000' : '#888', width: '100%', padding: '20px', cursor: agreed ? 'pointer' : 'not-allowed', fontSize: '14px', letterSpacing: '3px', fontFamily: "'Oswald', sans-serif", fontWeight: 600, textTransform: 'uppercase', border: 'none' }}>SUBMIT MANIFEST</button></div>
+    </div>
+  )
+}
+
+const ConfigTier3 = ({ mode, onClose }) => {
+  const basePrice = 3800
+  const [addons, setAddons] = useState({ expansion: false, cms: false, commerce: false })
+  let total = basePrice
+  if (addons.expansion) total += 1800
+  if (addons.cms) total += 2400
+  if (addons.commerce) total += 3000
+  const isFullSuite = addons.expansion && addons.cms && addons.commerce
+  const finalPrice = isFullSuite ? 9899 : total
+  const discountActive = isFullSuite
+  const toggleAll = () => isFullSuite ? setAddons({ expansion: false, cms: false, commerce: false }) : setAddons({ expansion: true, cms: true, commerce: true })
+  const handleSubmit = () => {
+    const subject = `RUNE AGENCY INQUIRY: ${mode}`
+    const body = JSON.stringify({ tier: 'PROTOCOL 3', asset: mode, addons, est_price: finalPrice }, null, 2)
+    window.location.href = `mailto:quotes@runedigitalstudio.com?subject=${subject}&body=${encodeURIComponent(body)}`
+  }
+  return (
+    <div style={{ position: 'fixed', top: 0, right: 0, width: '500px', height: '100%', background: 'rgba(10,10,10,0.95)', borderLeft: '1px solid #333', zIndex: 300, backdropFilter: 'blur(30px)', padding: '60px', display: 'flex', flexDirection: 'column', transform: 'translateX(0)' }}>
+      <div onClick={onClose} style={{ position: 'absolute', top: '40px', left: '-60px', cursor: 'pointer', color: '#fff', fontSize: '24px', opacity: 0.5 }}>✕</div>
+      <h3 style={{ color: '#ff0055', fontSize: '14px', letterSpacing: '3px', marginBottom: '10px' }}>PROTOCOL 3 // AGENCY</h3>
+      <h1 style={{ color: '#fff', fontSize: '36px', margin: '0 0 40px 0', fontWeight: 500 }}>SCOPE BUILDER</h1>
+      <div className="scope-item active" style={{ cursor: 'default' }}><div><div style={{color: '#fff', fontSize: '14px'}}>AGENCY CORE</div><div style={{color: '#666', fontSize: '10px'}}>ASSET + LANDING PAGE + DEPLOY</div></div><div style={{color: '#fff'}}>${basePrice}</div></div>
+      <div className={`scope-item ${addons.expansion ? 'active' : ''}`} onClick={() => setAddons({...addons, expansion: !addons.expansion})}><div><div style={{color: '#fff', fontSize: '14px'}}>EXPANSION PACK</div><div style={{color: '#666', fontSize: '10px'}}>ABOUT + TEAM + CONTACT + LEGAL PAGES</div></div><div style={{color: '#fff'}}>+$1,800</div></div>
+      <div className={`scope-item ${addons.cms ? 'active' : ''}`} onClick={() => setAddons({...addons, cms: !addons.cms})}><div><div style={{color: '#fff', fontSize: '14px'}}>DYNAMIC CMS</div><div style={{color: '#666', fontSize: '10px'}}>SELF-EDITABLE BLOG / NEWS / UPDATES</div></div><div style={{color: '#fff'}}>+$2,400</div></div>
+      <div className={`scope-item ${addons.commerce ? 'active' : ''}`} onClick={() => setAddons({...addons, commerce: !addons.commerce})}><div><div style={{color: '#fff', fontSize: '14px'}}>COMMERCE ENGINE</div><div style={{color: '#666', fontSize: '10px'}}>STRIPE / SHOPIFY INTEGRATION</div></div><div style={{color: '#fff'}}>+$3,000</div></div>
+      <div onClick={toggleAll} style={{ textAlign: 'center', padding: '10px', border: '1px dashed #555', color: '#888', fontSize: '10px', letterSpacing: '2px', cursor: 'pointer', marginTop: '20px' }}>[ {isFullSuite ? 'RESET SELECTION' : 'SELECT FULL SUITE (SAVE 10%)'} ]</div>
+      <div style={{ flexGrow: 1 }} />
+      <div style={{ borderTop: '1px solid #333', paddingTop: '30px' }}><div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', marginBottom: '5px', fontSize: '14px' }}><span>ESTIMATED TOTAL</span><span style={{ textDecoration: discountActive ? 'line-through' : 'none', color: discountActive ? '#888' : '#fff' }}>${total.toLocaleString()}</span></div>
+      {discountActive && (<div style={{ display: 'flex', justifyContent: 'space-between', color: '#00ffea', marginBottom: '20px', fontSize: '18px', fontWeight: 'bold' }}><span>BUNDLE PRICE</span><span>${finalPrice.toLocaleString()}</span></div>)}
+      <button onClick={handleSubmit} className="rune-btn" style={{ background: '#ff0055', color: '#fff', width: '100%', padding: '20px', cursor: 'pointer', fontSize: '14px', letterSpacing: '3px', fontFamily: "'Oswald', sans-serif", fontWeight: 600, textTransform: 'uppercase', border: 'none', marginTop: discountActive ? '0' : '15px' }}>REQUEST PROPOSAL</button></div>
+    </div>
+  )
+}
+
+const SuccessScreen = ({ onClose }) => {
+  const [email, setEmail] = useState(''); const [joined, setJoined] = useState(false); const handleJoin = () => { if(email) setJoined(true) }
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 500, background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <RuneLogo size={100} /><h1 style={{ color: '#00ffea', fontFamily: "'Oswald', sans-serif", fontSize: '48px', letterSpacing: '5px', marginTop: '40px', textTransform: 'uppercase' }}>ASSET SECURED</h1>
+      <div style={{ color: '#fff', fontFamily: "'Oswald', sans-serif", fontSize: '16px', letterSpacing: '2px', marginTop: '10px', textAlign: 'center', maxWidth: '400px', lineHeight: '1.6' }}>PAYMENT VERIFIED. SOURCE CODE DISPATCHED TO YOUR EMAIL.</div>
+      <div style={{ height: '1px', width: '300px', background: '#333', margin: '40px 0' }} />
+      {!joined ? (<div style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}><h2 style={{ color: '#888', fontSize: '14px', letterSpacing: '3px', marginBottom: '20px' }}>INITIALIZE SUPPLY DROP?</h2><div style={{ display: 'flex', gap: '10px' }}><input className="rune-input" placeholder="ENTER EMAIL" value={email} onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: 0 }} /><button onClick={handleJoin} className="rune-btn" style={{ background: '#ff0055', color: '#fff', border: 'none', padding: '0 30px', fontFamily: "'Oswald'", fontWeight: 600, cursor: 'pointer' }}>JOIN</button></div></div>) : (<div style={{ color: '#ff0055', fontSize: '18px', letterSpacing: '3px', fontWeight: 600 }}>// BLACKLIST ACCESS CONFIRMED</div>)}
+      <button onClick={onClose} style={{ marginTop: '60px', background: 'transparent', border: '1px solid #333', color: '#666', padding: '15px 40px', fontFamily: "'Oswald'", letterSpacing: '2px', cursor: 'pointer' }} onMouseEnter={(e) => {e.target.style.borderColor = '#fff'; e.target.style.color = '#fff'}} onMouseLeave={(e) => {e.target.style.borderColor = '#333'; e.target.style.color = '#666'}}>RETURN TO SHOWROOM</button>
+    </div>
+  )
+}
+
+// --- MAIN APP ---
+export default function Showroom() {
+  // LEVA CONTROLS (ADMIN / SELECTOR)
+  const { mode } = useControls('RUNE // SHOWROOM', { mode: { options: Object.keys(ASSETS) } })
+  
+  const [viewMode, setViewMode] = useState('IDLE')
+  const [activeColor, setActiveColor] = useState(ASSETS['DARK_MATTER'].defaultColor) 
+  const [activeText, setActiveText] = useState('DARK_MATTER')
+  
+  // DETECT MODIFICATION
+  const defaultColor = ASSETS[mode]?.defaultColor || '#ffffff'
+  const defaultText = mode
+  const isModified = (activeColor !== defaultColor) || (activeText !== defaultText)
+
+  // RESET ON MODE CHANGE
+  useEffect(() => {
+    setActiveColor(ASSETS[mode].defaultColor)
+    setActiveText(mode)
+  }, [mode])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('status') === 'confirmed') setViewMode('SUCCESS')
+  }, [])
+
+  const handleCloseSuccess = () => {
+    setViewMode('IDLE')
+    window.history.replaceState({}, document.title, window.location.pathname)
+  }
+
+  const handleReset = () => {
+    setActiveColor(defaultColor)
+    setActiveText(defaultText)
+  }
+
+  return (
+    <>
+      <GlobalStyles />
+      
+      {/* SCENE LAYER */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+        {mode === 'DARK_MATTER' && <DARK_MATTER primaryColor={activeColor} text={activeText} />}
+        {mode === 'CRYSTALIX' && <DEEPTHINK1 primaryColor={activeColor} text={activeText} />}
+        {mode === 'GATEWAY' && <GATEWAY primaryColor={activeColor} text={activeText} />}
+        {mode === 'INFERNO' && <INFERNO primaryColor={activeColor} text={activeText} />}
+        {mode === 'KINETIC' && <KINETIC primaryColor={activeColor} text={activeText} />}
+        {mode === 'MERCURY' && <MERCURY primaryColor={activeColor} text={activeText} />}
+      </div>
+
+      {/* UI LAYER */}
+      <div style={{ opacity: viewMode === 'IDLE' ? 1 : 0.3, transition: 'opacity 0.5s ease', pointerEvents: viewMode === 'IDLE' ? 'auto' : 'none' }}>
+        <BrandWatermark />
+        <InfoCard mode={mode} />
+        
+        {/* THE CONTROL DECK (ALWAYS VISIBLE IN IDLE) */}
+        <ControlDeck 
+          activeColor={activeColor} setColor={setActiveColor} 
+          activeText={activeText} setText={setActiveText} 
+          defaultColor={defaultColor} defaultText={defaultText}
+          isModified={isModified}
+        />
+
+        <div style={{ position: 'fixed', bottom: '50px', right: '430px', zIndex: 100 }}>
+          <button onClick={() => setViewMode('ACQUIRE')} className="rune-btn" style={{ background: 'rgba(0,0,0,0.8)', color: '#fff', border: '1px solid #fff', padding: '20px 60px', fontSize: '14px', letterSpacing: '3px', fontFamily: "'Oswald', sans-serif", fontWeight: 600, cursor: 'pointer' }}>
+            ACQUIRE ASSET
+          </button>
+        </div>
+      </div>
+
+      {/* MODALS */}
+      {viewMode === 'ACQUIRE' && (
+        <AcquisitionMatrix 
+          mode={mode} 
+          onClose={() => setViewMode('IDLE')} 
+          onConfigTier2={() => setViewMode('CONFIG_T2')} 
+          onConfigTier3={() => setViewMode('CONFIG_T3')} 
+          isModified={isModified}
+          onReset={handleReset}
+        />
+      )}
+      
+      {viewMode === 'CONFIG_T2' && <ConfigTier2 mode={mode} onClose={() => setViewMode('IDLE')} activeColor={activeColor} setColor={setActiveColor} activeText={activeText} setText={setActiveText} />}
+      {viewMode === 'CONFIG_T3' && <ConfigTier3 mode={mode} onClose={() => setViewMode('IDLE')} />}
+      {viewMode === 'SUCCESS' && <SuccessScreen onClose={handleCloseSuccess} />}
+      
+      {/* HIDDEN LEVA */}
+      <Leva collapsed={true} hidden={true} />
+    </>
+  )
+}
