@@ -1,5 +1,5 @@
 {
-  "name": "rune-mobile-fix-20251204-215054",
+  "name": "rune-digital-landing",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -9,11 +9,14 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "leva": "^0.9.35",
+    "leva": "latest",
     "three": "^0.160.0",
     "@react-three/fiber": "^8.15.16",
-    "@react-three/drei": "^9.99.0",
-    "@react-three/postprocessing": "^2.16.0"
+    "@react-three/drei": "latest",
+    "@react-three/postprocessing": "latest",
+    "maath": "latest",
+    "lamina": "latest",
+    "uuid": "latest"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
