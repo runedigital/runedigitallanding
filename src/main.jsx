@@ -13,5 +13,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
          <App />
       </Canvas>
     </Paywall>
-  </React.StrictMode>,
+   </React.StrictMode>,
 )
