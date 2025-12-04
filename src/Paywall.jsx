@@ -1,1 +1,1 @@
-import React from 'react'; export default function Paywall({ children }) { return ( <> {} <div style={{ position: 'absolute', bottom: 40, right: 40, color: 'red', fontFamily: 'Courier New', fontWeight: 'bold', pointerEvents: 'none', zIndex: 999 }}> PREVIEW MODE </div> </> ) }
+import React from 'react'; export default function Paywall() { return ( <div style={{ position: 'absolute', bottom: 40, right: 40, color: 'red', fontFamily: 'Courier New', fontWeight: 'bold', fontSize: '1.2rem', textShadow: '0 0 10px rgba(255,0,0,0.5)' }}> // PREVIEW MODE </div> ) }
