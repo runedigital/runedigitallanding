@@ -13,7 +13,6 @@ import {
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import GateKeeper from './GateKeeper'
-import InitializeSystem from './InitializeSystem'
 
 // --- RUNE DIGITAL // ASSET GALLERY ---
 import DARK_MATTER from './gallery/DARK_MATTER'
@@ -362,11 +361,7 @@ export default function App() {
  const [page, setPage] = useState('gate')
  
  if (page === 'gate') {
-  return <GateKeeper onEnter={() => setPage('init')} />
- }
- 
- if (page === 'init') {
-  return <InitializeSystem onEnter={() => setPage('showroom')} />
+  return <GateKeeper onEnter={() => setPage('showroom')} />
  }
  
  return <Showroom />
