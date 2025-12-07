@@ -409,7 +409,7 @@ export function Showroom() {
   <>
    <GlobalStyles />
 
-   <div style={{ opacity: 1, transition: 'opacity 2s ease', zIndex: 1 }}>
+   <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 1, transition: 'opacity 2s ease', zIndex: 1 }}>
       <Suspense fallback={null}>
           {mode === 'DARK_MATTER' && <DARK_MATTER primaryColor={activeColor} text={activeText} font={fontUrl} />}
           {mode === 'CRYSTALIX' && <DEEPTHINK1 primaryColor={activeColor} text={activeText} font={fontUrl} />}

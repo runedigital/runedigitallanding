@@ -346,7 +346,7 @@ export default function GateKeeper({ onEnter }) {
         <h1 className="gk-title">RUNE</h1>
         <div className="gk-subtitle">DIGITAL ASSETS</div>
         <div className="gk-btn-row">
-          <button onClick={onEnter} className="gk-btn">ENTER</button>
+          <button onClick={onEnter} className="gk-btn">INITIALIZE SYSTEM</button>
         </div>
       </div>
     </div>
