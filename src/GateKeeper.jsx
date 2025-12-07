@@ -21,6 +21,11 @@ export default function GateKeeper({ onEnter }) {
         cursorRef.current.style.left = mouseX + 'px'
         cursorRef.current.style.top = mouseY + 'px'
       }
+      // Update HUD coords
+      const coordsEl = document.getElementById('xy')
+      if (coordsEl) {
+        coordsEl.textContent = `${Math.round(mouseX)},${Math.round(mouseY)}`
+      }
     }
 
     const animate = () => {

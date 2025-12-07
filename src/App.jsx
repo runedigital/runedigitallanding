@@ -13,6 +13,7 @@ import {
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import GateKeeper from './GateKeeper'
+import InitializeSystem from './InitializeSystem'
 
 // --- RUNE DIGITAL // ASSET GALLERY ---
 import DARK_MATTER from './gallery/DARK_MATTER'
@@ -358,17 +359,20 @@ const InterventionModal = ({ onClose, onReset, onClaimOffer, isMobile }) => (
 )
 
 export default function App() {
- const [showGate, setShowGate] = useState(true)
+ const [page, setPage] = useState('gate')
  
- if (showGate) {
-  return <GateKeeper onEnter={() => setShowGate(false)} />
+ if (page === 'gate') {
+  return <GateKeeper onEnter={() => setPage('init')} />
+ }
+ 
+ if (page === 'init') {
+  return <InitializeSystem onEnter={() => setPage('showroom')} />
  }
  
  return <Showroom />
 }
 
 export function Showroom() {
- const [introFinished, setIntroFinished] = useState(false)
  const [mode, setMode] = useState('DARK_MATTER') 
  const [viewMode, setViewMode] = useState('IDLE')
  const [activeColor, setActiveColor] = useState('#ffffff')
@@ -409,9 +413,8 @@ export function Showroom() {
  return (
   <>
    <GlobalStyles />
-   {!introFinished && <div style={{ opacity: introFinished ? 0 : 1, transition: 'opacity 1s ease' }}><ChiralGate onEnter={() => setIntroFinished(true)} /></div>}
 
-   <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: introFinished ? 1 : 0, transition: 'opacity 2s ease', zIndex: 1 }}>
+   <div style={{ opacity: 1, transition: 'opacity 2s ease', zIndex: 1 }}>
       <Suspense fallback={null}>
           {mode === 'DARK_MATTER' && <DARK_MATTER primaryColor={activeColor} text={activeText} font={fontUrl} />}
           {mode === 'CRYSTALIX' && <DEEPTHINK1 primaryColor={activeColor} text={activeText} font={fontUrl} />}
@@ -436,7 +439,7 @@ export function Showroom() {
       </Suspense>
    </div>
 
-   <div style={{ opacity: (viewMode === 'IDLE' && introFinished) ? 1 : 0, transition: 'opacity 0.5s ease', pointerEvents: (viewMode === 'IDLE' && introFinished) ? 'auto' : 'none', position: 'relative', zIndex: 10 }}>
+   <div style={{ opacity: (viewMode === 'IDLE') ? 1 : 0, transition: 'opacity 0.5s ease', pointerEvents: (viewMode === 'IDLE') ? 'auto' : 'none', position: 'relative', zIndex: 10 }}>
     <BrandWatermark isMobile={isMobile} />
     <InfoCard mode={mode} isMobile={isMobile} />
     <div style={{ position: 'fixed', top: isMobile ? '80px' : '40px', right: isMobile ? '20px' : '40px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' : 'center', gap: '20px', zIndex: 100 }}>
