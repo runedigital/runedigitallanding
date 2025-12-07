@@ -12,6 +12,7 @@ import {
 } from '@react-three/drei'
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
+import GateKeeper from './GateKeeper'
 
 // --- RUNE DIGITAL // ASSET GALLERY ---
 import DARK_MATTER from './gallery/DARK_MATTER'
@@ -356,7 +357,17 @@ const InterventionModal = ({ onClose, onReset, onClaimOffer, isMobile }) => (
  </div>
 )
 
-export default function Showroom() {
+export default function App() {
+ const [showGate, setShowGate] = useState(true)
+ 
+ if (showGate) {
+  return <GateKeeper onEnter={() => setShowGate(false)} />
+ }
+ 
+ return <Showroom />
+}
+
+export function Showroom() {
  const [introFinished, setIntroFinished] = useState(false)
  const [mode, setMode] = useState('DARK_MATTER') 
  const [viewMode, setViewMode] = useState('IDLE')
