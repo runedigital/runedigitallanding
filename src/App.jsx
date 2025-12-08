@@ -13,6 +13,7 @@ import {
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import GateKeeper from './GateKeeper'
+import OrchestrationDemo from './OrchestrationDemo'
 
 // --- RUNE DIGITAL // ASSET GALLERY ---
 import DARK_MATTER from './gallery/DARK_MATTER'
@@ -364,10 +365,14 @@ export default function App() {
   return <GateKeeper onEnter={() => setPage('showroom')} />
  }
  
- return <Showroom />
+ if (page === 'orchestration-demo') {
+  return <OrchestrationDemo />
+ }
+ 
+ return <Showroom setPage={setPage} />
 }
 
-export function Showroom() {
+export function Showroom({ setPage }) {
  const [mode, setMode] = useState('DARK_MATTER') 
  const [viewMode, setViewMode] = useState('IDLE')
  const [activeColor, setActiveColor] = useState('#ffffff')
@@ -438,6 +443,7 @@ export function Showroom() {
     <BrandWatermark isMobile={isMobile} />
     <InfoCard mode={mode} isMobile={isMobile} />
     <div style={{ position: 'fixed', top: isMobile ? '80px' : '40px', right: isMobile ? '20px' : '40px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' : 'center', gap: '20px', zIndex: 100 }}>
+     <button onClick={() => setPage('orchestration-demo')} className="rune-btn" style={{ background: 'transparent', color: '#00ffea', border: '1px solid #00ffea', padding: '0 30px', fontSize: '12px', letterSpacing: '2px', fontFamily: "'Oswald', sans-serif", fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>RUNE DEMO</button>
      <div style={{ position: 'relative', width: '220px' }}>
       <select className="rune-select" value={mode} onChange={(e) => handleModeChange(e.target.value)}>
        {Object.keys(ASSETS).map(k => <option key={k} value={k}>{k}</option>)}
