@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMD SCHOOL - RUNE Command Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&family=Cinzel:wght@400;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+            z-index: 1;
+            background-size: 100% 2px;
+            pointer-events: none;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            background: #000;
+            border-bottom: 1px solid #0f0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav a {
+            color: #0f0;
+            text-decoration: none;
+            font-size: 10px;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .nav a:hover {
+            text-shadow: 0 0 15px #0f0;
+            color: #00ff00;
+        }
+        
+        main {
+            position: relative;
+            z-index: 2;
+            padding: 100px 40px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .terminal-header {
+            border: 1px solid #0f0;
+            background: rgba(0, 15, 0, 0.3);
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .terminal-header h1 {
+            font-size: 16px;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .terminal-header p {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .commands-section {
+            margin-bottom: 50px;
+        }
+        
+        .commands-section h2 {
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .command-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .command-card {
+            border: 1px solid #0f0;
+            background: rgba(0, 15, 0, 0.2);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .command-card:hover {
+            background: rgba(0, 15, 0, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .command-card .cmd {
+            color: #0f0;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .command-card .desc {
+            font-size: 11px;
+            color: #888;
+            line-height: 1.5;
+        }
+        
+        .interactive-terminal {
+            border: 1px solid #0f0;
+            background: #000;
+            padding: 20px;
+            margin-top: 40px;
+            min-height: 200px;
+            position: relative;
+        }
+        
+        .terminal-line {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        .prompt {
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .input {
+            color: #0ff;
+            text-shadow: 0 0 5px #0ff;
+        }
+        
+        .output {
+            color: #888;
+        }
+        
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #0f0;
+            color: #666;
+            margin-top: 60px;
+        }
+        
+        footer a {
+            color: #0f0;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        footer a:hover {
+            text-shadow: 0 0 10px #0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <header>
+        <div class="logo-text">CMD_SCHOOL v1.0</div>
+        <nav class="nav">
+            <a href="/">← HOME</a>
+            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="terminal-header">
+            <h1>[ COMMAND SCHOOL ]</h1>
+            <p>// RUNE ORCHESTRATION COMMAND INTERFACE TRAINING SYSTEM</p>
+            <p>// TYPE 'help' FOR AVAILABLE COMMANDS OR SELECT A COMMAND BELOW</p>
+        </div>
+        
+        <div class="commands-section">
+            <h2>CORE COMMANDS</h2>
+            <div class="command-list">
+                <div class="command-card">
+                    <div class="cmd">initialize_system</div>
+                    <div class="desc">Bootstrap RUNE orchestration layer. Initializes agent registry and state management.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">spawn_agent --type [agent_type]</div>
+                    <div class="desc">Spawn a new agent instance. Types: genesis, harvest, package, terraform, conductor.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">query_state --agent [name]</div>
+                    <div class="desc">Retrieve current state from a specific agent or global state.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">dispatch_task --to [agent] --task [spec]</div>
+                    <div class="desc">Send a task to an agent with JSON specification.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">list_agents --status [active|idle|error]</div>
+                    <div class="desc">List all agents with optional status filter.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">monitor --real-time [true|false]</div>
+                    <div class="desc">Open real-time monitoring dashboard for all agents.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="commands-section">
+            <h2>ANALYSIS COMMANDS</h2>
+            <div class="command-list">
+                <div class="command-card">
+                    <div class="cmd">analyze_decisions --range [start:end]</div>
+                    <div class="desc">Analyze decision logs within a specified range. Example: --range 100:200</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">trace_execution --agent [name] --task [id]</div>
+                    <div class="desc">Trace the execution path of a specific task through all agents.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">generate_report --type [performance|decisions|utilization]</div>
+                    <div class="desc">Generate analysis reports on system performance or agent activity.</div>
+                </div>
+                
+                <div class="command-card">
+                    <div class="cmd">export_data --format [json|csv] --dest [path]</div>
+                    <div class="desc">Export orchestration data in specified format.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="interactive-terminal">
+            <div class="terminal-line"><span class="prompt">rune:cmd-school$</span> help</div>
+            <div class="terminal-line"><span class="output">AVAILABLE COMMAND CATEGORIES:</span></div>
+            <div class="terminal-line"><span class="output">> system      - System initialization and control</span></div>
+            <div class="terminal-line"><span class="output">> agents      - Agent management and deployment</span></div>
+            <div class="terminal-line"><span class="output">> analysis    - Decision analysis and reporting</span></div>
+            <div class="terminal-line"><span class="output">> monitoring  - Real-time system monitoring</span></div>
+            <div class="terminal-line" style="margin-top: 20px;"><span class="prompt">rune:cmd-school$</span> <span class="input">spawn_agent --type genesis</span></div>
+            <div class="terminal-line"><span class="output">✓ Agent 'genesis-7a2c' spawned successfully</span></div>
+            <div class="terminal-line"><span class="output">✓ Initialization: 100%</span></div>
+            <div class="terminal-line"><span class="output">✓ Ready for tasks</span></div>
+            <div class="terminal-line" style="margin-top: 20px;"><span class="prompt">rune:cmd-school$</span> <span class="input">list_agents --status active</span></div>
+            <div class="terminal-line"><span class="output">genesis-7a2c     [ACTIVE]    Code Generation</span></div>
+            <div class="terminal-line"><span class="output">harvest-3f91     [ACTIVE]    Asset Management</span></div>
+            <div class="terminal-line"><span class="output">package-8b45     [ACTIVE]    Build & Deploy</span></div>
+            <div class="terminal-line"><span class="output">────────────────────────────────────</span></div>
+            <div class="terminal-line"><span class="output">Total: 3 agents active | 0 idle | 0 error</span></div>
+            <div class="terminal-line" style="margin-top: 20px;"><span class="prompt">rune:cmd-school$</span></div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>CMD SCHOOL - RUNE Digital Command Interface Training System © 2025</p>
+        <p style="margin-top: 15px;">
+            <a href="/">HOME</a>
+            <span style="color: #333; margin: 0 10px;">•</span>
+            <a href="/showroom/">SHOWROOM</a>
+            <span style="color: #333; margin: 0 10px;">•</span>
+            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
+        </p>
+    </footer>
+</body>
+</html>
