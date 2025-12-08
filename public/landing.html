@@ -175,59 +175,119 @@
             letter-spacing: 2px;
         }
         
+        .nodes-container {
+            position: relative;
+            margin: 60px 0;
+            perspective: 1000px;
+            padding: 40px 0;
+        }
+        
         .nodes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 20px;
         }
         
         .node {
-            background: linear-gradient(135deg, rgba(197, 160, 89, 0.05), rgba(197, 160, 89, 0.02));
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.3s;
             position: relative;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle at 35% 35%, rgba(197, 160, 89, 0.12), rgba(20, 20, 25, 0.85));
+            border: 2px solid #c5a059;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             overflow: hidden;
+            box-shadow: 0 0 25px rgba(197, 160, 89, 0.2), inset 0 0 15px rgba(197, 160, 89, 0.08);
         }
         
         .node::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.15), transparent);
-            transition: left 0.5s;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #c5a059,
+                #a0825a 120deg,
+                #c5a059 240deg,
+                #c5a059 360deg
+            );
+            opacity: 0;
+            animation: nodeBorderRotate 4s linear infinite;
+            z-index: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        @keyframes nodeBorderRotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
         
         .node:hover::before {
-            left: 100%;
+            opacity: 0.5;
         }
         
         .node:hover {
-            border-color: #c5a059;
-            box-shadow: 0 0 20px rgba(197, 160, 89, 0.3), inset 0 0 20px rgba(197, 160, 89, 0.05);
-            transform: translateY(-5px);
-            background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(197, 160, 89, 0.05));
+            border-color: #e0a55f;
+            background: radial-gradient(circle at 35% 35%, rgba(197, 160, 89, 0.22), rgba(20, 20, 25, 0.9));
+            box-shadow: 0 0 50px rgba(197, 160, 89, 0.5), inset 0 0 25px rgba(197, 160, 89, 0.15);
+            transform: scale(1.12) translateZ(20px);
+        }
+        
+        .node:hover .node-content {
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+        }
+        
+        .node-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+            pointer-events: none;
         }
         
         .node h3 {
             font-size: 13px;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin: 0 0 8px 0;
             color: #c5a059;
             text-transform: uppercase;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
         }
         
         .node p {
-            font-size: 12px;
-            color: #888;
-            line-height: 1.6;
-            margin-bottom: 15px;
+            font-size: 10px;
+            color: #909090;
+            line-height: 1.5;
+            margin: 0 0 12px 0;
+            opacity: 0;
+            max-height: 0;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .node:hover p {
+            opacity: 1;
+            max-height: 100px;
         }
         
         .node-link {
@@ -235,15 +295,23 @@
             color: #c5a059;
             text-decoration: none;
             font-size: 10px;
-            letter-spacing: 1px;
-            border: 1px solid rgba(197, 160, 89, 0.5);
-            padding: 8px 12px;
-            transition: all 0.3s;
+            letter-spacing: 1.5px;
+            border: 1px solid rgba(197, 160, 89, 0.7);
+            padding: 6px 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 3;
+            pointer-events: auto;
+            text-transform: uppercase;
+            font-weight: 600;
+            background: rgba(197, 160, 89, 0.05);
         }
         
         .node-link:hover {
             background: #c5a059;
             color: #000;
+            border-color: #c5a059;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
         }
         
         .cta-button {
@@ -344,41 +412,55 @@
                 <p>EXPLORE EXPERIMENTAL INTERFACES & CONCEPTUAL FRAMEWORKS</p>
             </div>
             
-            <div class="nodes-grid">
-                <div class="node">
-                    <h3>// NEURAL ORCHESTRATION</h3>
-                    <p>Multi-tier AI agent coordination with real-time decision logging. 231+ documented cycles with full audit trails across creative, business, and strategic domains.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
-                </div>
-                
-                <div class="node">
-                    <h3>// VERTEX AI NATIVE</h3>
-                    <p>Gemini 1.5 Pro multi-modal capabilities. Vision + text analysis enabling secondary market asset valuation, competitive intelligence, and real-time positioning.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
-                </div>
-                
-                <div class="node">
-                    <h3>// PRODUCTION SYSTEMS</h3>
-                    <p>Cloud Run deployment with BigQuery analytics. Currently processing live market data for Cash Converters secondary jewellery valuation pipeline at scale.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
-                </div>
-                
-                <div class="node">
-                    <h3>// KNOWLEDGE DISTILLATION</h3>
-                    <p>Advanced technique for compressing complex model reasoning into deployable systems. Foundation model fine-tuning and synthetic data generation workflows.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
-                </div>
-                
-                <div class="node">
-                    <h3>// MULTI-MODAL LEARNING</h3>
-                    <p>Vision + text fusion enabling simultaneous analysis. Asset grading, value assessment, and strategic decision-making in parallel across multiple input streams.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
-                </div>
-                
-                <div class="node">
-                    <h3>// AGENT SPECIALIZATION</h3>
-                    <p>11+ domain-specific agents handling creative assets, business intelligence, strategic planning, and execution. Three-tier hierarchy from decision makers to processors.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+            <div class="nodes-container">
+                <div class="nodes-grid">
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>NEURAL ORCHESTRATION</h3>
+                            <p>Multi-tier AI coordination with 231+ documented decisions</p>
+                            <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>VERTEX AI NATIVE</h3>
+                            <p>Gemini 1.5 Pro multi-modal vision + text analysis</p>
+                            <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>PRODUCTION SYSTEMS</h3>
+                            <p>Cloud Run deployment with BigQuery analytics</p>
+                            <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>KNOWLEDGE DISTILLATION</h3>
+                            <p>Foundation model fine-tuning & synthetic data generation</p>
+                            <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>MULTI-MODAL LEARNING</h3>
+                            <p>Vision + text fusion for parallel decision-making</p>
+                            <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>AGENT SPECIALIZATION</h3>
+                            <p>11+ domain-specific agents with three-tier hierarchy</p>
+                            <a href="/lab/NEURAL_HUB.html" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             
