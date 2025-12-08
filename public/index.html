@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE Digital - Enterprise AI Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&family=Cinzel:wght@400;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #020202;
+            color: #c5a059;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            z-index: 1;
+            background-size: 100% 2px;
+            pointer-events: none;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+            background: rgba(2, 2, 2, 0.95);
+        }
+        
+        .logo-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .logo-svg {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            letter-spacing: 3px;
+            color: #c5a059;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav a {
+            color: #c5a059;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+        }
+        
+        .nav a:hover {
+            color: #fff;
+        }
+        
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 100px 40px 40px;
+            background: radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.1), transparent);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            color: #c5a059;
+            margin-bottom: 15px;
+            letter-spacing: 4px;
+            font-weight: 700;
+        }
+        
+        .hero-subtitle {
+            color: #888;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 18px 40px;
+            border: 2px solid #c5a059;
+            background: transparent;
+            color: #c5a059;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #c5a059;
+            color: #000;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.4);
+        }
+        
+        .research-section {
+            padding: 100px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+            border-top: 1px solid rgba(197, 160, 89, 0.2);
+        }
+        
+        .research-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .research-header h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: #c5a059;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .research-header p {
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .nodes-container {
+            perspective: 1000px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            padding: 0 20px;
+        }
+        
+        .node {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(197, 160, 89, 0.03);
+            border: 2px solid rgba(197, 160, 89, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .node::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(#c5a059, #00ffea, #c5a059);
+            padding: 2px;
+            -webkit-mask: radial-gradient(circle at center, transparent 95%, black 100%);
+            mask: radial-gradient(circle at center, transparent 95%, black 100%);
+            animation: rotate 8s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .node:hover::before {
+            opacity: 1;
+        }
+        
+        .node:hover {
+            transform: scale(1.12);
+            box-shadow: 0 0 50px rgba(197, 160, 89, 0.3);
+            border-color: #c5a059;
+        }
+        
+        .node-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 2;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(2, 2, 2, 0.9), rgba(2, 2, 2, 0.7));
+        }
+        
+        .node-content h3 {
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: #c5a059;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .node-content p {
+            font-size: 11px;
+            color: #999;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            max-height: 50px;
+            overflow: hidden;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .node:hover .node-content p {
+            opacity: 0;
+        }
+        
+        .node-link {
+            display: inline-block;
+            border: 1px solid #c5a059;
+            color: #c5a059;
+            padding: 6px 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 3;
+            pointer-events: auto;
+            text-transform: uppercase;
+            font-weight: 600;
+            background: rgba(197, 160, 89, 0.05);
+        }
+        
+        .node-link:hover {
+            background: #c5a059;
+            color: #000;
+            border-color: #c5a059;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 20px 40px;
+            border: 2px solid #c5a059;
+            color: #c5a059;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+        
+        .cta-button:hover {
+            background: #c5a059;
+            color: #000;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.4);
+        }
+        
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid rgba(197, 160, 89, 0.2);
+            color: #666;
+        }
+        
+        footer p {
+            margin: 8px 0;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+        
+        footer a {
+            color: #c5a059;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        footer a:hover {
+            color: #fff;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .button-row {
+                gap: 20px;
+            }
+            
+            .btn {
+                padding: 15px 30px;
+                font-size: 12px;
+            }
+            
+            .nodes-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <header>
+        <div class="logo-section">
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none">
+                <path d="M30 20 L10 50 L30 80 H50 L70 50 L50 20 H30 Z" fill="none" stroke="#c5a059" stroke-width="2" />
+                <path d="M35 20 L15 50 L35 80" stroke="#c5a059" stroke-width="1.5" opacity="0.6" />
+                <circle cx="40" cy="50" r="3" fill="#c5a059" />
+            </svg>
+            <div class="logo-text">RUNE</div>
+        </div>
+        <nav class="nav">
+            <a href="#research">RESEARCH HUB</a>
+            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GITHUB</a>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero-section">
+            <h1 class="hero-title">RUNE DIGITAL</h1>
+            <p class="hero-subtitle">ENTERPRISE AI PLATFORM // BUILT ON GOOGLE CLOUD</p>
+            
+            <div class="button-row">
+                <button class="btn" onclick="window.location.href='/'; return false;">ENTER SHOWROOM</button>
+                <button class="btn" onclick="document.getElementById('research').scrollIntoView({behavior:'smooth'}); return false;">RESEARCH BRAIN</button>
+            </div>
+        </section>
+        
+        <section id="research" class="research-section">
+            <div class="research-header">
+                <h2>RESEARCH HUB</h2>
+                <p>EXPLORE EXPERIMENTAL INTERFACES & CONCEPTUAL FRAMEWORKS</p>
+            </div>
+            
+            <div class="nodes-container">
+                <div class="nodes-grid">
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>NEURAL ORCHESTRATION</h3>
+                            <p>Multi-tier AI coordination with 231+ documented decisions</p>
+                            <a href="/research/neural-orchestration/" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>VERTEX AI NATIVE</h3>
+                            <p>Gemini 1.5 Pro multi-modal vision + text analysis</p>
+                            <a href="/research/vertex-ai-native/" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>PRODUCTION SYSTEMS</h3>
+                            <p>Cloud Run deployment with BigQuery analytics</p>
+                            <a href="/research/production-systems/" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>KNOWLEDGE DISTILLATION</h3>
+                            <p>Foundation model fine-tuning & synthetic data generation</p>
+                            <a href="/research/knowledge-distillation/" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>MULTI-MODAL LEARNING</h3>
+                            <p>Vision + text fusion for parallel decision-making</p>
+                            <a href="/research/multimodal/" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                    
+                    <div class="node">
+                        <div class="node-content">
+                            <h3>AGENT SPECIALIZATION</h3>
+                            <p>11+ domain-specific agents with three-tier hierarchy</p>
+                            <a href="/research/agent-specialization/" class="node-link">EXPLORE →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 60px;">
+                <a href="/lab/NEURAL_HUB.html" class="cta-button">ENTER NEURAL HUB</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>RUNE Digital Studio © 2025</p>
+        <p style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
+            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GITHUB</a>
+            <span style="color: #333; margin: 0 10px;">•</span>
+            <a href="mailto:contact@runedigitalstudio.com">CONTACT</a>
+            <span style="color: #333; margin: 0 10px;">•</span>
+            <a href="#research">RESEARCH HUB</a>
+        </p>
+        <p style="margin-top: 15px; color: #555;">Built on Google Cloud Platform • Powered by Vertex AI & Gemini 1.5 Pro</p>
+    </footer>
+</body>
+</html>
