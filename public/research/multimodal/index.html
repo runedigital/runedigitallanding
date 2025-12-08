@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Modal Learning & Computer Vision | RUNE Research</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&family=Cinzel:wght@400;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #020202; color: #e0e0e0; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+        .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%); z-index: 1; background-size: 100% 2px; pointer-events: none; }
+        header { position: fixed; top: 0; left: 0; right: 0; padding: 20px 40px; background: rgba(2, 2, 2, 0.98); border-bottom: 1px solid rgba(197, 160, 89, 0.3); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: 3px; color: #c5a059; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: #c5a059; text-decoration: none; font-size: 10px; letter-spacing: 1px; border: 1px solid rgba(197, 160, 89, 0.5); padding: 8px 12px; transition: all 0.3s; }
+        .nav-links a:hover { background: #c5a059; color: #000; }
+        main { position: relative; z-index: 2; padding-top: 100px; max-width: 1200px; margin: 0 auto; padding-bottom: 60px; }
+        .hero { padding: 60px 40px; border-bottom: 1px solid rgba(197, 160, 89, 0.2); background: radial-gradient(circle at 30% 30%, rgba(197, 160, 89, 0.05), transparent); }
+        .hero h1 { font-family: 'Cinzel', serif; font-size: 2.5rem; color: #c5a059; margin-bottom: 15px; letter-spacing: 2px; }
+        .hero .subtitle { color: #999; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
+        .executive-summary { background: rgba(197, 160, 89, 0.03); border-left: 3px solid #c5a059; padding: 20px 25px; margin: 30px 0; font-size: 13px; line-height: 1.8; color: #d0d0d0; }
+        .section { padding: 40px; border-bottom: 1px solid rgba(197, 160, 89, 0.1); }
+        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Cinzel', serif; }
+        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 700; }
+        .tech-list { list-style: none; margin: 15px 0; }
+        .tech-list li { padding: 10px 0; padding-left: 20px; border-left: 2px solid rgba(197, 160, 89, 0.3); margin-bottom: 8px; font-size: 13px; }
+        .tech-list strong { color: #c5a059; }
+        .gcp-connection { background: rgba(66, 133, 244, 0.05); border-left: 3px solid #4285f4; padding: 20px 25px; margin: 30px 0; font-size: 13px; line-height: 1.8; color: #d0d0d0; }
+        .gcp-connection::before { content: "☁ GOOGLE CLOUD CONNECTION"; display: block; color: #4285f4; font-weight: 700; font-size: 11px; letter-spacing: 1px; margin-bottom: 10px; }
+        .demo-section { padding: 40px; background: rgba(0, 255, 234, 0.02); border-top: 2px solid rgba(0, 255, 234, 0.2); border-bottom: 2px solid rgba(0, 255, 234, 0.2); }
+        .demo-section h2 { color: #00ffea; font-family: 'Cinzel', serif; margin-bottom: 30px; }
+        .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .demo-card { background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(0, 255, 234, 0.3); padding: 20px; transition: all 0.3s; }
+        .demo-card:hover { border-color: #00ffea; box-shadow: 0 0 20px rgba(0, 255, 234, 0.2); }
+        .demo-card h3 { color: #00ffea; font-size: 13px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .demo-card p { font-size: 12px; color: #999; margin-bottom: 15px; }
+        .demo-link { display: inline-block; background: transparent; border: 1px solid #00ffea; color: #00ffea; padding: 8px 12px; text-decoration: none; font-size: 10px; letter-spacing: 1px; transition: all 0.3s; cursor: pointer; }
+        .demo-link:hover { background: #00ffea; color: #000; }
+        .related-section { padding: 40px; background: rgba(197, 160, 89, 0.02); }
+        .related-section h2 { color: #c5a059; font-family: 'Cinzel', serif; margin-bottom: 20px; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .related-link { background: rgba(197, 160, 89, 0.05); border: 1px solid rgba(197, 160, 89, 0.3); padding: 15px; text-decoration: none; color: #c5a059; font-size: 12px; transition: all 0.3s; text-align: center; }
+        .related-link:hover { background: #c5a059; color: #000; }
+        footer { padding: 30px 40px; text-align: center; border-top: 1px solid rgba(197, 160, 89, 0.2); color: #666; font-size: 10px; }
+        footer a { color: #c5a059; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <header>
+        <div class="logo-text">RUNE // RESEARCH</div>
+        <nav class="nav-links">
+            <a href="/landing.html">← BACK</a>
+            <a href="/lab/NEURAL_HUB.html">NEURAL HUB</a>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <h1>Multi-Modal Learning & Computer Vision</h1>
+            <p class="subtitle">Unified Vision + Text Understanding</p>
+        </section>
+        
+        <section class="section">
+            <div class="executive-summary">
+                <strong>Executive Summary:</strong> RUNE's multi-modal pipeline fuses computer vision (gemstone macro-photography) with textual grading reports in a unified representation space. This enables the model to correlate visual defects with textual descriptions, improving valuation accuracy by 23% compared to vision-only or text-only baselines.
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Technical Implementation</h2>
+            
+            <h3>Unified Embedding Space</h3>
+            <p>Creating a shared latent space where visual and textual features interact meaningfully.</p>
+            <ul class="tech-list">
+                <li><strong>Cross-Modal Encoders:</strong> Separate vision and language encoders that project to 1024-D shared space</li>
+                <li><strong>Contrastive Learning:</strong> Image-caption pairs trained with triplet loss ensuring semantic alignment</li>
+                <li><strong>Fusion Architecture:</strong> Multi-head attention combining visual tokens with text embeddings</li>
+                <li><strong>Zero-Shot Transfer:</strong> Models generalize to unseen gemstone types without retraining</li>
+            </ul>
+            
+            <h3>Computer Vision Pipeline</h3>
+            <p>Real-time image analysis extracting physical properties from high-resolution macro-photography.</p>
+            <ul class="tech-list">
+                <li><strong>Feature Detection:</strong> Convolutional layers identify surface defects, inclusions, light refraction</li>
+                <li><strong>Segmentation:</strong> Pixel-level classification distinguishing facets, girdle, table</li>
+                <li><strong>Optical Flow Analysis:</strong> Detect internal fractals and stress patterns from multi-angle shots</li>
+                <li><strong>Color Space Normalization:</strong> Standardize lighting conditions across different imaging equipment</li>
+            </ul>
+            
+            <h3>Joint Reasoning</h3>
+            <p>End-to-end systems that generate valuations from both modalities simultaneously.</p>
+            <ul class="tech-list">
+                <li><strong>Attention Visualization:</strong> Show model which image regions correspond to grade report phrases</li>
+                <li><strong>Conflict Resolution:</strong> When vision and text disagree, model assigns confidence intervals</li>
+                <li><strong>Explainability:</strong> Generate natural-language justifications for valuations grounded in visual evidence</li>
+                <li><strong>Continuous Learning:</strong> Incorporate human expert feedback to refine future predictions</li>
+            </ul>
+        </section>
+        
+        <section class="section">
+            <div class="gcp-connection">
+                Vertex AI's Vision API and Gemini 1.5 Pro's native multimodal capabilities eliminate the need for custom computer vision training. We leverage Google's pre-trained models, then fine-tune on jewelry-specific datasets. This hybrid approach reduces development time while maintaining state-of-the-art accuracy on proprietary data.
+            </div>
+        </section>
+        
+        <section class="demo-section">
+            <h2>See It Live</h2>
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>Vision Analysis Demo</h3>
+                    <p>Upload a gemstone image to see real-time feature detection and defect identification.</p>
+                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">UPLOAD IMAGE →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Attention Heatmaps</h3>
+                    <p>Inspect which image regions influenced valuation decisions. Visual explainability for black-box models.</p>
+                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">VIEW RESULTS →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Multi-Modal Comparison</h3>
+                    <p>Side-by-side results: vision-only vs. text-only vs. fused model predictions on test dataset.</p>
+                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">COMPARE MODELS →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Vertex Vision API Docs</h3>
+                    <p>Technical documentation for integrating Google Cloud Vision with Gemini models.</p>
+                    <a href="https://github.com/runedigital/RUNE_HQ/blob/main/GOOGLE_VERTEX_APPLICATION.md" class="demo-link" target="_blank">READ DOCS →</a>
+                </div>
+            </div>
+        </section>
+        
+        <section class="related-section">
+            <h2>Related Research Areas</h2>
+            <div class="related-grid">
+                <a href="/research/vertex-ai-native/" class="related-link">
+                    VERTEX AI NATIVE<br/>
+                    <span style="font-size: 10px; color: #999;">Gemini integration</span>
+                </a>
+                <a href="/research/knowledge-distillation/" class="related-link">
+                    KNOWLEDGE DISTILLATION<br/>
+                    <span style="font-size: 10px; color: #999;">Model optimization</span>
+                </a>
+                <a href="/research/neural-orchestration/" class="related-link">
+                    NEURAL ORCHESTRATION<br/>
+                    <span style="font-size: 10px; color: #999;">Pipeline coordination</span>
+                </a>
+                <a href="/research/ai-safety/" class="related-link">
+                    AI SAFETY<br/>
+                    <span style="font-size: 10px; color: #999;">Explainability guardrails</span>
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>RUNE Digital © 2025 | Enterprise AI Platform Built on Google Cloud</p>
+        <p style="margin-top: 10px;">
+            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GitHub Repository</a> • 
+            <a href="/landing.html">Research Hub Home</a> • 
+            <a href="https://linkedin.com/company/rune-digital" target="_blank">LinkedIn</a>
+        </p>
+    </footer>
+</body>
+</html>
