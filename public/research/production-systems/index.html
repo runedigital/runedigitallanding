@@ -20,8 +20,8 @@
         .hero .subtitle { color: #999; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
         .executive-summary { background: rgba(197, 160, 89, 0.03); border-left: 3px solid #c5a059; padding: 20px 25px; margin: 30px 0; font-size: 13px; line-height: 1.8; color: #d0d0d0; }
         .section { padding: 40px; border-bottom: 1px solid rgba(197, 160, 89, 0.1); }
-        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Cinzel', serif; }
-        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 700; }
+        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 0.15em; font-family: 'Cinzel', serif; line-height: 1.4; font-weight: 400; }
+        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 400; letter-spacing: 0.1em; line-height: 1.4; }
         .tech-list { list-style: none; margin: 15px 0; }
         .tech-list li { padding: 10px 0; padding-left: 20px; border-left: 2px solid rgba(197, 160, 89, 0.3); margin-bottom: 8px; font-size: 13px; }
         .tech-list strong { color: #c5a059; }
@@ -48,9 +48,9 @@
 <body>
     <div class="scanlines"></div>
     <header>
-        <div class="logo-text">RUNE // RESEARCH</div>
+        <div class="logo-text">RUNE DIGITAL // RESEARCH</div>
         <nav class="nav-links">
-            <a href="/landing.html">← BACK</a>
+            <a href="/research-hub.html">← BACK</a>
             <a href="/lab/NEURAL_HUB.html">NEURAL HUB</a>
         </nav>
     </header>
@@ -63,7 +63,7 @@
         
         <section class="section">
             <div class="executive-summary">
-                <strong>Executive Summary:</strong> RUNE deploys AI systems via Cloud Run (fully managed serverless containers) with integrated CI/CD pipelines that enforce quality gates before production traffic. This architecture guarantees zero-downtime deployments of new model versions while maintaining audit trails for regulatory compliance.
+                <strong>Executive Summary:</strong> RUNE deploys AI systems via serverless containers with integrated CI/CD pipelines that enforce quality gates before production traffic. This architecture guarantees zero-downtime deployments of new model versions while maintaining audit trails for regulatory compliance.
             </div>
         </section>
         
@@ -73,7 +73,7 @@
             <h3>Containerized Microservices Architecture</h3>
             <p>Lightweight service definitions that scale elastically with demand, reducing infrastructure costs while improving reliability.</p>
             <ul class="tech-list">
-                <li><strong>Cloud Run Integration:</strong> Sub-second cold start times with automatic horizontal scaling up to 1000 concurrent requests</li>
+                <li><strong>Serverless Containers:</strong> Sub-second cold start times with automatic horizontal scaling up to 1000 concurrent requests</li>
                 <li><strong>Service Mesh Observability:</strong> Real-time tracing and metrics exported to Cloud Monitoring for SLA compliance</li>
                 <li><strong>API Rate Limiting:</strong> Per-tenant quotas preventing runaway costs from compromised API keys</li>
                 <li><strong>Custom Domain Routing:</strong> Private endpoints with mTLS for B2B client connections</li>
@@ -100,7 +100,7 @@
         
         <section class="section">
             <div class="gcp-connection">
-                Cloud Run enforces industry-standard container security while abstracting away infrastructure management—ideal for enterprises requiring SOC 2 compliance without ops overhead. BigQuery handles archival and compliance-friendly data retention policies across all production pipelines.
+                Serverless architecture enforces industry-standard container security while abstracting away infrastructure management—ideal for enterprises requiring SOC 2 compliance without ops overhead. BigQuery handles archival and compliance-friendly data retention policies across all production pipelines.
             </div>
         </section>
         
@@ -108,50 +108,28 @@
             <h2>See It Live</h2>
             <div class="demo-grid">
                 <div class="demo-card">
-                    <h3>Burnrate Cost Tracker</h3>
-                    <p>Monitor LLM spend across OpenAI, Anthropic, and Vertex AI in real-time. Track cost per model, per hour, per user.</p>
-                    <a href="https://runedigitalstudio.com/burnrate" class="demo-link" target="_blank">OPEN TRACKER →</a>
+                    <h3>BURNRATE Tracker</h3>
+                    <p>Monitor LLM spend across OpenAI, Anthropic, and Vertex AI in real-time. Track cost per model.</p>
+                    <a href="/lab/BURNRATE.html" class="demo-link">OPEN TRACKER →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>CI/CD Pipeline Config</h3>
-                    <p>Inspect GitHub Actions workflow files showing automated testing, linting, and production deployment gates.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">VIEW WORKFLOWS →</a>
+                    <h3>Enterprise Command</h3>
+                    <p>Role-based access control with The Oracle AI assistant. See production-ready permission systems.</p>
+                    <a href="/lab/ENTERPRISE_COMMAND.html" class="demo-link">VIEW DEMO →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>Cloud Run Architecture</h3>
-                    <p>Technical documentation of container setup, service configuration, and traffic management.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ/blob/main/GOOGLE_VERTEX_APPLICATION.md" class="demo-link" target="_blank">READ DOCS →</a>
+                    <h3>Vertex AI Docs</h3>
+                    <p>Technical documentation for AI/ML deployment, model serving, and pipeline orchestration.</p>
+                    <a href="https://cloud.google.com/vertex-ai/docs" class="demo-link" target="_blank">READ DOCS →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>Monitoring Dashboard</h3>
-                    <p>Real-time Cloud Monitoring dashboard showing request latency, error rates, and resource utilization.</p>
-                    <a href="https://console.cloud.google.com/" class="demo-link" target="_blank">OPEN GCP CONSOLE →</a>
+                    <h3>GCP Console</h3>
+                    <p>Google Cloud Platform console for monitoring, deployment, and infrastructure management.</p>
+                    <a href="https://console.cloud.google.com/" class="demo-link" target="_blank">OPEN GCP →</a>
                 </div>
-            </div>
-        </section>
-        
-        <section class="related-section">
-            <h2>Related Research Areas</h2>
-            <div class="related-grid">
-                <a href="/research/neural-orchestration/" class="related-link">
-                    NEURAL ORCHESTRATION<br/>
-                    <span style="font-size: 10px; color: #999;">Multi-agent scheduling</span>
-                </a>
-                <a href="/research/vertex-ai-native/" class="related-link">
-                    VERTEX AI NATIVE<br/>
-                    <span style="font-size: 10px; color: #999;">Gemini 1.5 integration</span>
-                </a>
-                <a href="/research/agent-specialization/" class="related-link">
-                    AGENT SPECIALIZATION<br/>
-                    <span style="font-size: 10px; color: #999;">Domain-specific agents</span>
-                </a>
-                <a href="/research/ai-safety/" class="related-link">
-                    AI SAFETY<br/>
-                    <span style="font-size: 10px; color: #999;">Constitutional guardrails</span>
-                </a>
             </div>
         </section>
     </main>
@@ -159,9 +137,10 @@
     <footer>
         <p>RUNE Digital © 2025 | Enterprise AI Platform Built on Google Cloud</p>
         <p style="margin-top: 10px;">
-            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GitHub Repository</a> • 
-            <a href="/landing.html">Research Hub Home</a> • 
-            <a href="https://linkedin.com/company/rune-digital" target="_blank">LinkedIn</a>
+            
+            <a href="/research-hub.html">Research Hub Home</a> • 
+            <a href="https://linkedin.com/company/runedigital" target="_blank">LinkedIn</a> • 
+            <a href="mailto:services@runedigitalstudio.com">Contact</a>
         </p>
     </footer>
 </body>

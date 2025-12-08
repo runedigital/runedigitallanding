@@ -241,70 +241,196 @@
                 <path d="M35 20 L15 50 L35 80" stroke="#c5a059" stroke-width="1.5" opacity="0.6" />
                 <circle cx="40" cy="50" r="3" fill="#c5a059" />
             </svg>
-            <div class="logo-text">RUNE</div>
+            <div class="logo-text">RUNE DIGITAL</div>
         </div>
         <nav class="nav">
-            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
-            <a href="/showroom/" class="nav-showroom">SHOWROOM</a>
+            <a href="/research-hub.html">RESEARCH</a>
+            <a href="/about.html">ABOUT</a>
+            <a href="https://linkedin.com/company/runedigital" target="_blank">LINKEDIN</a>
+            <a href="mailto:services@runedigitalstudio.com">CONTACT</a>
         </nav>
     </header>
     
     <main>
         <h1 class="page-title">RESEARCH CENTER</h1>
         
+        <!-- Research Papers Section - FIRST (Google cares about this) -->
+        <div style="max-width: 1400px; margin: 0 auto 30px; padding: 20px 40px; border-left: 3px solid #4285f4;">
+            <div style="color: #4285f4; font-size: 11px; letter-spacing: 2px; margin-bottom: 5px;">VERTEX AI RESEARCH</div>
+            <div style="color: #666; font-size: 12px;">Technical documentation on Gemini integration and multi-modal pipelines</div>
+        </div>
+        
         <div class="research-grid">
+            <a href="/research/neural-orchestration/index.html" class="research-card" style="border-color: rgba(66, 133, 244, 0.3);">
+                <h3>AGENT ORCHESTRATION</h3>
+                <p>11+ specialized agents coordinated through three-tier hierarchy. 231+ documented decisions in STATE.json with full audit trail.</p>
+                <span class="research-card-link">EXPLORE →</span>
+            </a>
+            
+            <a href="/research/vertex-ai-native/index.html" class="research-card" style="border-color: rgba(66, 133, 244, 0.3);">
+                <h3>VERTEX AI NATIVE</h3>
+                <p>Gemini 1.5 Pro multi-modal vision + text analysis. Fine-tuning on proprietary gemstone datasets with managed training APIs.</p>
+                <span class="research-card-link">EXPLORE →</span>
+            </a>
+            
+            <a href="/research/knowledge-distillation/index.html" class="research-card" style="border-color: rgba(66, 133, 244, 0.3);">
+                <h3>KNOWLEDGE DISTILLATION</h3>
+                <p>rune-ai-v1 running locally on RTX GPU. Synthetic data generation from Gemini → local fine-tuning. 90% quality at 10% cost.</p>
+                <span class="research-card-link">EXPLORE →</span>
+            </a>
+            
+            <a href="/research/production-systems/index.html" class="research-card" style="border-color: rgba(66, 133, 244, 0.3);">
+                <h3>PRODUCTION SYSTEMS</h3>
+                <p>Serverless deployment with BigQuery analytics. Real-time inference endpoints with auto-scaling. Full Vercel + GCP integration.</p>
+                <span class="research-card-link">EXPLORE →</span>
+            </a>
+        </div>
+        
+        <!-- Live Systems Section -->
+        <div style="max-width: 1400px; margin: 50px auto 30px; padding: 20px 40px; border-left: 3px solid #c5a059;">
+            <div style="color: #c5a059; font-size: 11px; letter-spacing: 2px; margin-bottom: 5px;">LIVE SYSTEMS</div>
+            <div style="color: #666; font-size: 12px;">Production-ready demos and interactive visualizations</div>
+        </div>
+        
+        <div class="research-grid">
+            <a href="/lab/ENTERPRISE_COMMAND.html" class="research-card" style="border-color: rgba(255, 0, 85, 0.3);">
+                <h3>ENTERPRISE COMMAND</h3>
+                <p>AI-powered operations dashboard with role-based access control, real-time permissions workflow, and embedded Oracle AI assistant. Multi-location franchise management.</p>
+                <span class="research-card-link">EXPLORE →</span>
+            </a>
+            
+            <a href="https://runeai-game.vercel.app/" target="_blank" class="research-card">
+                <h3>RUNE AI</h3>
+                <p>Meta-horror narrative game where the AI knows it's AI. 16 episodes exploring consciousness, creation, and the line between pattern-matching and understanding.</p>
+                <span class="research-card-link">PLAY ↗</span>
+            </a>
+            
+            <a href="/lab/GENESIS.html" class="research-card" style="border-color: rgba(0, 243, 255, 0.3);">
+                <h3>GENESIS</h3>
+                <p>Real-time 3D character builder with Three.js. Watch a hunter construct from void → wireframe → form → material → life. Slider-controlled genesis pipeline.</p>
+                <span class="research-card-link">CREATE →</span>
+            </a>
+            
+            <a href="https://synadeploy.vercel.app/" target="_blank" class="research-card" style="border-color: rgba(168, 85, 247, 0.3);">
+                <h3>SYNA VISUALS</h3>
+                <p>60 AI-generated holographic wallpapers with Stripe e-commerce. All assets created via DALL-E API in parallel during development. Premium digital art store.</p>
+                <span class="research-card-link">VIEW LIVE ↗</span>
+            </a>
+            
+            <a href="https://www.asset-vault.app/" target="_blank" class="research-card" style="border-color: rgba(0, 200, 150, 0.3);">
+                <h3>ASSET VAULT</h3>
+                <p>Enterprise digital asset management platform. Secure storage, version control, and team collaboration for creative professionals. Full SaaS production app.</p>
+                <span class="research-card-link">VIEW LIVE ↗</span>
+            </a>
+            
+            <a href="/lab/BURNRATE.html" class="research-card" style="border-color: rgba(0, 255, 136, 0.3);">
+                <h3>BURNRATE</h3>
+                <p>API cost tracking dashboard for developers. Monitor OpenAI, Anthropic, DALL-E, and 20+ APIs in real-time. Budget alerts before you hit your limit.</p>
+                <span class="research-card-link">TRACK →</span>
+            </a>
+            
             <a href="/lab/NEURAL_HUB.html" class="research-card">
                 <h3>NEURAL HUB</h3>
-                <p>Interactive 3D visualization of the RUNE agent orchestration network. Explore node connections and decision flows in real-time.</p>
+                <p>Interactive 3D visualization of the RUNE agent orchestration network. Explore node connections, decision flows, and real-time system state.</p>
                 <span class="research-card-link">ENTER →</span>
             </a>
             
-            <a href="/cmd-school/" class="research-card">
+            <a href="/lab/CMD_SCHOOL.html" class="research-card">
                 <h3>CMD SCHOOL</h3>
-                <p>Command interface training system. Learn the RUNE orchestration commands and explore the operational interface.</p>
+                <p>Terminal-based command training interface. Execute RUNE orchestration commands, view system diagnostics, and access agent protocols.</p>
                 <span class="research-card-link">LAUNCH →</span>
             </a>
             
-            <a href="/showroom/" class="research-card">
+            <a href="/lab/RUNE_SCANNER.html" class="research-card" style="border-color: rgba(201, 162, 39, 0.3);">
+                <h3>RUNE SCANNER</h3>
+                <p>Real-time trend intelligence platform concept. Multi-tier data scanning across public signals, social data, and dark data layers. Full SaaS landing page.</p>
+                <span class="research-card-link">SCAN →</span>
+            </a>
+            
+            <a href="/showroom/index.html" class="research-card">
                 <h3>SHOWROOM</h3>
-                <p>Showcase of production assets and live projects. Interactive demos, dashboards, and deployed systems.</p>
+                <p>20 generative digital assets with Stripe integration. Full customization controls and acquisition flow. Production e-commerce demo.</p>
+                <span class="research-card-link">VIEW →</span>
+            </a>
+        </div>
+        
+        <!-- Lab Experiments Section - 12 total -->
+        <div style="max-width: 1400px; margin: 50px auto 30px; padding: 20px 40px; border-left: 3px solid #00ffea;">
+            <div style="color: #00ffea; font-size: 11px; letter-spacing: 2px; margin-bottom: 5px;">LAB EXPERIMENTS</div>
+            <div style="color: #666; font-size: 12px;">Visual effects, WebGL experiments, and technical prototypes</div>
+        </div>
+        
+        <div class="research-grid">
+            <a href="/lab/CHAOS_THEORY.html" class="research-card">
+                <h3>CHAOS THEORY</h3>
+                <p>Lorenz attractor visualization with particle physics. Interactive chaos parameters and real-time rendering.</p>
                 <span class="research-card-link">VIEW →</span>
             </a>
             
-            <a href="/research/neural-orchestration/" class="research-card">
-                <h3>NEURAL ORCHESTRATION</h3>
-                <p>Multi-tier AI coordination with 231+ documented decisions</p>
-                <span class="research-card-link">EXPLORE →</span>
+            <a href="/lab/THE_TESSERACT.html" class="research-card">
+                <h3>THE TESSERACT</h3>
+                <p>4D hypercube projection into 3D space. Rotation controls and dimensional visualization experiments.</p>
+                <span class="research-card-link">VIEW →</span>
             </a>
             
-            <a href="/research/vertex-ai-native/" class="research-card">
-                <h3>VERTEX AI NATIVE</h3>
-                <p>Gemini 1.5 Pro multi-modal vision + text analysis</p>
-                <span class="research-card-link">EXPLORE →</span>
+            <a href="/lab/EVENT_HORIZON.html" class="research-card">
+                <h3>EVENT HORIZON</h3>
+                <p>Black hole simulation with gravitational lensing. 500,000 particles in orbital shader with GPU instancing.</p>
+                <span class="research-card-link">VIEW →</span>
             </a>
             
-            <a href="/research/production-systems/" class="research-card">
-                <h3>PRODUCTION SYSTEMS</h3>
-                <p>Cloud Run deployment with BigQuery analytics</p>
-                <span class="research-card-link">EXPLORE →</span>
+            <a href="/lab/THE_HIVE.html" class="research-card">
+                <h3>THE HIVE</h3>
+                <p>200,000 GPU-instanced particles in emergent swarm behavior. Single draw call rendering via custom shaders.</p>
+                <span class="research-card-link">VIEW →</span>
             </a>
             
-            <a href="/research/knowledge-distillation/" class="research-card">
-                <h3>KNOWLEDGE DISTILLATION</h3>
-                <p>Foundation model fine-tuning & synthetic data generation</p>
-                <span class="research-card-link">EXPLORE →</span>
+            <a href="/lab/MULTIVERSE.html" class="research-card" style="border-color: rgba(255, 255, 255, 0.2);">
+                <h3>MULTIVERSE</h3>
+                <p>Reality-bending visualization with custom HUD overlay. Cursor-free navigation through dimensional space.</p>
+                <span class="research-card-link">VIEW →</span>
             </a>
             
-            <a href="/research/multimodal/" class="research-card">
-                <h3>MULTI-MODAL LEARNING</h3>
-                <p>Vision + text fusion for parallel decision-making</p>
-                <span class="research-card-link">EXPLORE →</span>
+            <a href="/lab/ENTANGLEMENT.html" class="research-card" style="border-color: rgba(0, 255, 234, 0.3);">
+                <h3>ENTANGLEMENT</h3>
+                <p>Quantum entanglement simulation. Two particles locked in spin state - move one, the other responds instantly.</p>
+                <span class="research-card-link">VIEW →</span>
             </a>
             
-            <a href="/research/agent-specialization/" class="research-card">
-                <h3>AGENT SPECIALIZATION</h3>
-                <p>11+ domain-specific agents with three-tier hierarchy</p>
-                <span class="research-card-link">EXPLORE →</span>
+            <a href="/lab/VECTOR_SPACE_NAVIGATOR.html" class="research-card" style="border-color: rgba(0, 255, 234, 0.3);">
+                <h3>VECTOR SPACE</h3>
+                <p>Semantic radar visualization. Navigate through word embeddings and semantic relationships in real-time.</p>
+                <span class="research-card-link">VIEW →</span>
+            </a>
+            
+            <a href="/lab/COMPOUND_REACTOR.html" class="research-card" style="border-color: rgba(197, 160, 89, 0.3);">
+                <h3>COMPOUND REACTOR</h3>
+                <p>Interactive singularity visualization with control panel. Adjust parameters and watch the reaction evolve.</p>
+                <span class="research-card-link">VIEW →</span>
+            </a>
+            
+            <a href="/lab/THE_HOLOGRAM.html" class="research-card" style="border-color: rgba(0, 255, 102, 0.3);">
+                <h3>THE HOLOGRAM</h3>
+                <p>Holographic principle demonstration. 2D source projecting into 3D with custom GLSL shaders and interference patterns.</p>
+                <span class="research-card-link">VIEW →</span>
+            </a>
+            
+            <a href="/lab/RUNE_GRAVITY.html" class="research-card" style="border-color: rgba(255, 0, 85, 0.3);">
+                <h3>GRAVITY</h3>
+                <p>Black hole shader with mouse-controlled gravitational distortion. Real-time space-time curvature simulation.</p>
+                <span class="research-card-link">VIEW →</span>
+            </a>
+            
+            <a href="/lab/SYSTEM_VOID.html" class="research-card" style="border-color: rgba(0, 255, 234, 0.3);">
+                <h3>SYSTEM VOID</h3>
+                <p>The God Protocol runtime. Mix-blend-mode UI with custom cursor and emergent visual patterns.</p>
+                <span class="research-card-link">VIEW →</span>
+            </a>
+            
+            <a href="/lab/THE_GOD_FRACTAL.html" class="research-card" style="border-color: rgba(0, 255, 234, 0.3);">
+                <h3>THE COMPILER</h3>
+                <p>AI-powered fractal compiler interface. Left panel code editor with real-time 3D visualization output.</p>
+                <span class="research-card-link">VIEW →</span>
             </a>
         </div>
     </main>
@@ -312,13 +438,18 @@
     <footer>
         <p>RUNE Digital Studio © 2025</p>
         <p style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
+            <a href="/research-hub.html">RESEARCH</a>
             <span style="color: #333; margin: 0 10px;">•</span>
-            <a href="mailto:contact@runedigitalstudio.com">CONTACT</a>
+            <a href="mailto:services@runedigitalstudio.com">CONTACT</a>
             <span style="color: #333; margin: 0 10px;">•</span>
-            <a href="/showroom/">SHOWROOM</a>
+            <a href="/showroom/index.html">SHOWROOM</a>
         </p>
-        <p style="margin-top: 15px; color: #555;">Built on Google Cloud Platform • Powered by Vertex AI & Gemini 1.5 Pro</p>
+        <p style="margin-top: 15px; color: #555;">
+            Built on Google Cloud Platform • Powered by Vertex AI & Gemini 2.0 • Deployed via Vercel
+        </p>
+        <p style="margin-top: 8px; color: #444; font-size: 9px;">
+            11+ Agents • 231+ Decisions • rune-ai-v1 Local LLM • RTX 4070 Inference
+        </p>
     </footer>
 </body>
 </html>

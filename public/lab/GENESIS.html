@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE // GENESIS V2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Fira+Code:wght@300;500&display=swap');
+
+        :root {
+            --void: #080808;
+            --cyan: #00f3ff;
+            --blood: #D10000;
+            --dark-blood: #4a0000;
+            --gold: #c5a059;
+            --text-dim: #444;
+        }
+
+        body { margin: 0; overflow: hidden; background: var(--void); font-family: 'Rajdhani', sans-serif; }
+
+        /* --- LAYOUT --- */
+        #interface {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: grid; grid-template-columns: 400px 1fr;
+            pointer-events: none;
+        }
+
+        /* --- LEFT: TERMINAL --- */
+        #terminal-panel {
+            background: rgba(10, 10, 10, 0.9);
+            border-right: 1px solid #333;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .term-header {
+            padding: 15px; border-bottom: 1px solid #333;
+            font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--gold);
+            display: flex; justify-content: space-between;
+        }
+
+        #code-scroller {
+            flex: 1; padding: 20px; overflow: hidden;
+            font-family: 'Fira Code', monospace; font-size: 0.7rem; 
+            line-height: 1.6; color: var(--cyan);
+            text-shadow: 0 0 2px rgba(0, 243, 255, 0.2);
+            white-space: pre;
+            opacity: 0.8;
+        }
+
+        .kwd { color: #ff00ff; }
+        .func { color: #ffff00; }
+        .str { color: #00ff00; }
+        .com { color: #666; font-style: italic; }
+
+        /* --- RIGHT: VIEWPORT UI --- */
+        #controls-area {
+            position: absolute; bottom: 50px; left: 400px; right: 0;
+            display: flex; flex-direction: column; align-items: center;
+            pointer-events: auto;
+        }
+
+        .slider-container {
+            width: 60%; position: relative;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent;
+            position: relative; z-index: 2;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 40px;
+            background: #000; border: 2px solid var(--cyan);
+            cursor: grab; margin-top: -8px;
+            box-shadow: 0 0 15px var(--cyan);
+        }
+
+        .track-bg {
+            position: absolute; top: 2px; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--cyan) 0%, var(--gold) 50%, var(--blood) 100%);
+            z-index: 1;
+        }
+
+        .stage-markers {
+            display: flex; justify-content: space-between; width: 100%;
+            margin-top: 15px; font-size: 0.7rem; letter-spacing: 2px; color: #666;
+            text-transform: uppercase;
+        }
+
+        .status-hud {
+            position: absolute; top: 20px; right: 20px; text-align: right;
+        }
+        .big-stat { font-size: 2rem; font-weight: bold; color: var(--text-dim); }
+        .label { font-size: 0.7rem; color: var(--gold); letter-spacing: 2px; }
+
+    </style>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    </script>
+</head>
+<body>
+
+    <div id="interface">
+        <div id="terminal-panel">
+            <div class="term-header">
+                <span>RUNE_ENGINE_V4</span>
+                <span>MEM: 64TB</span>
+            </div>
+            <div id="code-scroller"></div>
+        </div>
+
+        <div id="controls-area">
+            <div class="slider-container">
+                <div class="track-bg"></div>
+                <input type="range" min="0" max="100" value="0" id="genesis-slider">
+                <div class="stage-markers">
+                    <span>Void</span>
+                    <span>Wireframe</span>
+                    <span>Form</span>
+                    <span>Material</span>
+                    <span>Life</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-hud">
+            <div class="label">RENDER PIPELINE</div>
+            <div class="big-stat" id="pipeline-status">OFFLINE</div>
+            <div style="margin-top:10px; font-family: 'Fira Code'; font-size: 0.7rem; color: #444;" id="poly-count">TRIS: 0</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+
+        const loreCode = `
+#include <reality_engine.h>
+#include <eldritch_physics.h>
+
+class HunterEntity : public NightmareConstruct {
+    
+    void Initialize() {
+        MemoryPool* soul = new MemoryPool(SIZE_INFINITE);
+        
+        Bone* spine = ConstructSpine(VERTS_3044);
+        Bone* arm_r = ConstructLimb(WEAPON_HEAVY);
+        
+        Texture map_diff = LoadTexture("worn_leather.png");
+        Texture map_norm = LoadTexture("beast_blood_n.png");
+        
+        ClothSim* coat = new ClothSim();
+        coat->SetWind(VECTOR_NORTH);
+        coat->SetDrag(0.85f);
+        
+        Weapon* cleaver = ForgeWeapon("SAW_CLEAVER");
+        cleaver->AddSerration(TEETH_COUNT_12);
+        cleaver->SharpenEdge(RUST_LEVEL_MED);
+        
+        while(insight > 0) {
+            CalculateLighting(MOON_PHASE_RED);
+            
+            if (blood_echoes > 10000) {
+                ApplyGore(mesh, SPLATTER_HIGH);
+            }
+            
+            Shader* huntShader = Compile("nightmare.glsl");
+            huntShader->SetUniform("u_fear", 1.0);
+            
+            DrawGeometry(GL_TRIANGLES);
+        }
+    }
+    
+    void InjectConsciousness() {
+        Synapse::Fire(ALL);
+        Heart::Beat(BPM_140);
+    }
+};
+`;
+
+        function formatCode(text) {
+            return text
+                .replace(/(include|void|class|public|new|if|while|return)/g, '<span class="kwd">$1</span>')
+                .replace(/([A-Z][a-zA-Z0-9_]+)(\()/g, '<span class="func">$1</span>$2')
+                .replace(/(".*?")/g, '<span class="str">$1</span>')
+                .replace(/(\/\/.*)/g, '<span class="com">$1</span>');
+        }
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x080808, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(40, (window.innerWidth - 400) / window.innerHeight, 0.1, 100);
+        camera.position.set(4, 3, 6);
+        camera.lookAt(0, 1.5, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth - 400, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+        
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.right = '0';
+        renderer.domElement.style.top = '0';
+
+        const composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.strength = 0;
+        bloomPass.threshold = 0.1;
+        bloomPass.radius = 0.5;
+        composer.addPass(bloomPass);
+
+        const filmPass = new FilmPass(0.5, 0.5, 648, false);
+        composer.addPass(filmPass);
+
+        const hunterGroup = new THREE.Group();
+        scene.add(hunterGroup);
+
+        const mats = {
+            wire: new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.05 }),
+            clay: new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 1.0, metalness: 0.0 }),
+            leather: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3, metalness: 0.2 }),
+            cloth: new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.0 }),
+            skin: new THREE.MeshStandardMaterial({ color: 0x8d5524, roughness: 0.5 }), 
+            metal: new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.9 }),
+            blood: new THREE.MeshPhysicalMaterial({ 
+                color: 0x8a0303, metalness: 0.0, roughness: 0.1, transmission: 0.2, thickness: 1.0 
+            })
+        };
+
+        const meshes = [];
+
+        function createMesh(geometry, finalMat) {
+            const wire = new THREE.Mesh(geometry, mats.wire);
+            hunterGroup.add(wire);
+
+            const solid = new THREE.Mesh(geometry, mats.clay.clone());
+            solid.castShadow = true;
+            solid.receiveShadow = true;
+            solid.visible = false;
+            hunterGroup.add(solid);
+
+            meshes.push({ wire, solid, finalMat });
+            return { wire, solid };
+        }
+
+        const hatGeo = new THREE.CylinderGeometry(0.6, 0.8, 0.5, 3);
+        createMesh(hatGeo, mats.leather).solid.position.set(0, 3.6, 0);
+        meshes[meshes.length-1].wire.position.set(0, 3.6, 0);
+        
+        const hatTopGeo = new THREE.ConeGeometry(0.5, 0.8, 16);
+        createMesh(hatTopGeo, mats.leather).solid.position.set(0, 4.0, 0);
+        meshes[meshes.length-1].wire.position.set(0, 4.0, 0);
+
+        const collarGeo = new THREE.CylinderGeometry(0.6, 0.8, 0.8, 16, 1, true);
+        mats.leather.side = THREE.DoubleSide;
+        const collar = createMesh(collarGeo, mats.leather);
+        collar.solid.position.set(0, 3.2, 0);
+        collar.wire.position.set(0, 3.2, 0);
+
+        const mantleGeo = new THREE.ConeGeometry(1.2, 1.5, 16, 4, true);
+        const mantle = createMesh(mantleGeo, mats.cloth);
+        mantle.solid.position.set(0, 2.5, 0);
+        mantle.wire.position.set(0, 2.5, 0);
+
+        const coatGeo = new THREE.CylinderGeometry(0.7, 1.4, 3.5, 16, 4, true);
+        const coat = createMesh(coatGeo, mats.leather);
+        coat.solid.position.set(0, 1.0, 0);
+        coat.wire.position.set(0, 1.0, 0);
+
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.lineTo(0.5, 0.1);
+        for(let i=0; i<6; i++) {
+            shape.lineTo(0.5 + (i*0.2), -0.2);
+            shape.lineTo(0.6 + (i*0.2), 0.1);
+        }
+        shape.lineTo(2.0, 0.2);
+        shape.lineTo(1.8, 0.6);
+        shape.lineTo(0, 0.5);
+        
+        const extrudeSettings = { steps: 2, depth: 0.05, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 };
+        const cleaverGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        cleaverGeo.center();
+
+        const weapon = createMesh(cleaverGeo, mats.metal);
+        const wPos = [1.2, 1.5, 0.8];
+        const wRot = [0, -Math.PI/2, Math.PI/4];
+        weapon.solid.position.set(...wPos);
+        weapon.solid.rotation.set(...wRot);
+        weapon.solid.scale.set(1.5, 1.5, 1.5);
+        
+        weapon.wire.position.set(...wPos);
+        weapon.wire.rotation.set(...wRot);
+        weapon.wire.scale.set(1.5, 1.5, 1.5);
+
+        const planeGeo = new THREE.CircleGeometry(4, 32);
+        const plane = createMesh(planeGeo, mats.blood);
+        plane.solid.rotation.x = -Math.PI/2;
+        plane.solid.position.y = -1.8;
+        plane.wire.rotation.x = -Math.PI/2;
+        plane.wire.position.y = -1.8;
+
+        const ambLight = new THREE.AmbientLight(0x404040, 0.5);
+        scene.add(ambLight);
+
+        const keyLight = new THREE.SpotLight(0xffffff, 0, 20, Math.PI/4, 0.5, 1);
+        keyLight.position.set(5, 8, 5);
+        keyLight.castShadow = true;
+        scene.add(keyLight);
+
+        const rimLight = new THREE.PointLight(0x00f3ff, 0, 10);
+        rimLight.position.set(-3, 4, -3);
+        scene.add(rimLight);
+
+        const bloodLight = new THREE.PointLight(0xff0000, 0, 10);
+        bloodLight.position.set(3, 1, 3);
+        scene.add(bloodLight);
+
+        const slider = document.getElementById('genesis-slider');
+        const codeDiv = document.getElementById('code-scroller');
+        const statusEl = document.getElementById('pipeline-status');
+        const polyEl = document.getElementById('poly-count');
+        const maxCodeLen = loreCode.length;
+
+        function updateConstruct() {
+            const val = slider.value / 100;
+
+            const chars = Math.floor(maxCodeLen * val);
+            codeDiv.innerHTML = formatCode(loreCode.substring(0, chars));
+            codeDiv.scrollTop = codeDiv.scrollHeight;
+
+            if (val > 0.1) {
+                const wireOp = Math.min(0.3, (val - 0.1) * 2);
+                meshes.forEach(m => {
+                    m.wire.material.opacity = wireOp;
+                    if(val < 0.4) {
+                        m.wire.position.x += (Math.random()-0.5) * 0.01;
+                    }
+                });
+                bloomPass.strength = (val < 0.4) ? 2.0 : 0.5;
+            }
+
+            meshes.forEach(m => {
+                if (val > 0.3) {
+                    m.solid.visible = true;
+                    
+                    if (val < 0.7) {
+                        m.solid.material = mats.clay;
+                        const clayLightness = (val - 0.3) * 2.5;
+                        m.solid.material.color.setHSL(0, 0, clayLightness * 0.5);
+                    } else {
+                        m.solid.material = m.finalMat;
+                    }
+                } else {
+                    m.solid.visible = false;
+                }
+            });
+
+            keyLight.intensity = Math.max(0, (val - 0.4) * 100);
+            rimLight.intensity = (val < 0.5) ? (val * 10) : (1 - val) * 5;
+            bloodLight.intensity = Math.max(0, (val - 0.8) * 50);
+
+            let tris = Math.floor(val * 12405);
+            polyEl.innerText = `TRIS: ${tris}`;
+
+            if (val < 0.1) {
+                statusEl.innerText = "INIT_CORE...";
+                statusEl.style.color = "#444";
+            } else if (val < 0.4) {
+                statusEl.innerText = "GENERATING MESH";
+                statusEl.style.color = "var(--cyan)";
+            } else if (val < 0.7) {
+                statusEl.innerText = "BAKING LIGHTS";
+                statusEl.style.color = "var(--gold)";
+            } else {
+                statusEl.innerText = "HUNTER ALIVE";
+                statusEl.style.color = "var(--blood)";
+                statusEl.style.textShadow = "0 0 10px var(--blood)";
+            }
+        }
+
+        slider.addEventListener('input', updateConstruct);
+        updateConstruct();
+
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            const val = slider.value / 100;
+
+            if (val < 0.7) {
+                hunterGroup.rotation.y += 0.05 * (1-val);
+            } else {
+                hunterGroup.rotation.y = Math.sin(time * 0.5) * 0.2;
+                hunterGroup.position.y = Math.sin(time * 2) * 0.02;
+            }
+
+            composer.render();
+        }
+
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth - 400;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            composer.setSize(w, h);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

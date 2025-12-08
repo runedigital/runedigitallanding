@@ -340,14 +340,12 @@
             toggleMatrix(); log("Loading...", "log-ok");
         }
         
-        // PRO COMMANDS
+        // PRO COMMANDS - NOW UNLOCKED FOR DEMO
         else if (cmd === "glitch") {
-            if(USER_LEVEL === 'GUEST') log(">> LOCKED. UPGRADE REQUIRED.", "log-locked");
-            else triggerGlitch();
+            triggerGlitch();
         }
         else if (cmd === "visualize") {
-            if(USER_LEVEL === 'GUEST') log(">> LOCKED. UPGRADE REQUIRED.", "log-locked");
-            else startVisualizer();
+            startVisualizer();
         }
 
         // REACTOR
@@ -360,15 +358,7 @@
         else if (parts[0] === "lesson") {
             const num = parseInt(parts[1]);
             if (lessons[num]) {
-                if (num >= 4 && USER_LEVEL === 'GUEST') {
-                    log(">> ERROR: ACCESS DENIED.", "log-error");
-                    log(">> MODULES " + num + "+ ARE ENCRYPTED.", "log-locked");
-                    log("1. OPERATOR ($9/mo)  :: PERSONAL USE", "log-tier");
-                    log("2. ARCHITECT ($99/mo) :: COMMERCIAL USE", "log-tier");
-                    log(">> TYPE 'buy 1' OR 'buy 2' TO UNLOCK.", "log-input");
-                } else {
-                    lessons[num].forEach(l => log(l, "log-system"));
-                }
+                lessons[num].forEach(l => log(l, "log-system"));
             } else { log("Lesson not found.", "log-error"); }
         }
 

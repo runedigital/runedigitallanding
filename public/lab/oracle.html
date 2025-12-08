@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <title>The Oracle // CC Knowledge Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d0d0d;
+            --bg-card: #141414;
+            --border: #252525;
+            --oracle-primary: #00ffea;
+            --oracle-secondary: #a855f7;
+            --text: #ffffff;
+            --text-dim: #888888;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            min-height: 100vh;
+        }
+
+        /* Floating Widget Button */
+        .oracle-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--oracle-primary), var(--oracle-secondary));
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 255, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s ease;
+            z-index: 9999;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .oracle-trigger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 255, 234, 0.6);
+        }
+
+        .oracle-trigger.active {
+            animation: none;
+            transform: rotate(45deg);
+        }
+
+        .oracle-trigger .icon-default { display: block; }
+        .oracle-trigger .icon-close { display: none; }
+        .oracle-trigger.active .icon-default { display: none; }
+        .oracle-trigger.active .icon-close { display: block; }
+
+        /* Chat Panel */
+        .oracle-panel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 380px;
+            max-height: 600px;
+            background: var(--bg-dark);
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 9998;
+        }
+
+        .oracle-panel.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Header */
+        .oracle-header {
+            background: linear-gradient(135deg, rgba(0, 255, 234, 0.15), rgba(168, 85, 247, 0.15));
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .oracle-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--oracle-primary), var(--oracle-secondary));
+        }
+
+        .oracle-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--oracle-primary), var(--oracle-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 234, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 234, 0.8); }
+        }
+
+        .oracle-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            letter-spacing: 3px;
+            color: var(--oracle-primary);
+        }
+
+        .oracle-subtitle {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .oracle-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #00ff88;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Quick Actions */
+        .oracle-quick {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .quick-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-dim);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(0, 255, 234, 0.1);
+            border-color: var(--oracle-primary);
+            color: var(--oracle-primary);
+        }
+
+        /* Chat Messages */
+        .oracle-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            animation: messageIn 0.3s ease-out;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.oracle {
+            align-self: flex-start;
+            background: linear-gradient(135deg, rgba(0, 255, 234, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(0, 255, 234, 0.2);
+            color: var(--text);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .message-source {
+            font-size: 9px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .message-steps {
+            margin-top: 10px;
+        }
+
+        .message-steps ol {
+            margin-left: 15px;
+            margin-top: 8px;
+        }
+
+        .message-steps li {
+            margin-bottom: 6px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 15px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--oracle-primary);
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Input */
+        .oracle-input {
+            padding: 15px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .oracle-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .oracle-input input:focus {
+            outline: none;
+            border-color: var(--oracle-primary);
+        }
+
+        .oracle-input input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .oracle-send {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--oracle-primary), var(--oracle-secondary));
+            color: #000;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .oracle-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.5);
+        }
+
+        /* Footer */
+        .oracle-footer {
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-size: 9px;
+            color: var(--text-dim);
+        }
+
+        .oracle-footer a {
+            color: var(--oracle-primary);
+            text-decoration: none;
+        }
+
+        /* Price Result Box */
+        .price-result {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 234, 0.1));
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .price-result .price-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+            color: #00ff88;
+        }
+
+        .price-result .price-breakdown {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 6px;
+            white-space: pre-line;
+        }
+
+        /* Scrollbar */
+        .oracle-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .oracle-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .oracle-messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Trigger Button -->
+    <button class="oracle-trigger" id="oracleTrigger" onclick="toggleOracle()">
+        <span class="icon-default">🔮</span>
+        <span class="icon-close">+</span>
+    </button>
+
+    <!-- Chat Panel -->
+    <div class="oracle-panel" id="oraclePanel">
+        <div class="oracle-header">
+            <div class="oracle-avatar">🔮</div>
+            <div class="oracle-title">THE ORACLE</div>
+            <div class="oracle-subtitle">CC Knowledge & Pricing Assistant</div>
+            <div class="oracle-status">
+                <div class="status-dot"></div>
+                Online • 9 guides loaded • Ready to help
+            </div>
+        </div>
+
+        <div class="oracle-quick">
+            <button class="quick-btn" onclick="askQuick('Price 5g of 18ct gold')">🥇 Price Gold</button>
+            <button class="quick-btn" onclick="askQuick('How do I test gold carat?')">🧪 Test Gold</button>
+            <button class="quick-btn" onclick="askQuick('Stocktake process?')">📋 Stocktake</button>
+            <button class="quick-btn" onclick="askQuick('Price 20g silver chain')">🪙 Price Silver</button>
+        </div>
+
+        <div class="oracle-messages" id="oracleMessages">
+            <div class="message oracle">
+                👋 Hey! I'm The Oracle - your instant access to CC processes, guides, and pricing.
+                <br><br>
+                <strong>I can help with:</strong><br>
+                • 💰 Pricing (just tell me what you're pricing)<br>
+                • 🧪 Testing & verification processes<br>
+                • 📋 Stocktake & procedures<br>
+                • 🔧 Repairs & valuations
+            </div>
+        </div>
+
+        <div class="oracle-input">
+            <input type="text" id="oracleInput" placeholder="Ask anything or 'price 10g 9ct gold'..." onkeypress="handleKeyPress(event)">
+            <button class="oracle-send" onclick="sendMessage()">→</button>
+        </div>
+
+        <div class="oracle-footer">
+            Powered by <a href="#">CC Knowledge Base</a> • Trained on internal guides
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // PRICING ENGINE - Extracted from PricingCalc.html
+        // ═══════════════════════════════════════════════════════════════
+        const goldPrices = {
+            '9ct': 120, '9k': 120, '9': 120,
+            '10ct': 133, '10k': 133, '10': 133,
+            '14ct': 187, '14k': 187, '14': 187,
+            '18ct': 240, '18k': 240, '18': 240,
+            '21ct': 280, '21k': 280, '21': 280,
+            '22ct': 293, '22k': 293, '22': 293,
+            '24ct': 320, '24k': 320, '24': 320,
+            'platinum': 110, 'plat': 110
+        };
+
+        const silverPrice = 10; // $10 per gram sterling 925
+
+        function parsePrice(query) {
+            const q = query.toLowerCase();
+            
+            // Try to extract weight (number followed by g or grams)
+            const weightMatch = q.match(/(\d+\.?\d*)\s*(g|gram|grams)/);
+            const weight = weightMatch ? parseFloat(weightMatch[1]) : null;
+
+            // Try to extract carat for gold
+            const caratMatch = q.match(/(\d+)\s*(ct|k|carat|karat)/);
+            const carat = caratMatch ? caratMatch[1] + 'ct' : null;
+
+            // Check what type
+            if (q.includes('gold') || carat) {
+                if (!weight) return null;
+                const caratKey = carat || '9ct'; // default to 9ct
+                const pricePerGram = goldPrices[caratKey] || goldPrices['9ct'];
+                const total = weight * pricePerGram;
+                return {
+                    type: 'gold',
+                    weight: weight,
+                    carat: caratKey.toUpperCase(),
+                    pricePerGram: pricePerGram,
+                    total: total,
+                    breakdown: `${weight}g × $${pricePerGram}/g (${caratKey.toUpperCase()} Gold)`
+                };
+            }
+
+            if (q.includes('silver')) {
+                if (!weight) return null;
+                const total = weight * silverPrice;
+                return {
+                    type: 'silver',
+                    weight: weight,
+                    pricePerGram: silverPrice,
+                    total: total,
+                    breakdown: `${weight}g × $${silverPrice}/g (Sterling 925)`
+                };
+            }
+
+            if (q.includes('platinum') || q.includes('plat')) {
+                if (!weight) return null;
+                const total = weight * goldPrices['platinum'];
+                return {
+                    type: 'platinum',
+                    weight: weight,
+                    pricePerGram: goldPrices['platinum'],
+                    total: total,
+                    breakdown: `${weight}g × $${goldPrices['platinum']}/g (Platinum)`
+                };
+            }
+
+            // Valuation based pricing
+            const valuationMatch = q.match(/valuation.*?(\$?\d+,?\d*)/);
+            if (valuationMatch || q.includes('valuation')) {
+                const amount = valuationMatch ? parseFloat(valuationMatch[1].replace(/[$,]/g, '')) : null;
+                if (!amount) return null;
+                const percentage = 0.65; // Standard tier
+                const total = amount * percentage;
+                return {
+                    type: 'valuation',
+                    amount: amount,
+                    percentage: 65,
+                    total: total,
+                    breakdown: `$${amount.toLocaleString()} × 65% (Standard Tier)`
+                };
+            }
+
+            // Tiffany / Premium Silver
+            if (q.includes('tiffany') || q.includes('premium silver')) {
+                const rrpMatch = q.match(/(\$?\d+,?\d*)/);
+                if (!rrpMatch) return null;
+                const rrp = parseFloat(rrpMatch[1].replace(/[$,]/g, ''));
+                const total = rrp * 0.5;
+                return {
+                    type: 'premium_silver',
+                    rrp: rrp,
+                    percentage: 50,
+                    total: total,
+                    breakdown: `$${rrp.toLocaleString()} RRP × 50%`
+                };
+            }
+
+            return null;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // KNOWLEDGE BASE - Process Guides
+        // ═══════════════════════════════════════════════════════════════
+        const knowledgeResponses = {
+            'gold_test': {
+                title: 'Gold Testing & Carat Verification',
+                content: `Here's how to test gold carat:`,
+                steps: [
+                    'Get the acid testing kit (9ct, 14ct, 18ct, 22ct acids)',
+                    'Rub the item on the testing stone to leave a mark',
+                    'Apply 9ct acid to the mark - if it dissolves, it\'s not gold',
+                    'If it stays, test with 14ct acid, then 18ct, then 22ct',
+                    'The carat is determined by the highest acid it survives',
+                    'Weigh the item and check current gold price',
+                    'Use the Gold Calculator or ask me to price it!'
+                ],
+                source: 'Gold Pricing Guide • Scrap Jewellery Training'
+            },
+            'stocktake': {
+                title: 'Stocktake Process',
+                content: `Complete stocktake process:`,
+                steps: [
+                    'Print stocktake sheets for your section',
+                    'Use handheld scanner to scan each item barcode',
+                    'Verify item matches description on screen',
+                    'Check condition and update if needed',
+                    'Flag any items not found as "missing"',
+                    'Submit completed section to manager',
+                    'Reconcile discrepancies before end of day'
+                ],
+                source: 'Shop Floor Stocktake Process • Jewellery Stocktake Process'
+            },
+            'repair': {
+                title: 'Jewellery Repairs Process',
+                content: `Handling jewellery repairs:`,
+                steps: [
+                    'Assess the repair needed with the customer',
+                    'Take photos of the item in current state',
+                    'Get customer details and contact number',
+                    'Quote repair cost using the repair price list',
+                    'Take deposit if value over $100',
+                    'Log in repair tracking system',
+                    'Send to approved jeweller for repair',
+                    'Call customer when ready for collection'
+                ],
+                source: 'Jewellery Repairs and Valuations'
+            },
+            'pandora': {
+                title: 'Pandora Pricing',
+                content: `For Pandora items:`,
+                steps: [
+                    'Check CCPOS Item History for recent sales',
+                    'Search eBay completed listings for market rate',
+                    'Check current Pandora website RRP',
+                    'Price based on condition and market demand',
+                    'Retired pieces may command premium',
+                    'Common charms: price competitively'
+                ],
+                source: 'CC Retail Jewellery Pricing Guide'
+            },
+            'luxury': {
+                title: 'Luxury/Designer Pricing',
+                content: `For luxury items (Gucci, LV, etc):`,
+                steps: [
+                    'Current pieces: Price at 70% of RRP',
+                    'Non-current pieces: Check The RealReal',
+                    'Also check Vestiaire Collective for comps',
+                    'Authenticate before purchasing',
+                    'Document serial numbers and authenticity markers',
+                    'High-value items: consult manager'
+                ],
+                source: 'CC Retail Jewellery Pricing Guide'
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        // CHAT FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
+        function toggleOracle() {
+            const trigger = document.getElementById('oracleTrigger');
+            const panel = document.getElementById('oraclePanel');
+            trigger.classList.toggle('active');
+            panel.classList.toggle('open');
+            
+            if (panel.classList.contains('open')) {
+                document.getElementById('oracleInput').focus();
+            }
+        }
+
+        function askQuick(question) {
+            document.getElementById('oracleInput').value = question;
+            sendMessage();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('oracleInput');
+            const messages = document.getElementById('oracleMessages');
+            const query = input.value.trim();
+
+            if (!query) return;
+
+            // Add user message
+            messages.innerHTML += `<div class="message user">${query}</div>`;
+            input.value = '';
+
+            // Show typing indicator
+            const typingId = Date.now();
+            messages.innerHTML += `
+                <div class="typing-indicator" id="typing-${typingId}">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            messages.scrollTop = messages.scrollHeight;
+
+            // Simulate AI processing
+            setTimeout(() => {
+                document.getElementById(`typing-${typingId}`).remove();
+                const response = getResponse(query);
+                messages.innerHTML += response;
+                messages.scrollTop = messages.scrollHeight;
+            }, 800 + Math.random() * 400);
+        }
+
+        function getResponse(query) {
+            const q = query.toLowerCase();
+
+            // ═══════════════════════════════════════════════════════════════
+            // PRICING QUERIES - Try to calculate a price first
+            // ═══════════════════════════════════════════════════════════════
+            if (q.includes('price') || q.includes('worth') || q.includes('value') || 
+                q.match(/\d+\s*g/) || q.includes('how much')) {
+                
+                const priceResult = parsePrice(query);
+                
+                if (priceResult) {
+                    return `
+                        <div class="message oracle">
+                            💰 <strong>Calculated Price:</strong>
+                            <div class="price-result">
+                                <div class="price-value">$${priceResult.total.toFixed(2)}</div>
+                                <div class="price-breakdown">${priceResult.breakdown}</div>
+                            </div>
+                            <div class="message-source">📊 Based on current CC pricing guide rates</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // ═══════════════════════════════════════════════════════════════
+            // KNOWLEDGE QUERIES
+            // ═══════════════════════════════════════════════════════════════
+            if (q.includes('test') && q.includes('gold') || q.includes('carat') || q.includes('acid')) {
+                return formatKnowledge(knowledgeResponses.gold_test);
+            }
+            
+            if (q.includes('stocktake') || q.includes('stock take') || q.includes('inventory')) {
+                return formatKnowledge(knowledgeResponses.stocktake);
+            }
+            
+            if (q.includes('repair') || q.includes('fix') || q.includes('broken')) {
+                return formatKnowledge(knowledgeResponses.repair);
+            }
+            
+            if (q.includes('pandora')) {
+                return formatKnowledge(knowledgeResponses.pandora);
+            }
+            
+            if (q.includes('luxury') || q.includes('gucci') || q.includes('louis') || q.includes('designer')) {
+                return formatKnowledge(knowledgeResponses.luxury);
+            }
+
+            // ═══════════════════════════════════════════════════════════════
+            // PRICING HELP
+            // ═══════════════════════════════════════════════════════════════
+            if (q.includes('gold') && !q.includes('test')) {
+                return `
+                    <div class="message oracle">
+                        🥇 <strong>Gold Pricing</strong><br><br>
+                        To price gold, tell me the weight and carat.<br><br>
+                        Examples:<br>
+                        • "Price 5g of 18ct gold"<br>
+                        • "How much is 10g 9ct worth?"<br>
+                        • "Value 3.5g 14k gold"<br><br>
+                        <strong>Current rates:</strong><br>
+                        9ct: $120/g | 14ct: $187/g<br>
+                        18ct: $240/g | 22ct: $293/g
+                        <div class="message-source">💡 Just give me the numbers and I'll calculate!</div>
+                    </div>
+                `;
+            }
+
+            if (q.includes('silver')) {
+                return `
+                    <div class="message oracle">
+                        🪙 <strong>Silver Pricing</strong><br><br>
+                        Sterling Silver (925): <strong>$10/gram</strong><br><br>
+                        Tell me the weight:<br>
+                        • "Price 20g silver chain"<br>
+                        • "Value 15g silver bracelet"<br><br>
+                        <strong>Premium Silver (Tiffany, etc):</strong><br>
+                        Price at 50% of RRP<br>
+                        • "Tiffany necklace RRP $400"
+                        <div class="message-source">📚 Source: CC Retail Jewellery Pricing Guide</div>
+                    </div>
+                `;
+            }
+
+            // Default response
+            return `
+                <div class="message oracle">
+                    I'm searching for "${query}"...<br><br>
+                    <strong>I can help with:</strong><br>
+                    • 💰 <strong>Pricing:</strong> "Price 5g 18ct gold"<br>
+                    • 🧪 <strong>Testing:</strong> "How to test gold carat?"<br>
+                    • 📋 <strong>Stocktake:</strong> "Stocktake process"<br>
+                    • 🔧 <strong>Repairs:</strong> "Jewellery repair process"<br>
+                    • 👜 <strong>Luxury:</strong> "How to price Gucci?"
+                    <div class="message-source">💡 Try being more specific or use the quick buttons above</div>
+                </div>
+            `;
+        }
+
+        function formatKnowledge(data) {
+            let stepsHtml = data.steps.map(s => `<li>${s}</li>`).join('');
+            return `
+                <div class="message oracle">
+                    <strong>${data.title}</strong>
+                    <br><br>
+                    ${data.content}
+                    <div class="message-steps">
+                        <ol>${stepsHtml}</ol>
+                    </div>
+                    <div class="message-source">📚 Source: ${data.source}</div>
+                </div>
+            `;
+        }
+    </script>
+
+</body>
+</html>

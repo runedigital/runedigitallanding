@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <!-- Background -->
+  <rect width="400" height="500" fill="#0a0a0f"/>
+  
+  <!-- Raidho Rune (ᚱ) - The R -->
+  <g transform="translate(200, 180)">
+    <!-- Vertical line -->
+    <path d="M 0 -120 L 0 120" 
+          stroke="#c5a059" 
+          stroke-width="24" 
+          stroke-linecap="square"
+          fill="none"/>
+    <!-- Upper diagonal (going right and down from top) -->
+    <path d="M 0 -120 L 80 -20" 
+          stroke="#c5a059" 
+          stroke-width="24" 
+          stroke-linecap="square"
+          fill="none"/>
+    <!-- Lower diagonal (going back left and down to meet stem) -->
+    <path d="M 80 -20 L 0 80" 
+          stroke="#c5a059" 
+          stroke-width="24" 
+          stroke-linecap="square"
+          fill="none"/>
+  </g>
+  
+  <!-- RUNE DIGITAL text -->
+  <text x="200" y="420" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="36" 
+        font-weight="600"
+        letter-spacing="8"
+        fill="#c5a059" 
+        text-anchor="middle">RUNE DIGITAL</text>
+  
+  <!-- Subtle glow effect on rune -->
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>

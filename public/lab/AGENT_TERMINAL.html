@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE DIGITAL // AGENT SWARM TERMINAL</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #0a0a0f;
+            font-family: 'JetBrains Mono', monospace;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .terminal {
+            background: linear-gradient(180deg, #0d0d12 0%, #0a0a0f 100%);
+            height: 100vh;
+            max-height: 400px;
+            padding: 12px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .terminal::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.1) 0px,
+                rgba(0,0,0,0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            color: #c5a059;
+            font-size: 11px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        
+        .status {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+            font-size: 8px;
+            padding: 3px 8px;
+            letter-spacing: 1px;
+        }
+        
+        .header-right {
+            font-size: 8px;
+            color: #666;
+            letter-spacing: 1px;
+        }
+        
+        .log-container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .log-line {
+            display: flex;
+            gap: 10px;
+            padding: 2px 0;
+            font-size: 10px;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .timestamp {
+            color: #555;
+            min-width: 60px;
+        }
+        
+        .tier {
+            min-width: 55px;
+            font-weight: 700;
+        }
+        
+        .tier-1 { color: #ff6b6b; }
+        .tier-2 { color: #4ecdc4; }
+        .tier-3 { color: #ffe66d; }
+        .system { color: #c5a059; }
+        
+        .agent {
+            min-width: 80px;
+            color: #888;
+        }
+        
+        .message {
+            color: #ccc;
+            flex: 1;
+        }
+        
+        .highlight { color: #00ff88; }
+        .warning { color: #ff9f43; }
+        .error { color: #ff6b6b; }
+        .gold { color: #c5a059; }
+        .cyan { color: #00ffea; }
+        .purple { color: #a855f7; }
+        
+        .divider {
+            border-top: 1px solid rgba(197, 160, 89, 0.2);
+            margin: 6px 0;
+            position: relative;
+        }
+        
+        .divider::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -6px;
+            left: 15px;
+            background: #0a0a0f;
+            padding: 0 8px;
+            color: #c5a059;
+            font-size: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 30px;
+            padding: 10px 0;
+            border-top: 1px solid rgba(197, 160, 89, 0.2);
+            margin-top: 10px;
+        }
+        
+        .metric {
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #00ff88;
+        }
+        
+        .metric-label {
+            font-size: 7px;
+            color: #666;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: #c5a059;
+            animation: blink 1s infinite;
+            margin-left: 5px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">RUNE DIGITAL</div>
+                <div class="status">● LIVE</div>
+            </div>
+            <div class="header-right">AGENT ORCHESTRATOR V2 // PARALLEL EXECUTION</div>
+        </div>
+        
+        <div class="log-container">
+            <div class="log-line">
+                <span class="timestamp">02:47:31</span>
+                <span class="tier system">[SYSTEM]</span>
+                <span class="agent">ORCHESTRATOR</span>
+                <span class="message">Initializing <span class="gold">WRECKING CREW</span> parallel execution...</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:32</span>
+                <span class="tier tier-1">[TIER-1]</span>
+                <span class="agent">OPUS</span>
+                <span class="message">Architecture analysis complete. <span class="highlight">12 modules</span> identified.</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:32</span>
+                <span class="tier tier-1">[TIER-1]</span>
+                <span class="agent">ORACLE</span>
+                <span class="message">Rapid prototyping: <span class="cyan">3 variants</span> generated for review.</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:33</span>
+                <span class="tier tier-1">[TIER-1]</span>
+                <span class="agent">GEMINI</span>
+                <span class="message">Cross-referencing <span class="purple">Vertex AI</span> documentation...</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:33</span>
+                <span class="tier tier-1">[TIER-1]</span>
+                <span class="agent">SONNET</span>
+                <span class="message">Code optimization pass: <span class="highlight">-23% token usage</span></span>
+            </div>
+            
+            <div class="divider" data-label="CONSENSUS ACHIEVED"></div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:35</span>
+                <span class="tier system">[SYSTEM]</span>
+                <span class="agent">DISPATCHER</span>
+                <span class="message">Deploying <span class="gold">TIER-2</span> specialist agents...</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:36</span>
+                <span class="tier tier-2">[TIER-2]</span>
+                <span class="agent">GENESIS</span>
+                <span class="message">Generating production code... <span class="highlight">847 lines</span></span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:37</span>
+                <span class="tier tier-2">[TIER-2]</span>
+                <span class="agent">ARCHITECT</span>
+                <span class="message">Schema validation: <span class="highlight">PASSED</span></span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:38</span>
+                <span class="tier tier-2">[TIER-2]</span>
+                <span class="agent">HARVEST</span>
+                <span class="message">Asset collection: <span class="cyan">23 resources</span> indexed</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:39</span>
+                <span class="tier tier-3">[TIER-3]</span>
+                <span class="agent">POLISH</span>
+                <span class="message">Code formatting applied. Linting: <span class="highlight">0 errors</span></span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:40</span>
+                <span class="tier tier-3">[TIER-3]</span>
+                <span class="agent">INDEXER</span>
+                <span class="message">Documentation generated. <span class="purple">README.md</span> updated.</span>
+            </div>
+            
+            <div class="log-line">
+                <span class="timestamp">02:47:41</span>
+                <span class="tier system">[SYSTEM]</span>
+                <span class="agent">ORCHESTRATOR</span>
+                <span class="message"><span class="gold">BUILD COMPLETE</span> — All agents synchronized.<span class="cursor"></span></span>
+            </div>
+        </div>
+        
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value">11</div>
+                <div class="metric-label">AGENTS ACTIVE</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">4</div>
+                <div class="metric-label">TIER-1 MODELS</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">847</div>
+                <div class="metric-label">LINES GENERATED</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">9.3s</div>
+                <div class="metric-label">EXECUTION TIME</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" style="color: #00ffea;">✓</div>
+                <div class="metric-label">BUILD STATUS</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

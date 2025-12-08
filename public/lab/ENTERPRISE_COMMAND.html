@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Command Center // AI-Powered Operations Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #111111;
+            --border: #222;
+            --accent: #00ffea;
+            --accent-pink: #ff0055;
+            --text: #ffffff;
+            --text-dim: #888888;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .demo-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 234, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            font-size: 10px;
+            letter-spacing: 2px;
+            border-radius: 3px;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .subtitle {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 4px;
+            margin-bottom: 60px;
+            font-weight: 300;
+        }
+
+        .demo-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 4px;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--card-color, var(--accent));
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--card-color, var(--accent));
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            filter: grayscale(0.2);
+        }
+
+        .card-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+
+        .card-role {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 9px;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        .badge-owner {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-manager {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        /* Executive card - full width */
+        .dashboard-card.corporate {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(20, 18, 15, 0.9));
+            border-color: rgba(201, 169, 98, 0.2);
+            backdrop-filter: blur(20px);
+        }
+
+        .dashboard-card.corporate:hover {
+            border-color: rgba(201, 169, 98, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(201, 169, 98, 0.1);
+        }
+
+        .dashboard-card.corporate::before {
+            background: linear-gradient(90deg, transparent, #c9a962, transparent);
+        }
+
+        .corporate-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .corporate-left {
+            flex: 1;
+        }
+
+        .corporate-badge {
+            background: rgba(201, 169, 98, 0.1);
+            border: 1px solid rgba(201, 169, 98, 0.3);
+            color: #c9a962;
+            padding: 8px 20px;
+            border-radius: 3px;
+            font-weight: 400;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .feature-grid {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .feature-grid h3 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .feature-text strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .tech-stack {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tech-stack h4 {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--text-dim);
+            margin-bottom: 15px;
+        }
+
+        .tech-badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-radius: 3px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .modal-desc {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 12px 30px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-grid, .features-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/research-hub.html" class="back-link">← RESEARCH HUB</a>
+    <div class="demo-badge">DEMO VERSION</div>
+
+    <div class="logo">ENTERPRISE <span>COMMAND</span></div>
+    <div class="subtitle">AI-POWERED OPERATIONS DASHBOARD</div>
+    
+    <div class="demo-title">ROLE-BASED ACCESS CONTROL // SELECT VIEW</div>
+
+    <div class="dashboard-grid">
+        <!-- Owner View -->
+        <a href="/lab/owner.html" class="dashboard-card" style="--card-color: #ff3131;">
+            <span class="card-badge badge-owner">FULL ACCESS</span>
+            <div class="card-icon">👑</div>
+            <div class="card-name">OWNER</div>
+            <div class="card-role">FRANCHISE OWNER // ENTERPRISE</div>
+            <div class="card-desc">Full command center with AI intelligence, real-time analytics, and approval workflows.</div>
+        </a>
+
+        <!-- Manager View -->
+        <a href="/lab/manager.html" class="dashboard-card" style="--card-color: #00ff88;">
+            <span class="card-badge badge-manager">MANAGED</span>
+            <div class="card-icon">📊</div>
+            <div class="card-name">MANAGER</div>
+            <div class="card-role">STORE MANAGER // OPERATIONS</div>
+            <div class="card-desc">Day-to-day operations dashboard. Request elevated permissions from owners in real-time.</div>
+        </a>
+
+        <!-- Viewer -->
+        <a href="/lab/corporate.html" class="dashboard-card" style="--card-color: #a855f7;">
+            <span class="card-badge badge-manager">READ ONLY</span>
+            <div class="card-icon">👁️</div>
+            <div class="card-name">VIEWER</div>
+            <div class="card-role">INVESTOR // STAKEHOLDER</div>
+            <div class="card-desc">Read-only analytics and reporting dashboard for external stakeholders.</div>
+        </a>
+
+        <!-- Corporate/Executive View -->
+        <a href="/lab/corporate.html" class="dashboard-card corporate">
+            <div class="corporate-content">
+                <div class="corporate-left">
+                    <div class="card-icon">🏛️</div>
+                    <div class="card-name">EXECUTIVE</div>
+                    <div class="card-role">MULTI-LOCATION OVERSIGHT</div>
+                    <div class="card-desc">Black glass executive view. Multi-franchise intelligence, aggregated KPIs, and strategic insights.</div>
+                </div>
+                <div class="corporate-badge">C-SUITE</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="feature-grid">
+        <h3>🚀 CORE CAPABILITIES</h3>
+        <div class="features-list">
+            <div class="feature-item">
+                <div class="feature-icon">🔮</div>
+                <div class="feature-text">
+                    <strong>AI Oracle Assistant</strong>
+                    Embedded knowledge base with real-time pricing calculations and process guidance.
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔔</div>
+                <div class="feature-text">
+                    <strong>Real-Time Permissions</strong>
+                    Request → Approve workflow with instant cross-device notifications.
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">
+                    <strong>Live Analytics</strong>
+                    Sales, inventory, and performance metrics updated in real-time.
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔐</div>
+                <div class="feature-text">
+                    <strong>Role-Based Access</strong>
+                    Granular permissions per role, per location, per function.
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <div class="feature-text">
+                    <strong>Mobile-First Design</strong>
+                    Full functionality on any device. PWA-ready for app-like experience.
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔗</div>
+                <div class="feature-text">
+                    <strong>API Integration</strong>
+                    Connects to existing POS, inventory, and CRM systems via REST API.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tech-stack">
+        <h4>BUILT WITH</h4>
+        <div class="tech-badges">
+            <span class="tech-badge">NEXT.JS</span>
+            <span class="tech-badge">TYPESCRIPT</span>
+            <span class="tech-badge">TAILWIND</span>
+            <span class="tech-badge">VERTEX AI</span>
+            <span class="tech-badge">DIALOGFLOW CX</span>
+            <span class="tech-badge">FIREBASE</span>
+            <span class="tech-badge">VERCEL</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        Enterprise Command Center by <a href="/">RUNE DIGITAL</a>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-icon" id="modalIcon">👑</div>
+            <div class="modal-title" id="modalTitle">OWNER DASHBOARD</div>
+            <div class="modal-desc" id="modalDesc">
+                This is a demo preview of the Enterprise Command Center. The full system includes real-time data synchronization, 
+                AI-powered assistance, and granular permission controls across all organizational roles.
+            </div>
+            <button class="modal-close" onclick="closeModal()">CLOSE PREVIEW</button>
+        </div>
+    </div>
+
+    <script>
+        const modalData = {
+            owner: {
+                icon: '👑',
+                title: 'OWNER DASHBOARD',
+                desc: 'Full command center access with AI intelligence, approval workflows, and complete visibility across all operations. Owners can approve/deny manager requests in real-time.'
+            },
+            manager: {
+                icon: '📊',
+                title: 'MANAGER DASHBOARD',
+                desc: 'Day-to-day operations control with the ability to request elevated permissions from owners. Managers see their store\'s performance and can escalate decisions that require owner approval.'
+            },
+            staff: {
+                icon: '🛒',
+                title: 'STAFF DASHBOARD',
+                desc: 'Simplified interface focused on daily tasks. The AI Oracle assists with pricing calculations and process questions without requiring manager involvement.'
+            },
+            viewer: {
+                icon: '👁️',
+                title: 'VIEWER DASHBOARD',
+                desc: 'Read-only access to analytics and reporting. Perfect for investors, stakeholders, or auditors who need visibility without operational control.'
+            },
+            executive: {
+                icon: '🏛️',
+                title: 'EXECUTIVE DASHBOARD',
+                desc: 'Multi-location aggregate view with strategic KPIs, trend analysis, and cross-franchise comparisons. Designed for C-suite decision makers managing multiple locations.'
+            }
+        };
+
+        function showModal(role) {
+            const data = modalData[role];
+            document.getElementById('modalIcon').textContent = data.icon;
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalDesc').textContent = data.desc;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+    
+    <!-- The Oracle Widget -->
+    <button class="oracle-trigger" id="oracleTrigger" onclick="toggleOracle()">🔮</button>
+    <div class="oracle-panel" id="oraclePanel">
+        <div class="oracle-header">
+            <div class="oracle-avatar">🔮</div>
+            <div class="oracle-title">THE ORACLE</div>
+            <div class="oracle-subtitle">AI Knowledge & Pricing Assistant</div>
+            <div class="oracle-status">
+                <div class="status-dot"></div>
+                Online • Knowledge base loaded
+            </div>
+        </div>
+        <div class="oracle-quick">
+            <button class="quick-btn" onclick="askQuick('Price 5 units premium')">💎 Premium</button>
+            <button class="quick-btn" onclick="askQuick('How to verify quality?')">🧪 Quality</button>
+            <button class="quick-btn" onclick="askQuick('Stocktake process')">📋 Stocktake</button>
+            <button class="quick-btn" onclick="askQuick('Price 10 units standard')">📦 Standard</button>
+        </div>
+        <div class="oracle-messages" id="oracleMessages">
+            <div class="message oracle">
+                👋 I'm The Oracle - ask me about pricing or processes!<br><br>
+                <strong>Try:</strong><br>
+                • "Price 5 units premium"<br>
+                • "How to verify quality?"<br>
+                • "Stocktake process"
+            </div>
+        </div>
+        <div class="oracle-input-area">
+            <input type="text" id="oracleInput" placeholder="Ask anything..." onkeypress="handleKeyPress(event)">
+            <button class="oracle-send" onclick="sendMessage()">→</button>
+        </div>
+    </div>
+
+    <style>
+        .oracle-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ffea, #a855f7);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 255, 234, 0.4);
+            font-size: 28px;
+            z-index: 9999;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .oracle-trigger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 255, 234, 0.6);
+        }
+        .oracle-panel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 360px;
+            max-height: 500px;
+            background: #0d0d0d;
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+        }
+        .oracle-panel.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+        .oracle-header {
+            background: linear-gradient(135deg, rgba(0, 255, 234, 0.15), rgba(168, 85, 247, 0.15));
+            padding: 20px;
+            border-bottom: 1px solid #252525;
+        }
+        .oracle-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffea, #a855f7);
+        }
+        .oracle-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ffea, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .oracle-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            letter-spacing: 3px;
+            color: #00ffea;
+        }
+        .oracle-subtitle {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .oracle-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #00ff88;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .oracle-quick {
+            padding: 12px;
+            border-bottom: 1px solid #252525;
+            display: flex;
+            gap: 8px;
+        }
+        .quick-btn {
+            padding: 8px 12px;
+            border: 1px solid #252525;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #888;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quick-btn:hover {
+            background: rgba(0, 255, 234, 0.1);
+            border-color: #00ffea;
+            color: #00ffea;
+        }
+        .oracle-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 250px;
+        }
+        .message {
+            max-width: 85%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .message.oracle {
+            align-self: flex-start;
+            background: linear-gradient(135deg, rgba(0, 255, 234, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(0, 255, 234, 0.2);
+        }
+        .message.user {
+            align-self: flex-end;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #252525;
+        }
+        .oracle-input-area {
+            padding: 15px;
+            border-top: 1px solid #252525;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .oracle-input-area input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #252525;
+            border-radius: 25px;
+            background: #141414;
+            color: #fff;
+            font-size: 13px;
+        }
+        .oracle-input-area input:focus {
+            outline: none;
+            border-color: #00ffea;
+        }
+        .oracle-input-area input::placeholder {
+            color: #666;
+        }
+        .oracle-send {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ffea, #a855f7);
+            color: #000;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .oracle-send:hover {
+            transform: scale(1.1);
+        }
+    </style>
+
+    <script>
+        function toggleOracle() {
+            const panel = document.getElementById('oraclePanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                document.getElementById('oracleInput').focus();
+            }
+        }
+
+        function askQuick(question) {
+            document.getElementById('oracleInput').value = question;
+            sendMessage();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('oracleInput');
+            const messages = document.getElementById('oracleMessages');
+            const query = input.value.trim();
+
+            if (!query) return;
+
+            messages.innerHTML += `<div class="message user">${query}</div>`;
+            input.value = '';
+
+            // Typing indicator
+            messages.innerHTML += `<div class="message oracle typing-indicator" id="typing"><span style="animation: blink 1s infinite;">●</span> <span style="animation: blink 1s infinite 0.2s;">●</span> <span style="animation: blink 1s infinite 0.4s;">●</span></div>`;
+            messages.scrollTop = messages.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById('typing')?.remove();
+                const response = getResponse(query);
+                messages.innerHTML += response;
+                messages.scrollTop = messages.scrollHeight;
+            }, 600);
+        }
+
+        // Pricing rates
+        const rates = {
+            'premium': 45,
+            'standard': 25,
+            'basic': 15,
+            'bulk': 10
+        };
+
+        // Knowledge base
+        const knowledge = {
+            quality: {
+                title: 'Quality Verification',
+                steps: ['Check item condition (A/B/C grade)', 'Verify authenticity markers', 'Test functionality if applicable', 'Document any defects with photos', 'Apply grading to pricing', 'Get manager approval for high-value items'],
+                source: 'Quality Assurance Guide'
+            },
+            stocktake: {
+                title: 'Stocktake Process',
+                steps: ['Print stocktake sheets by category', 'Scan each barcode in sequence', 'Verify item matches description', 'Flag missing or discrepant items', 'Submit counts to manager', 'Reconcile before end of day'],
+                source: 'Inventory Management SOP'
+            },
+            returns: {
+                title: 'Returns Process',
+                steps: ['Check receipt and purchase date', 'Verify item condition unchanged', 'Process refund to original payment', 'If exchange, apply price difference', 'Log reason in system', 'Restock or flag for inspection'],
+                source: 'Customer Service Handbook'
+            }
+        };
+
+        function parsePrice(q) {
+            q = q.toLowerCase();
+            const qtyMatch = q.match(/(\d+\.?\d*)\s*(unit|item|piece)?s?/);
+            const qty = qtyMatch ? parseFloat(qtyMatch[1]) : null;
+            
+            if (qty) {
+                let tier = 'standard';
+                let rate = rates.standard;
+                
+                if (q.includes('premium')) { tier = 'premium'; rate = rates.premium; }
+                else if (q.includes('basic')) { tier = 'basic'; rate = rates.basic; }
+                else if (q.includes('bulk')) { tier = 'bulk'; rate = rates.bulk; }
+                
+                return { 
+                    total: qty * rate, 
+                    breakdown: `${qty} × $${rate}/unit (${tier.toUpperCase()} tier)`,
+                    tier: tier
+                };
+            }
+            return null;
+        }
+
+        function getResponse(query) {
+            const q = query.toLowerCase();
+            
+            // Try pricing first
+            if (q.includes('price') || q.includes('cost') || q.includes('worth') || q.match(/\d+\s*(unit|item)?/)) {
+                const price = parsePrice(q);
+                if (price) {
+                    return `<div class="message oracle">
+                        💰 <strong>Calculated Price:</strong>
+                        <div style="background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 234, 0.1)); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                            <div style="font-family: 'Oswald', sans-serif; font-size: 28px; color: #00ff88;">$${price.total.toFixed(2)}</div>
+                            <div style="font-size: 11px; color: #888; margin-top: 4px;">${price.breakdown}</div>
+                        </div>
+                        <div style="font-size: 10px; color: #666; margin-top: 10px;">💡 Rates: Premium $45 | Standard $25 | Basic $15 | Bulk $10</div>
+                    </div>`;
+                }
+            }
+            
+            // Knowledge queries
+            if (q.includes('verify') || q.includes('quality') || q.includes('grade') || q.includes('test')) {
+                const k = knowledge.quality;
+                return `<div class="message oracle"><strong>${k.title}</strong><ol style="margin: 10px 0 0 20px; padding: 0;">${k.steps.map(s=>`<li style="margin: 4px 0;">${s}</li>`).join('')}</ol><div style="font-size: 10px; color: #666; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">📚 ${k.source}</div></div>`;
+            }
+            if (q.includes('stocktake') || q.includes('inventory') || q.includes('count')) {
+                const k = knowledge.stocktake;
+                return `<div class="message oracle"><strong>${k.title}</strong><ol style="margin: 10px 0 0 20px; padding: 0;">${k.steps.map(s=>`<li style="margin: 4px 0;">${s}</li>`).join('')}</ol><div style="font-size: 10px; color: #666; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">📚 ${k.source}</div></div>`;
+            }
+            if (q.includes('return') || q.includes('refund') || q.includes('exchange')) {
+                const k = knowledge.returns;
+                return `<div class="message oracle"><strong>${k.title}</strong><ol style="margin: 10px 0 0 20px; padding: 0;">${k.steps.map(s=>`<li style="margin: 4px 0;">${s}</li>`).join('')}</ol><div style="font-size: 10px; color: #666; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">📚 ${k.source}</div></div>`;
+            }
+            
+            // Pricing help
+            if (q.includes('rate') || q.includes('tier')) {
+                return `<div class="message oracle">
+                    💎 <strong>Pricing Tiers</strong><br><br>
+                    <strong>Premium:</strong> $45/unit - Top quality, verified<br>
+                    <strong>Standard:</strong> $25/unit - Good condition<br>
+                    <strong>Basic:</strong> $15/unit - Fair condition<br>
+                    <strong>Bulk:</strong> $10/unit - Volume discount<br><br>
+                    Try: "Price 5 units premium"
+                </div>`;
+            }
+            
+            // Default
+            return `<div class="message oracle">
+                I can help with:<br><br>
+                💰 <strong>Pricing</strong> - "Price 5 units premium"<br>
+                🧪 <strong>Quality</strong> - "How to verify quality?"<br>
+                📋 <strong>Stocktake</strong> - "Stocktake process"<br>
+                ↩️ <strong>Returns</strong> - "Refund process"<br><br>
+                <em>Ask me anything!</em>
+            </div>`;
+        }
+    </script>
+</body>
+</html>

@@ -20,8 +20,8 @@
         .hero .subtitle { color: #999; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
         .executive-summary { background: rgba(197, 160, 89, 0.03); border-left: 3px solid #c5a059; padding: 20px 25px; margin: 30px 0; font-size: 13px; line-height: 1.8; color: #d0d0d0; }
         .section { padding: 40px; border-bottom: 1px solid rgba(197, 160, 89, 0.1); }
-        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Cinzel', serif; }
-        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 700; }
+        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 0.15em; font-family: 'Cinzel', serif; line-height: 1.4; font-weight: 400; }
+        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 400; letter-spacing: 0.1em; line-height: 1.4; }
         .tech-list { list-style: none; margin: 15px 0; }
         .tech-list li { padding: 10px 0; padding-left: 20px; border-left: 2px solid rgba(197, 160, 89, 0.3); margin-bottom: 8px; font-size: 13px; }
         .tech-list strong { color: #c5a059; }
@@ -48,59 +48,79 @@
 <body>
     <div class="scanlines"></div>
     <header>
-        <div class="logo-text">RUNE // RESEARCH</div>
+        <div class="logo-text">RUNE DIGITAL // RESEARCH</div>
         <nav class="nav-links">
-            <a href="/landing.html">← BACK</a>
+            <a href="/research-hub.html">← BACK</a>
             <a href="/lab/NEURAL_HUB.html">NEURAL HUB</a>
         </nav>
     </header>
     
     <main>
         <section class="hero">
-            <h1>Native Vertex AI & Multimodal Pipelines</h1>
-            <p class="subtitle">Gemini 1.5 Pro Enterprise Integration</p>
+            <h1>Multi-Provider AI Infrastructure</h1>
+            <p class="subtitle">Vertex AI + NVIDIA NIM + Ollama Hybrid Stack</p>
         </section>
         
         <section class="section">
             <div class="executive-summary">
-                <strong>Executive Summary:</strong> Rune AI is built as a "Vertex-First" platform. We leverage the extensive 1M+ token context window of Gemini 1.5 Pro to process entire auction history logs and high-fidelity gemstone imagery in a single pass. This architecture bypasses the limitations of traditional RAG (Retrieval-Augmented Generation) by allowing the model to reason across the full dataset natively.
+                <strong>Executive Summary:</strong> RUNE operates a hybrid AI infrastructure combining <strong>Google Vertex AI</strong> (Gemini 1.5 Pro), <strong>NVIDIA NIM APIs</strong> (developer access), and <strong>Ollama local inference</strong> (rune-ai-v1 on RTX 4070). This multi-provider approach optimizes for cost, latency, and capability—using cloud APIs for complex reasoning and local models for high-frequency, low-latency tasks.
             </div>
         </section>
         
         <section class="section">
-            <h2>Technical Implementation</h2>
+            <h2>Live API Configuration</h2>
             
-            <h3>Multimodal Ingestion Pipeline</h3>
-            <p>Direct pipelines from BigQuery to Vertex AI for processing unstructured valuation data (PDF certificates, 4K macro photography).</p>
+            <h3>Active API Integrations</h3>
+            <p>Currently configured and operational in <code>CONFIG/RUNE_CONFIG.json</code>:</p>
             <ul class="tech-list">
-                <li><strong>Image Processing:</strong> Real-time ingestion of macro-lens gemstone photography (up to 50MP resolution)</li>
-                <li><strong>Document Understanding:</strong> Automated extraction of GIA/IGS grading reports from PDF certificates</li>
-                <li><strong>Market Data Integration:</strong> Live spot price feeds cross-referenced with asset attributes</li>
-                <li><strong>Latency Optimization:</strong> Sub-2-second end-to-end valuation pipeline</li>
+                <li><strong>NVIDIA NIM API:</strong> Developer access for inference endpoints (nvapi-***). Used for cost-effective batch processing.</li>
+                <li><strong>Google Gemini API:</strong> Direct API key for Gemini 1.5 Pro multi-modal reasoning (AIzaSy***)</li>
+                <li><strong>OpenAI API:</strong> GPT-4o for comparison benchmarks and fallback (sk-proj-***)</li>
+                <li><strong>GitHub API:</strong> Automated issue creation for agent task distribution (github_pat_***)</li>
+                <li><strong>Stripe API:</strong> Live payment processing for SHOWROOM e-commerce (sk_live_***)</li>
+                <li><strong>Dialogflow CX:</strong> Webhook integration for conversational AI flows</li>
             </ul>
             
-            <h3>Structured Output Enforcement</h3>
-            <p>Enforcing JSON schema constraints at the model level to ensure downstream compatibility with our fintech dashboards (Burnrate).</p>
+            <h3>NVIDIA Integration</h3>
+            <p>Currently using NVIDIA developer APIs. Google rep recommended NVIDIA Inception program (application pending).</p>
             <ul class="tech-list">
-                <li><strong>Schema Validation:</strong> Gemini constrained generation for deterministic output formats</li>
-                <li><strong>Type Safety:</strong> All numeric outputs tagged with confidence intervals and data sources</li>
-                <li><strong>Audit Trail:</strong> Every valuation tagged with model version, timestamp, and input hashes</li>
-                <li><strong>Backwards Compatibility:</strong> Support for multiple schema versions across API clients</li>
+                <li><strong>NIM Endpoints:</strong> Access to NVIDIA-hosted inference for Llama, Mistral, and custom models</li>
+                <li><strong>Cost Optimization:</strong> NVIDIA APIs as primary backend, Gemini for complex multi-modal tasks</li>
+                <li><strong>Inception Status:</strong> Developer access active, full Inception membership pending</li>
+                <li><strong>Future Plan:</strong> Apply for NVIDIA Inception once revenue milestones hit</li>
             </ul>
             
-            <h3>Latency Optimization</h3>
-            <p>Utilization of Vertex AI's provisioned throughput for predictable enterprise SLAs.</p>
+            <h3>Ollama Local Stack</h3>
+            <p>Three models running locally on RTX 4070 Super (16GB VRAM):</p>
             <ul class="tech-list">
-                <li><strong>Provisioned Capacity:</strong> Dedicated quota prevents noisy neighbor effects</li>
-                <li><strong>Batch Processing:</strong> Efficient handling of 1000+ asset valuations per minute</li>
-                <li><strong>Caching Strategy:</strong> Long-context window reduces redundant API calls</li>
-                <li><strong>P99 Latency:</strong> &lt;5 second response time for complex multimodal queries</li>
+                <li><strong>rune-ai-v1:latest</strong> (4.4 GB) — Custom fine-tuned model for RUNE HQ orchestration</li>
+                <li><strong>rune-domain-agent:latest</strong> (4.4 GB) — Specialized agent for domain-specific workflows</li>
+                <li><strong>mistral:7b</strong> (4.4 GB) — Base model for experimentation and fine-tuning</li>
+            </ul>
+        </section>
+        
+        <section class="section">
+            <h2>Hardware Infrastructure</h2>
+            
+            <h3>Production Rigs</h3>
+            <p>Documented in STATE.json hardware_stack:</p>
+            <ul class="tech-list">
+                <li><strong>Rig 1:</strong> RTX 3060 (12GB VRAM) + 32GB RAM — Tier 2 worker inference</li>
+                <li><strong>Rig 2:</strong> RTX 4070 Super (16GB VRAM) + 64GB RAM + AMD 9900X — Tier 1 supervisor (Llama 70B capable)</li>
+                <li><strong>Laptop:</strong> Floater backup + daily coordinator interface</li>
+            </ul>
+            
+            <h3>Inference Stack</h3>
+            <ul class="tech-list">
+                <li><strong>Tier 1 (Supervisor):</strong> Llama 3.1 70B Q4_K_M — 400-600ms latency, $0/month</li>
+                <li><strong>Tier 2 (Workers):</strong> Mistral 8x7B MoE Q4 — 100-200ms latency, $0/month</li>
+                <li><strong>Tier 3 (Floaters):</strong> Phi-3.5 Mini Q4 — 20-50ms latency, $0/month</li>
             </ul>
         </section>
         
         <section class="section">
             <div class="gcp-connection">
-                Our valuation pipeline relies exclusively on Gemini 1.5 Pro for its ability to cross-reference visual defects in gemstones with textual grading reports in a single inference call—capability not matched by other providers. This native multimodal reasoning is the cornerstone of our fintech differentiation.
+                The Google Cloud rep specifically recommended pursuing NVIDIA Inception for additional compute credits and support. Current strategy: Use NVIDIA NIM APIs for cost-effective inference, escalate complex multi-modal tasks to Gemini 1.5 Pro, and run high-frequency orchestration locally via Ollama. This hybrid approach keeps costs near $0 for development while maintaining access to premium capabilities.
             </div>
         </section>
         
@@ -108,50 +128,28 @@
             <h2>See It Live</h2>
             <div class="demo-grid">
                 <div class="demo-card">
-                    <h3>Burnrate Dashboard</h3>
-                    <p>Real-time cost tracking across OpenAI, Anthropic, Vertex AI. View token consumption and model-specific insights.</p>
-                    <a href="https://runedigitalstudio.com/burnrate" class="demo-link" target="_blank">OPEN DASHBOARD →</a>
+                    <h3>Neural Hub</h3>
+                    <p>See Vertex AI integration in action. Multi-model orchestration with real-time cost tracking.</p>
+                    <a href="/lab/NEURAL_HUB.html" class="demo-link">OPEN DASHBOARD →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>Business Dashboard Demo</h3>
-                    <p>Experiment: Multi-modal asset valuation pipeline using Gemini 1.5 Pro vision analysis. Upload images to see AI grading.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">VIEW CODE →</a>
+                    <h3>Ollama Docs</h3>
+                    <p>Documentation for local LLM inference. Run models on consumer hardware at $0/month.</p>
+                    <a href="https://ollama.ai" class="demo-link" target="_blank">OLLAMA DOCS →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>BigQuery Analytics</h3>
-                    <p>Inspect historical valuation data, model accuracy metrics, and latency benchmarks.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">EXPLORE DATA →</a>
+                    <h3>NVIDIA NIM</h3>
+                    <p>Developer documentation for NVIDIA inference endpoints. Enterprise-grade model hosting.</p>
+                    <a href="https://developer.nvidia.com/nim" class="demo-link" target="_blank">NVIDIA NIM →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>Google Cloud Architecture</h3>
-                    <p>Full technical documentation of Vertex AI integration and scaling strategies.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ/blob/main/GOOGLE_VERTEX_APPLICATION.md" class="demo-link" target="_blank">READ DOCS →</a>
+                    <h3>Vertex AI Docs</h3>
+                    <p>Official Google Cloud documentation for Vertex AI platform and Gemini models.</p>
+                    <a href="https://cloud.google.com/vertex-ai/docs" class="demo-link" target="_blank">READ DOCS →</a>
                 </div>
-            </div>
-        </section>
-        
-        <section class="related-section">
-            <h2>Related Research Areas</h2>
-            <div class="related-grid">
-                <a href="/research/multimodal/" class="related-link">
-                    MULTI-MODAL LEARNING<br/>
-                    <span style="font-size: 10px; color: #999;">Vision + text fusion</span>
-                </a>
-                <a href="/research/production-systems/" class="related-link">
-                    PRODUCTION SYSTEMS<br/>
-                    <span style="font-size: 10px; color: #999;">Cloud Run deployment</span>
-                </a>
-                <a href="/research/knowledge-distillation/" class="related-link">
-                    KNOWLEDGE DISTILLATION<br/>
-                    <span style="font-size: 10px; color: #999;">Teacher-student models</span>
-                </a>
-                <a href="/research/neural-orchestration/" class="related-link">
-                    NEURAL ORCHESTRATION<br/>
-                    <span style="font-size: 10px; color: #999;">Multi-agent state management</span>
-                </a>
             </div>
         </section>
     </main>
@@ -159,9 +157,10 @@
     <footer>
         <p>RUNE Digital © 2025 | Enterprise AI Platform Built on Google Cloud</p>
         <p style="margin-top: 10px;">
-            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GitHub Repository</a> • 
-            <a href="/landing.html">Research Hub Home</a> • 
-            <a href="https://linkedin.com/company/rune-digital" target="_blank">LinkedIn</a>
+            
+            <a href="/research-hub.html">Research Hub Home</a> • 
+            <a href="https://linkedin.com/company/runedigital" target="_blank">LinkedIn</a> • 
+            <a href="mailto:services@runedigitalstudio.com">Contact</a>
         </p>
     </footer>
 </body>

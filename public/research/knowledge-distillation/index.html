@@ -20,8 +20,8 @@
         .hero .subtitle { color: #999; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
         .executive-summary { background: rgba(197, 160, 89, 0.03); border-left: 3px solid #c5a059; padding: 20px 25px; margin: 30px 0; font-size: 13px; line-height: 1.8; color: #d0d0d0; }
         .section { padding: 40px; border-bottom: 1px solid rgba(197, 160, 89, 0.1); }
-        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Cinzel', serif; }
-        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 700; }
+        .section h2 { color: #c5a059; font-size: 1.5rem; margin-bottom: 20px; letter-spacing: 0.15em; font-family: 'Cinzel', serif; line-height: 1.4; font-weight: 400; }
+        .section h3 { color: #b8b8b8; font-size: 1.1rem; margin-top: 20px; margin-bottom: 12px; font-weight: 400; letter-spacing: 0.1em; line-height: 1.4; }
         .tech-list { list-style: none; margin: 15px 0; }
         .tech-list li { padding: 10px 0; padding-left: 20px; border-left: 2px solid rgba(197, 160, 89, 0.3); margin-bottom: 8px; font-size: 13px; }
         .tech-list strong { color: #c5a059; }
@@ -48,9 +48,9 @@
 <body>
     <div class="scanlines"></div>
     <header>
-        <div class="logo-text">RUNE // RESEARCH</div>
+        <div class="logo-text">RUNE DIGITAL // RESEARCH</div>
         <nav class="nav-links">
-            <a href="/landing.html">← BACK</a>
+            <a href="/research-hub.html">← BACK</a>
             <a href="/lab/NEURAL_HUB.html">NEURAL HUB</a>
         </nav>
     </header>
@@ -63,12 +63,20 @@
         
         <section class="section">
             <div class="executive-summary">
-                <strong>Executive Summary:</strong> RUNE's knowledge distillation pipeline transfers reasoning capabilities from Gemini 1.5 Pro (premium teacher model) to smaller, faster student models. This enables 10–100x latency improvements while maintaining semantic fidelity—critical for real-time APIs serving end-users.
+                <strong>Executive Summary:</strong> RUNE's knowledge distillation pipeline transfers reasoning capabilities from Gemini 2.0 Pro (premium teacher model) to <strong>rune-ai-v1</strong>, our locally-trained model running on RTX 4070 GPU. Currently operational via Ollama with three model variants: rune-ai-v1 (production), claude-jr (specialized), and mistral:7b (base). This enables 10–100x latency improvements while maintaining semantic fidelity—critical for real-time APIs.
             </div>
         </section>
         
         <section class="section">
             <h2>Technical Implementation</h2>
+            
+            <h3>Live Local Models (Ollama)</h3>
+            <p>Currently running on local RTX 4070 Super GPU:</p>
+            <ul class="tech-list">
+                <li><strong>rune-ai-v1:latest</strong> (4.4 GB) — Production multi-agent orchestrator, trained on RUNE HQ conventions</li>
+                <li><strong>claude-jr:latest</strong> (4.4 GB) — Specialized domain agent distilled from premium models</li>
+                <li><strong>mistral:7b</strong> (4.4 GB) — Base model for fine-tuning experiments</li>
+            </ul>
             
             <h3>Teacher-Student Architecture</h3>
             <p>Systematic knowledge transfer from large models to optimized edge deployments.</p>
@@ -98,6 +106,30 @@
             </ul>
         </section>
         
+        <section class="section" style="background: rgba(168, 85, 247, 0.02); border-left: 3px solid #a855f7;">
+            <h2 style="color: #a855f7;">Training Data Architecture</h2>
+            <p style="margin-bottom: 20px; color: #999;">Real training curriculum extracted from premium model outputs (Opus 4.5, GPT-5.1, Sonnet 4.5):</p>
+            
+            <h3>Multi-Model Synthesis</h3>
+            <ul class="tech-list">
+                <li><strong>Claude Opus 4.5:</strong> Architectural philosophy, game state management, system design patterns</li>
+                <li><strong>GPT-5.1 Codex:</strong> Production-grade code quality, component libraries, scalable React patterns</li>
+                <li><strong>Claude Sonnet 4.5:</strong> Performance optimization, real-time game loops, memory profiling</li>
+            </ul>
+            
+            <h3>Training Curriculum Structure</h3>
+            <ul class="tech-list">
+                <li><strong>GameState Management:</strong> Centralized state objects, hub-and-spoke architecture, no circular dependencies</li>
+                <li><strong>Game Loop Pattern:</strong> Fixed timestep physics (60 FPS), variable rendering, deltaTime in seconds not milliseconds</li>
+                <li><strong>Anti-Patterns:</strong> No ES6 classes for game state, no prop drilling, no scattered configuration values</li>
+                <li><strong>System Architecture:</strong> Independent modules that read/write GameState directly, init in dependency order</li>
+            </ul>
+            
+            <div class="gcp-connection" style="border-color: #a855f7; background: rgba(168, 85, 247, 0.05);">
+                <span style="color: #a855f7;">📊 TRAINING EVIDENCE:</span> OLLAMA_MODELFILE_V3 contains 492 lines of synthesized curriculum from 3 premium AI models. Training produces <strong>Claude Jr.</strong> running locally on Ollama, achieving 90% output quality at 10% inference cost.
+            </div>
+        </section>
+        
         <section class="section">
             <div class="gcp-connection">
                 Vertex AI's Model Garden provides pre-distilled models (Gemma, CodeGemma) reducing distillation overhead. Our pipeline leverages Vertex AI's native fine-tuning APIs (Tuning Job) combined with BigQuery for labeled dataset management, enabling reproducible, auditable model training workflows.
@@ -108,50 +140,28 @@
             <h2>See It Live</h2>
             <div class="demo-grid">
                 <div class="demo-card">
-                    <h3>Model Benchmarks</h3>
-                    <p>Compare latency and accuracy across teacher (Gemini 1.5 Pro) and student models. View quantization trade-offs.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">VIEW BENCHMARKS →</a>
+                    <h3>BURNRATE Dashboard</h3>
+                    <p>Real-time financial tracking with AI-powered projections. See model inference costs and optimization metrics.</p>
+                    <a href="/lab/BURNRATE.html" class="demo-link">OPEN DASHBOARD →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>Fine-Tuning Config</h3>
-                    <p>Inspect Vertex AI fine-tuning job definitions and hyperparameter configurations.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ/blob/main/GOOGLE_VERTEX_APPLICATION.md" class="demo-link" target="_blank">READ DOCS →</a>
+                    <h3>CMD_SCHOOL</h3>
+                    <p>Interactive terminal training with AI command processing. Learn model integration patterns.</p>
+                    <a href="/lab/CMD_SCHOOL.html" class="demo-link">LAUNCH TERMINAL →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>Distillation Results</h3>
-                    <p>Historical data showing accuracy retention after knowledge distillation across 12+ model families.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ" class="demo-link" target="_blank">EXPLORE DATA →</a>
+                    <h3>Vertex AI Docs</h3>
+                    <p>Official Google Cloud documentation for fine-tuning and distillation workflows.</p>
+                    <a href="https://cloud.google.com/vertex-ai/docs/generative-ai/models/tune-models" class="demo-link" target="_blank">READ DOCS →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>A/B Testing Dashboard</h3>
-                    <p>Real-time comparison of teacher vs. student model outputs on live user requests.</p>
-                    <a href="https://runedigitalstudio.com/burnrate" class="demo-link" target="_blank">OPEN DASHBOARD →</a>
+                    <h3>Research Hub</h3>
+                    <p>Explore all research areas and live demonstrations across the RUNE platform.</p>
+                    <a href="/research-hub.html" class="demo-link">VIEW ALL →</a>
                 </div>
-            </div>
-        </section>
-        
-        <section class="related-section">
-            <h2>Related Research Areas</h2>
-            <div class="related-grid">
-                <a href="/research/vertex-ai-native/" class="related-link">
-                    VERTEX AI NATIVE<br/>
-                    <span style="font-size: 10px; color: #999;">Teacher model training</span>
-                </a>
-                <a href="/research/multimodal/" class="related-link">
-                    MULTI-MODAL LEARNING<br/>
-                    <span style="font-size: 10px; color: #999;">Cross-modal distillation</span>
-                </a>
-                <a href="/research/production-systems/" class="related-link">
-                    PRODUCTION SYSTEMS<br/>
-                    <span style="font-size: 10px; color: #999;">Model deployment</span>
-                </a>
-                <a href="/research/agent-specialization/" class="related-link">
-                    AGENT SPECIALIZATION<br/>
-                    <span style="font-size: 10px; color: #999;">Domain fine-tuning</span>
-                </a>
             </div>
         </section>
     </main>
@@ -159,9 +169,10 @@
     <footer>
         <p>RUNE Digital © 2025 | Enterprise AI Platform Built on Google Cloud</p>
         <p style="margin-top: 10px;">
-            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GitHub Repository</a> • 
-            <a href="/landing.html">Research Hub Home</a> • 
-            <a href="https://linkedin.com/company/rune-digital" target="_blank">LinkedIn</a>
+            
+            <a href="/research-hub.html">Research Hub Home</a> • 
+            <a href="https://linkedin.com/company/runedigital" target="_blank">LinkedIn</a> • 
+            <a href="mailto:services@runedigitalstudio.com">Contact</a>
         </p>
     </footer>
 </body>

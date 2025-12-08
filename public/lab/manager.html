@@ -1,0 +1,2983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="googlebot" content="noindex, nofollow">
+    <title>Enterprise Manager // Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0d0d0d;
+            --bg-card: #141414;
+            --border: #252525;
+            --user-color: #f59e0b;
+            --user-accent: #ffffff;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --success: #00ff88;
+            --warning: #f59e0b;
+            --danger: #ff0055;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: #0d0d0d !important;
+            background-color: #0d0d0d !important;
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-card), #1a1a1a);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--user-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .user-info h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--user-color);
+        }
+
+        .user-info span {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notif-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .notif-badge.show { display: block; }
+
+        /* Section */
+        .section {
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .stat-card.hidden {
+            display: none;
+        }
+
+        .stat-card.locked {
+            opacity: 0.4;
+            position: relative;
+        }
+
+        .stat-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+        }
+
+        .stat-laManager B {
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            color: var(--text);
+        }
+
+        .stat-value.positive { color: var(--success); }
+        .stat-value.warning { color: var(--warning); }
+        .stat-value.danger { color: var(--danger); }
+
+        /* Email List */
+        .email-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .email-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .email-card.urgent {
+            border-left: 3px solid var(--danger);
+        }
+
+        .email-card.hot {
+            border-left: 3px solid var(--warning);
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .email-from {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sentiment { font-size: 16px; }
+        .sentiment.hidden { display: none; }
+
+        .churn-risk {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .churn-risk.hidden { display: none; }
+        .churn-risk.hot { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .churn-risk.warm { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .churn-risk.cold { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+
+        .email-time {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .email-subject {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .email-preview {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .email-tags {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .email-tag {
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+        }
+
+        .email-tag.hot-lead { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+        .email-tag.valuation { background: rgba(0, 255, 234, 0.2); color: #00ffea; }
+
+        .ai-insight {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            font-size: 11px;
+            color: #a855f7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-insight.hidden { display: none; }
+
+        /* Feature Request Section */
+        .request-section {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(0, 255, 234, 0.05));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .request-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #a855f7;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .feature-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-icon { font-size: 16px; }
+
+        .feature-name {
+            font-size: 13px;
+        }
+
+        .feature-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .feature-status.enabled { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .feature-status.disabled { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+        .feature-status.pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+        .request-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 10px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .request-btn.enable {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .request-btn.disable {
+            background: rgba(255, 0, 85, 0.2);
+            color: #ff0055;
+            border: 1px solid rgba(255, 0, 85, 0.3);
+        }
+
+        .request-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .request-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Notifications Panel */
+        .notif-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 90%;
+            max-width: 350px;
+            height: 100%;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            z-index: 200;
+            transition: right 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notif-panel.open { right: 0; }
+
+        .notif-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notif-header h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .notif-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .notif-item.unread {
+            border-left: 3px solid var(--user-color);
+        }
+
+        .notif-item.approved { border-left-color: var(--success); }
+        .notif-item.denied { border-left-color: var(--danger); }
+
+        .notif-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .notif-message {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .notif-time {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--user-color);
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 300;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Live indicator */
+        .live-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ═══════════════════════════════════════
+           DATA SYNC STATUS - Integration Indicators
+           Shows live connection status to data sources
+           ═══════════════════════════════════════ */
+        .sync-status-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 10px;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .sync-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .sync-title {
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 1px;
+            font-size: 9px;
+        }
+
+        .sync-timestamp {
+            color: #666;
+            font-size: 8px;
+        }
+
+        .sync-sources {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sync-source {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sync-dot.connected {
+            background: #00ff88;
+            box-shadow: 0 0 6px #00ff88;
+        }
+
+        .sync-dot.syncing {
+            background: #ffd700;
+            animation: syncPulse 1s infinite;
+        }
+
+        .sync-dot.disconnected {
+            background: #ff0055;
+        }
+
+        .sync-dot.beta {
+            background: #a855f7;
+            box-shadow: 0 0 6px #a855f7;
+        }
+
+        @keyframes syncPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .sync-source-name {
+            color: #888;
+            flex: 1;
+        }
+
+        .sync-source-status {
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sync-source-status.live {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+        }
+
+        .sync-source-status.ready {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+        }
+
+        .sync-source-status.beta {
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+        }
+
+        .sync-expand-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .sync-expand-btn:hover {
+            color: #fff;
+        }
+
+        .sync-beta-badge {
+            font-size: 7px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Refresh indicator */
+        .refresh-banner {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #a855f7, #00ffea);
+            color: #000;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 1px;
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+            z-index: 99;
+            cursor: pointer;
+        }
+
+        .refresh-banner.show {
+            transform: translateY(0);
+        }
+
+        /* Roster Section */
+        .roster-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+        }
+
+        .roster-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .roster-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .roster-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            letter-spacing: 1px;
+        }
+
+        .roster-grid {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            overflow-x: auto;
+        }
+
+        .roster-card {
+            flex-shrink: 0;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 15px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .roster-card.on-floor {
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        .roster-card.break {
+            opacity: 0.6;
+        }
+
+        .roster-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--user-color), #333);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .roster-name {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .roster-shift {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .roster-status {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .roster-status.active { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+        .roster-status.break { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .roster-status.arriving { background: rgba(0, 255, 234, 0.15); color: #00ffea; }
+
+        /* Live Leaderboard */
+        .leaderboard-section {
+            background: linear-gradient(135deg, var(--bg-card), #1a1a1a);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+        }
+
+        .leaderboard-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .leaderboard-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 5px;
+        }
+
+        .lb-tab {
+            font-size: 9px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .lb-tab.active {
+            background: var(--user-color);
+            border-color: var(--user-color);
+            color: #000;
+        }
+
+        .leaderboard-list {
+            padding: 10px 0;
+        }
+
+        .lb-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: all 0.3s;
+        }
+
+        .lb-row:last-child { border-bottom: none; }
+
+        .lb-row:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .lb-rank {
+            width: 30px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            color: var(--text-dim);
+        }
+
+        .lb-rank.gold { color: #ffd700; }
+        .lb-rank.silver { color: #c0c0c0; }
+        .lb-rank.bronze { color: #cd7f32; }
+
+        .lb-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--border);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .lb-name {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .lb-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            color: var(--success);
+        }
+
+        .lb-change {
+            font-size: 10px;
+            margin-left: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        .lb-change.up { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+        .lb-change.down { background: rgba(255, 0, 85, 0.15); color: #ff0055; }
+        .lb-change.same { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+
+        .lb-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+            margin-left: 8px;
+        }
+
+        /* Ticker animation */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lb-row { animation: slideIn 0.3s ease-out; }
+
+        /* ═══════════════════════════════════════
+           MARKDOWN ALERTS - AI STOCK OPTIMIZER
+           ═══════════════════════════════════════ */
+        .markdown-section {
+            background: linear-gradient(135deg, #1a0a0a, #0a0a0a);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .markdown-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff0055, transparent);
+        }
+
+        .markdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 0, 85, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .markdown-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .markdown-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff0055;
+            animation: urgentPulse 1s infinite;
+        }
+
+        @keyframes urgentPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 0, 85, 0); }
+        }
+
+        .markdown-count {
+            background: rgba(255, 0, 85, 0.2);
+            color: #ff0055;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .markdown-list {
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .markdown-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .markdown-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 0, 85, 0.3);
+            transform: translateX(3px);
+        }
+
+        .markdown-card.urgent {
+            border-left: 3px solid #ff0055;
+        }
+
+        .markdown-card.warning {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .markdown-card.watch {
+            border-left: 3px solid #00ffea;
+        }
+
+        .markdown-priority {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .markdown-priority.urgent { background: rgba(255, 0, 85, 0.15); }
+        .markdown-priority.warning { background: rgba(245, 158, 11, 0.15); }
+        .markdown-priority.watch { background: rgba(0, 255, 234, 0.15); }
+
+        .markdown-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .markdown-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .markdown-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .markdown-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .markdown-tag.days {
+            background: rgba(255, 0, 85, 0.15);
+            color: #ff6b6b;
+        }
+
+        .markdown-tag.gp {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .markdown-tag.category {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+        }
+
+        .markdown-prices {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .markdown-current {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: line-through;
+        }
+
+        .markdown-recommended {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            color: #00ff88;
+        }
+
+        .markdown-savings {
+            font-size: 9px;
+            color: #ff0055;
+            margin-top: 2px;
+        }
+
+        .markdown-action {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+            color: #00ff88;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .markdown-action:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.4), rgba(0, 255, 136, 0.2));
+            transform: scale(1.1);
+        }
+
+        .markdown-action.done {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.15));
+        }
+
+        .markdown-ai-reason {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            padding-left: 52px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .markdown-ai-reason::before {
+            content: '🧠';
+        }
+
+        .markdown-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 0, 85, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .markdown-total {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .markdown-total strong {
+            color: #00ff88;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+        }
+
+        .markdown-apply-all {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ff0055, #ff4488);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .markdown-apply-all:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+
+        /* ═══════════════════════════════════════
+           NUDGE ALERT SYSTEM - Owner Notification
+           ═══════════════════════════════════════ */
+        #nudgeOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #nudgeOverlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .nudge-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px 60px;
+            text-align: center;
+            animation: nudgeBounce 0.5s ease;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+        }
+
+        @keyframes nudgeBounce {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .nudge-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: nudgeShake 0.5s ease infinite;
+        }
+
+        @keyframes nudgeShake {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .nudge-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffd700;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .nudge-message {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        .nudge-dismiss {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .nudge-dismiss:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Markdown card pulse animation when nudged */
+        .markdown-card.nudge-pulse {
+            animation: cardPulse 0.5s ease;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) !important;
+            border-color: #ffd700 !important;
+        }
+
+        @keyframes cardPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Markdown header flash when nudged */
+        .markdown-header.nudge-flash {
+            animation: headerFlash 0.5s ease 3;
+        }
+
+        @keyframes headerFlash {
+            0%, 100% { background: linear-gradient(135deg, var(--user-color) 0%, transparent 100%); }
+            50% { background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%); }
+        }
+
+        /* ═══════════════════════════════════════
+           PERFORMANCE PULSE - Staff Performance System
+           ═══════════════════════════════════════ */
+        .performance-section {
+            background: linear-gradient(135deg, #0a1a0a, #0a0a0a);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .performance-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+        }
+
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        }
+
+        .performance-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .performance-badge {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        .performance-list {
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .perf-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .perf-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(3px);
+        }
+
+        .perf-card.needs-attention {
+            border-left: 3px solid #ff0055;
+        }
+
+        .perf-card.improving {
+            border-left: 3px solid #00ff88;
+        }
+
+        .perf-card.steady {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .perf-card.follow-up {
+            border-left: 3px solid #00ffea;
+            background: rgba(0, 255, 234, 0.03);
+        }
+
+        .perf-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .perf-staff {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .perf-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .perf-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .perf-role {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .perf-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .perf-status.attention { background: rgba(255, 0, 85, 0.15); color: #ff6b6b; }
+        .perf-status.improving { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+        .perf-status.steady { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .perf-status.followup { background: rgba(0, 255, 234, 0.15); color: #00ffea; }
+
+        .perf-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .perf-metric {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .perf-metric-laManager B {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .perf-metric-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .perf-metric-value.up { color: #00ff88; }
+        .perf-metric-value.down { color: #ff0055; }
+        .perf-metric-value.same { color: #f59e0b; }
+
+        .perf-metric-change {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        .perf-insight {
+            font-size: 11px;
+            color: var(--text-dim);
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .perf-insight-icon {
+            font-size: 14px;
+        }
+
+        .perf-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .perf-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .perf-action-btn.note {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .perf-action-btn.followup {
+            background: rgba(0, 255, 234, 0.15);
+            color: #00ffea;
+        }
+
+        .perf-action-btn.praise {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+        }
+
+        .perf-action-btn.formal {
+            background: rgba(255, 0, 85, 0.15);
+            color: #ff6b6b;
+        }
+
+        .perf-action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Follow-up Alert Badge */
+        .followup-due {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #00ffea;
+            padding: 4px 10px;
+            background: rgba(0, 255, 234, 0.1);
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+
+        /* Notes History */
+        .perf-notes-history {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .perf-note-item {
+            font-size: 10px;
+            color: var(--text-dim);
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+            display: flex;
+            gap: 8px;
+        }
+
+        .perf-note-date {
+            color: #888;
+            min-width: 60px;
+        }
+
+        .perf-note-text {
+            flex: 1;
+        }
+
+        .perf-note-type {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 600;
+        }
+
+        .perf-note-type.coaching { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+        .perf-note-type.warning { background: rgba(255, 0, 85, 0.1); color: #ff6b6b; }
+        .perf-note-type.praise { background: rgba(0, 255, 234, 0.1); color: #00ffea; }
+
+        /* Add Note Modal */
+        .note-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .note-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .note-modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+        }
+
+        .note-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .note-modal-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .note-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .note-type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .note-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note-type-btn.active {
+            border-color: var(--user-color);
+            color: var(--user-color);
+            background: rgba(var(--user-color), 0.1);
+        }
+
+        .note-textarea {
+            width: 100%;
+            height: 100px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 13px;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        .note-followup {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .note-followup laManager B {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .note-followup select {
+            flex: 1;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .note-save-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--user-color);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note-save-btn:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="user-badge">
+            <div class="user-avatar" id="userAvatar">J</div>
+            <div class="user-info">
+                <h1 id="userName">Manager A</h1>
+                <span id="userTitle">MANAGER // FLOOR OPS</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="notif-btn" onclick="document.getElementById('performanceSection').scrollIntoView({behavior:'smooth'})" title="Staff Performance">
+                📊
+            </button>
+            <button class="notif-btn" onclick="toggleNotifications()">
+                🔔
+                <span class="notif-badge" id="notifBadge">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Refresh Banner -->
+    <div class="refresh-banner" id="refreshBanner" onclick="location.reload()">
+        ⚡ SETTINGS UPDATED - TAP TO REFRESH
+    </div>
+
+    <!-- Stats Section -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">TODAY'S STATS</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card" id="statSales">
+                <div class="stat-laManager B">RETAIL SALES</div>
+                <div class="stat-value positive">$14,892</div>
+            </div>
+            <div class="stat-card" id="statLeads">
+                <div class="stat-laManager B">HOT LEADS</div>
+                <div class="stat-value warning">7</div>
+            </div>
+            <div class="stat-card" id="statMargin">
+                <div class="stat-laManager B">MARGIN</div>
+                <div class="stat-value">56.8%</div>
+            </div>
+            <div class="stat-card" id="statShrinkage">
+                <div class="stat-laManager B">SHRINKAGE</div>
+                <div class="stat-value danger">$342</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roster Section -->
+    <div class="roster-section">
+        <div class="roster-header">
+            <div class="roster-title">
+                📅 TODAY'S ROSTER
+            </div>
+            <div class="roster-badge">EMPLOYMENT HERO</div>
+        </div>
+        <div class="roster-grid" id="rosterGrid">
+            <!-- Roster cards populated by JS -->
+        </div>
+    </div>
+
+    <!-- Live Leaderboard -->
+    <div class="leaderboard-section">
+        <div class="leaderboard-header">
+            <div class="leaderboard-title">
+                🏆 LIVE LEADERBOARD
+                <span class="lb-live-dot"></span>
+            </div>
+            <div class="leaderboard-tabs">
+                <button class="lb-tab active" onclick="switchLeaderboard('sales')">SALES</button>
+                <button class="lb-tab" onclick="switchLeaderboard('deals')">DEALS</button>
+                <button class="lb-tab" onclick="switchLeaderboard('margin')">MARGIN</button>
+            </div>
+        </div>
+        <div class="leaderboard-list" id="leaderboardList">
+            <!-- Leaderboard populated by JS -->
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         MARKDOWN ALERTS - AI STOCK OPTIMIZER
+         Today's items requiring price markdown based on age & depreciation
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="markdown-section">
+        <div class="markdown-header">
+            <div class="markdown-title">
+                <span class="markdown-pulse"></span>
+                ⚠️ TODAY'S MARKDOWN ALERTS
+            </div>
+            <div class="markdown-count" id="markdownCount">10 ITEMS</div>
+        </div>
+        <div class="markdown-list" id="markdownList">
+            <!-- Markdown items populated by JS -->
+        </div>
+        <div class="markdown-footer">
+            <div class="markdown-total">
+                Potential GP Recovery: <strong id="gpRecovery">+$2,847</strong>
+            </div>
+            <button class="markdown-apply-all" onclick="applyAllMarkdowns()">
+                ⚡ APPLY ALL RECOMMENDED
+            </button>
+        </div>
+    </div>
+
+    <!-- Email Section -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">PRIORITY INBOX</div>
+        </div>
+        <div class="email-list">
+            <div class="email-card urgent">
+                <div class="email-header">
+                    <div class="email-from">
+                        Sarah M. 
+                        <span class="sentiment" id="sentiment1">😊</span>
+                        <span class="churn-risk hot" id="churn1">🔥 Active</span>
+                    </div>
+                    <div class="email-time">2h ago</div>
+                </div>
+                <div class="email-subject">RE: Gold Rolex Valuation</div>
+                <div class="email-preview">Hi, I'm ready to come in today with the Rolex. What time works?</div>
+                <div class="email-tags">
+                    <span class="email-tag valuation">Valuation</span>
+                    <span class="email-tag hot-lead">Hot Lead</span>
+                </div>
+                <div class="ai-insight" id="insight1">
+                    🧠 Customer mentioned competitor - Adelaide Exchange
+                </div>
+            </div>
+
+            <div class="email-card hot">
+                <div class="email-header">
+                    <div class="email-from">
+                        Marcus T.
+                        <span class="sentiment" id="sentiment2">😐</span>
+                        <span class="churn-risk warm" id="churn2">⚠️ 21 days</span>
+                    </div>
+                    <div class="email-time">4h ago</div>
+                </div>
+                <div class="email-subject">Layby Balance Inquiry</div>
+                <div class="email-preview">What's remaining on my layby for the PS5? Been a few weeks...</div>
+                <div class="email-tags">
+                    <span class="email-tag">Layby</span>
+                </div>
+                <div class="ai-insight" id="insight2">
+                    🧠 Re-engagement opportunity - send layby reminder
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         PERFORMANCE PULSE - Staff Performance & Retention System
+         Track metrics, log conversations, set follow-ups, build your team
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="performance-section" id="performanceSection">
+        <div class="performance-header">
+            <div class="performance-title">
+                📊 PERFORMANCE PULSE
+            </div>
+            <div class="performance-badge">LIVE METRICS</div>
+        </div>
+        <div class="performance-list" id="performanceList">
+            <!-- Staff performance cards populated by JS -->
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="note-modal" id="noteModal">
+        <div class="note-modal-content">
+            <div class="note-modal-header">
+                <span class="note-modal-title">📝 ADD NOTE - <span id="noteStaffName">Staff</span></span>
+                <button class="note-modal-close" onclick="closeNoteModal()">×</button>
+            </div>
+            <div class="note-type-selector">
+                <button class="note-type-btn active" data-type="coaching" onclick="selectNoteType(this)">🌱 Coaching</button>
+                <button class="note-type-btn" data-type="praise" onclick="selectNoteType(this)">⭐ Praise</button>
+                <button class="note-type-btn" data-type="warning" onclick="selectNoteType(this)">⚠️ Warning</button>
+            </div>
+            <textarea class="note-textarea" id="noteText" placeholder="What did you discuss? What was observed?"></textarea>
+            <div class="note-followup">
+                <laManager B>⏰ Follow-up in:</laManager B>
+                <select id="noteFollowup">
+                    <option value="">No follow-up</option>
+                    <option value="1">1 day</option>
+                    <option value="3">3 days</option>
+                    <option value="7">7 days</option>
+                    <option value="14">14 days</option>
+                    <option value="30">30 days</option>
+                </select>
+            </div>
+            <button class="note-save-btn" onclick="saveNote()">💾 SAVE NOTE</button>
+        </div>
+    </div>
+
+    <!-- Feature Request Section -->
+    <div class="request-section">
+        <div class="request-title">
+            🔐 REQUEST ACCESS
+        </div>
+        <div class="feature-list" id="featureList">
+            <!-- Features will be populated by JS -->
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div class="overlay" id="overlay" onclick="toggleNotifications()"></div>
+    <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">
+            <h2>NOTIFICATIONS</h2>
+            <button class="close-btn" onclick="toggleNotifications()">×</button>
+        </div>
+        <div class="notif-list" id="notifList">
+            <!-- Notifications populated by JS -->
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Request sent!</div>
+
+    <!-- Live Indicator -->
+    <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE SYNC
+    </div>
+
+    <!-- Data Sync Status Panel -->
+    <div class="sync-status-panel" id="syncPanel">
+        <div class="sync-header">
+            <span class="sync-title">⚡ DATA SOURCES</span>
+            <span class="sync-timestamp" id="lastSyncTime">Updated: --:--</span>
+        </div>
+        <div class="sync-sources">
+            <div class="sync-source">
+                <div class="sync-dot connected"></div>
+                <span class="sync-source-name">Report Warehouse</span>
+                <span class="sync-source-status live">LIVE</span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot connected"></div>
+                <span class="sync-source-name">Employment Hero</span>
+                <span class="sync-source-status live">LIVE</span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot syncing"></div>
+                <span class="sync-source-name">POS Integration</span>
+                <span class="sync-source-status beta">BETA<span class="sync-beta-badge">COMING</span></span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot beta"></div>
+                <span class="sync-source-name">AI Insights Engine</span>
+                <span class="sync-source-status beta">BETA</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get user from URL param (default: Manager A)
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user') || 'Manager A';
+        
+        // Initialize sync
+        const sync = new CCSync(userId);
+        const user = CC_CONFIG.users[userId];
+
+        // ============================================
+        // DATA SYNC STATUS - Live timestamp & status
+        // ============================================
+        function updateSyncTimestamp() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastSyncTime').textContent = `Updated: ${timeStr}`;
+        }
+        
+        // Update timestamp on load and every 30 seconds
+        updateSyncTimestamp();
+        setInterval(updateSyncTimestamp, 30000);
+        
+        // Simulate occasional "syncing" animation on data sources
+        function simulateSync() {
+            const sources = document.querySelectorAll('.sync-source .sync-dot.connected');
+            const randomSource = sources[Math.floor(Math.random() * sources.length)];
+            if (randomSource) {
+                randomSource.classList.remove('connected');
+                randomSource.classList.add('syncing');
+                setTimeout(() => {
+                    randomSource.classList.remove('syncing');
+                    randomSource.classList.add('connected');
+                    updateSyncTimestamp();
+                }, 1500);
+            }
+        }
+        
+        // Sync animation every 45 seconds
+        setInterval(simulateSync, 45000);
+
+        // Apply user theme
+        document.documentElement.style.setProperty('--user-color', user.color);
+        document.documentElement.style.setProperty('--user-accent', user.accent);
+        document.getElementById('userAvatar').textContent = user.icon || user.name[0];
+        document.getElementById('userName').textContent = user.name.toUpperCase();
+        document.getElementById('userTitle').textContent = user.title;
+        if (user.subtitle) {
+            document.getElementById('userTitle').textContent += ' • ' + user.subtitle;
+        }
+        document.title = `Enterprise Manager // ${user.name}`;
+
+        // Apply theme-specific styles
+        applyTheme(user.theme);
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const header = document.querySelector('.header');
+            
+            // Remove any existing theme
+            body.classList.remove('theme-luxury', 'theme-bling', 'theme-ironman', 'theme-hedge-fund');
+            
+            if (theme === 'luxury') {
+                // Manager A - Luxury handbags / Hermès / Gucci
+                body.style.background = '#0d0d0d';
+                document.documentElement.style.setProperty('--bg-card', '#141414');
+                document.documentElement.style.setProperty('--border', '#252525');
+            } else if (theme === 'bling') {
+                // Manager B - Gold & Diamond jewellery
+                body.style.background = '#0d0d0d';
+                document.documentElement.style.setProperty('--bg-card', '#141414');
+                document.documentElement.style.setProperty('--border', '#252525');
+            } else {
+                // Default dark theme
+                body.style.background = '#0d0d0d';
+                document.documentElement.style.setProperty('--bg-card', '#141414');
+                document.documentElement.style.setProperty('--border', '#252525');
+            }
+        }
+
+        // Track pending requests
+        let pendingRequests = {};
+
+        // Feature definitions for managers
+        const managerFeatures = [
+            { key: 'showMargins', icon: '📊', name: 'Margin Data' },
+            { key: 'showShrinkage', icon: '📉', name: 'Shrinkage Data' },
+            { key: 'showSentiment', icon: '😊', name: 'Sentiment Indicators' },
+            { key: 'showCustomerHistory', icon: '👤', name: 'Customer History' },
+            { key: 'showChurnRisk', icon: '❄️', name: 'Churn Risk Badges' },
+            { key: 'showAiInsights', icon: '🧠', name: 'AI Insights' },
+            { key: 'showCompetitorAlerts', icon: '⚔️', name: 'Competitor Alerts' }
+        ];
+
+        // Apply current features
+        function applyFeatures() {
+            const features = sync.getFeatures();
+            const requests = sync.getRequests();
+
+            // Check which features have pending requests from this user
+            pendingRequests = {};
+            requests.filter(r => r.from === userId && r.status === 'pending').forEach(r => {
+                pendingRequests[r.feature] = r;
+            });
+
+            // Stats visibility
+            document.getElementById('statMargin').classList.toggle('locked', !features.showMargins);
+            document.getElementById('statShrinkage').classList.toggle('locked', !features.showShrinkage);
+
+            // AI features
+            document.querySelectorAll('.sentiment').forEach(el => {
+                el.classList.toggle('hidden', !features.showSentiment);
+            });
+            document.querySelectorAll('.churn-risk').forEach(el => {
+                el.classList.toggle('hidden', !features.showChurnRisk);
+            });
+            document.querySelectorAll('.ai-insight').forEach(el => {
+                el.classList.toggle('hidden', !features.showAiInsights);
+            });
+
+            // Render feature request list
+            renderFeatureList(features);
+        }
+
+        function renderFeatureList(features) {
+            const container = document.getElementById('featureList');
+            container.innerHTML = managerFeatures.map(f => {
+                const enabled = features[f.key];
+                const pending = pendingRequests[f.key];
+                
+                let statusClass = enabled ? 'enabled' : 'disabled';
+                let statusText = enabled ? 'ENABLED' : 'DISABLED';
+                let buttonHtml = '';
+
+                if (pending) {
+                    statusClass = 'pending';
+                    statusText = 'PENDING';
+                    buttonHtml = `<span style="font-size: 10px; color: #f59e0b;">⏳ Awaiting approval</span>`;
+                } else if (!enabled) {
+                    buttonHtml = `<button class="request-btn enable" onclick="requestFeature('${f.key}', true)">REQUEST</button>`;
+                }
+
+                return `
+                    <div class="feature-item">
+                        <div class="feature-info">
+                            <span class="feature-icon">${f.icon}</span>
+                            <span class="feature-name">${f.name}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="feature-status ${statusClass}">${statusText}</span>
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function requestFeature(featureKey, state) {
+            const request = sync.requestFeature(featureKey, state, `${user.name} needs access for customer service`);
+            if (request) {
+                showToast('✅ Request sent to owners!');
+                applyFeatures();
+            }
+        }
+
+        // Notifications
+        function updateNotifications() {
+            const notifications = sync.getNotifications();
+            const unread = notifications.filter(n => !n.read).length;
+            
+            const badge = document.getElementById('notifBadge');
+            badge.textContent = unread;
+            badge.classList.toggle('show', unread > 0);
+
+            const list = document.getElementById('notifList');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">No notifications</div>';
+                return;
+            }
+
+            list.innerHTML = notifications.map(n => {
+                const time = new Date(n.timestamp).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+                let extraClass = n.read ? '' : 'unread';
+                if (n.type === 'request_approved') extraClass += ' approved';
+                if (n.type === 'request_denied') extraClass += ' denied';
+
+                return `
+                    <div class="notif-item ${extraClass}" onclick="sync.markRead(${n.id}); updateNotifications();">
+                        <div class="notif-title">${n.title}</div>
+                        <div class="notif-message">${n.message}</div>
+                        <div class="notif-time">${time}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notifPanel').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+            updateNotifications();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Listen for real-time updates
+        sync.onUpdate((message) => {
+            if (message.type === 'FEATURES_UPDATED') {
+                // Show refresh banner
+                document.getElementById('refreshBanner').classList.add('show');
+                showToast('⚡ Settings updated by owner!');
+                // Auto-apply after short delay
+                setTimeout(() => {
+                    applyFeatures();
+                    document.getElementById('refreshBanner').classList.remove('show');
+                }, 1000);
+            }
+            if (message.type === 'REQUEST_HANDLED') {
+                applyFeatures();
+                updateNotifications();
+            }
+            if (message.type === 'NEW_NOTIFICATION') {
+                updateNotifications();
+            }
+            // 🔔 OWNER NUDGE - Markdown action required
+            if (message.type === 'MARKDOWN_NUDGE') {
+                handleMarkdownNudge(message);
+            }
+        });
+        
+        // Handle incoming nudge from owner
+        function handleMarkdownNudge(message) {
+            // 1. Show prominent toast
+            showNudgeAlert(message.fromName || 'Owner');
+            
+            // 2. Scroll to markdown section
+            const markdownSection = document.querySelector('.markdown-section');
+            if (markdownSection) {
+                markdownSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // 3. Add pulse animation to markdown cards
+            document.querySelectorAll('.markdown-card:not(.applied)').forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('nudge-pulse');
+                    setTimeout(() => card.classList.remove('nudge-pulse'), 2000);
+                }, index * 100);
+            });
+            
+            // 4. Flash the markdown header
+            const header = document.querySelector('.markdown-header');
+            if (header) {
+                header.classList.add('nudge-flash');
+                setTimeout(() => header.classList.remove('nudge-flash'), 3000);
+            }
+            
+            // 5. Update notification count
+            updateNotifications();
+        }
+        
+        // Big nudge alert overlay
+        function showNudgeAlert(ownerName) {
+            // Create overlay if doesn't exist
+            let overlay = document.getElementById('nudgeOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'nudgeOverlay';
+                overlay.innerHTML = `
+                    <div class="nudge-content">
+                        <div class="nudge-icon">📢</div>
+                        <div class="nudge-title">ATTENTION REQUIRED</div>
+                        <div class="nudge-message">${ownerName} is requesting markdown action</div>
+                        <button class="nudge-dismiss" onclick="dismissNudge()">REVIEW NOW →</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            } else {
+                overlay.querySelector('.nudge-message').textContent = `${ownerName} is requesting markdown action`;
+            }
+            overlay.classList.add('show');
+            
+            // Play attention sound (optional - browser may block)
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+fn5+fnpuXlZOQjoyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRUQQ');
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+            } catch(e) {}
+        }
+        
+        function dismissNudge() {
+            const overlay = document.getElementById('nudgeOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        // Initialize (roster, markdown, leaderboard initialized after their definitions Manager Bow)
+        applyFeatures();
+        updateNotifications();
+
+        // Refresh features periodically (for cross-device sync)
+        setInterval(() => {
+            applyFeatures();
+            updateNotifications();
+        }, 5000);
+
+        // ============================================
+        // ROSTER SECTION - Employment Hero Integration
+        // ============================================
+        const rosterData = [
+            { name: 'Amy K.', initials: 'AK', shift: '8:00 - 4:00', status: 'active', role: 'Senior' },
+            { name: 'Ben T.', initials: 'BT', shift: '8:00 - 4:00', status: 'active', role: 'Sales' },
+            { name: 'Chloe M.', initials: 'CM', shift: '9:00 - 5:00', status: 'break', role: 'Sales' },
+            { name: 'Dan W.', initials: 'DW', shift: '10:00 - 6:00', status: 'arriving', role: 'Sales' },
+            { name: 'Emma R.', initials: 'ER', shift: '12:00 - 8:00', status: 'arriving', role: 'Closer' },
+        ];
+
+        function initRoster() {
+            const grid = document.getElementById('rosterGrid');
+            grid.innerHTML = rosterData.map(staff => `
+                <div class="roster-card ${staff.status === 'active' ? 'on-floor' : ''} ${staff.status === 'break' ? 'break' : ''}">
+                    <div class="roster-avatar">${staff.initials}</div>
+                    <div class="roster-name">${staff.name}</div>
+                    <div class="roster-shift">${staff.shift}</div>
+                    <div class="roster-status ${staff.status}">
+                        ${staff.status === 'active' ? '● On Floor' : staff.status === 'break' ? '☕ Break' : '🕒 ' + staff.shift.split(' - ')[0]}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Initialize roster now that data is defined
+        initRoster();
+
+        // ============================================
+        // MARKDOWN ALERTS - AI Stock Optimizer
+        // Based on stock age, category depreciation curves
+        // ============================================
+        const markdownData = [
+            {
+                id: 1,
+                name: 'iPhone 12 Pro 128GB - Pacific Blue',
+                category: 'Tech',
+                daysOnFloor: 67,
+                currentPrice: 749,
+                recommendedPrice: 649,
+                currentGP: 18,
+                newGP: 12,
+                priority: 'urgent',
+                aiReason: 'iPhone 14 Pro dropping 15% next week - move now or lose margin'
+            },
+            {
+                id: 2,
+                name: 'Samsung Galaxy S21 Ultra 256GB',
+                category: 'Tech',
+                daysOnFloor: 54,
+                currentPrice: 899,
+                recommendedPrice: 749,
+                currentGP: 22,
+                newGP: 14,
+                priority: 'urgent',
+                aiReason: 'S24 launch impact - similar units dropped 28% last quarter'
+            },
+            {
+                id: 3,
+                name: 'Bose QuietComfort 45 Headphones',
+                category: 'Tech',
+                daysOnFloor: 45,
+                currentPrice: 349,
+                recommendedPrice: 299,
+                currentGP: 25,
+                newGP: 18,
+                priority: 'warning',
+                aiReason: 'Competitor pricing undercuts by $40 - customer walked yesterday'
+            },
+            {
+                id: 4,
+                name: '18K Gold Cuban Link Chain 24"',
+                category: 'Jewellery',
+                daysOnFloor: 89,
+                currentPrice: 2199,
+                recommendedPrice: 1899,
+                currentGP: 35,
+                newGP: 28,
+                priority: 'urgent',
+                aiReason: 'Holding cost $18/day - markdown saves $540 over next 30 days'
+            },
+            {
+                id: 5,
+                name: 'DJI Mavic Air 2 Fly More Combo',
+                category: 'Tech',
+                daysOnFloor: 52,
+                currentPrice: 1299,
+                recommendedPrice: 1099,
+                currentGP: 20,
+                newGP: 12,
+                priority: 'warning',
+                aiReason: 'Air 3 released - depreciation curve accelerating 5% weekly'
+            },
+            {
+                id: 6,
+                name: 'Vintage Rolex Datejust 36mm 1988',
+                category: 'Watch',
+                daysOnFloor: 34,
+                currentPrice: 6499,
+                recommendedPrice: 5999,
+                currentGP: 28,
+                newGP: 22,
+                priority: 'watch',
+                aiReason: 'Market shows 3 similar listings at $5.8K - position competitively'
+            },
+            {
+                id: 7,
+                name: 'PlayStation 5 Disc Edition Bundle',
+                category: 'Gaming',
+                daysOnFloor: 28,
+                currentPrice: 799,
+                recommendedPrice: 749,
+                currentGP: 15,
+                newGP: 12,
+                priority: 'watch',
+                aiReason: 'PS5 Pro rumours - customer sentiment shifting to wait mode'
+            },
+            {
+                id: 8,
+                name: 'DeWalt 20V MAX Combo Kit 8-Tool',
+                category: 'Tools',
+                daysOnFloor: 61,
+                currentPrice: 599,
+                recommendedPrice: 499,
+                currentGP: 32,
+                newGP: 22,
+                priority: 'warning',
+                aiReason: 'Trade-in surge expected after EOFY - free up capital now'
+            },
+            {
+                id: 9,
+                name: 'Louis Vuitton Neverfull MM Damier',
+                category: 'Fashion',
+                daysOnFloor: 43,
+                currentPrice: 1899,
+                recommendedPrice: 1699,
+                currentGP: 40,
+                newGP: 33,
+                priority: 'watch',
+                aiReason: 'Luxury market softening - faster turn preferred'
+            },
+            {
+                id: 10,
+                name: 'Canon EOS R6 Mark II Body Only',
+                category: 'Camera',
+                daysOnFloor: 38,
+                currentPrice: 2799,
+                recommendedPrice: 2499,
+                currentGP: 18,
+                newGP: 12,
+                priority: 'warning',
+                aiReason: 'R7 eating market share - camera segment underperforming 12%'
+            }
+        ];
+
+        let appliedMarkdowns = new Set();
+
+        function initMarkdowns() {
+            renderMarkdowns();
+            updateMarkdownStats();
+        }
+
+        function renderMarkdowns() {
+            const list = document.getElementById('markdownList');
+            const priorityEmoji = { urgent: '🔥', warning: '⚠️', watch: '👀' };
+            const categoryEmoji = { Tech: '📱', Jewellery: '💎', Watch: '⌚', Gaming: '🎮', Tools: '🔧', Fashion: '👜', Camera: '📷' };
+
+            list.innerHTML = markdownData.map(item => {
+                const isApplied = appliedMarkdowns.has(item.id);
+                const savings = item.currentPrice - item.recommendedPrice;
+                
+                return `
+                    <div class="markdown-card ${item.priority} ${isApplied ? 'applied' : ''}" id="markdown-${item.id}">
+                        <div class="markdown-priority ${item.priority}">
+                            ${priorityEmoji[item.priority]}
+                        </div>
+                        <div class="markdown-info">
+                            <div class="markdown-item-name">${item.name}</div>
+                            <div class="markdown-meta">
+                                <span class="markdown-tag days">📅 ${item.daysOnFloor} days</span>
+                                <span class="markdown-tag gp">GP: ${item.currentGP}% → ${item.newGP}%</span>
+                                <span class="markdown-tag category">${categoryEmoji[item.category] || '📦'} ${item.category}</span>
+                            </div>
+                            <div class="markdown-ai-reason">${item.aiReason}</div>
+                        </div>
+                        <div class="markdown-prices">
+                            <div class="markdown-current">$${item.currentPrice.toLocaleString()}</div>
+                            <div class="markdown-recommended">$${item.recommendedPrice.toLocaleString()}</div>
+                            <div class="markdown-savings">-$${savings}</div>
+                        </div>
+                        <button class="markdown-action ${isApplied ? 'done' : ''}" onclick="applyMarkdown(${item.id})" ${isApplied ? 'disabled' : ''}>
+                            ${isApplied ? '✓' : '→'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyMarkdown(id) {
+            appliedMarkdowns.add(id);
+            renderMarkdowns();
+            updateMarkdownStats();
+            
+            const item = markdownData.find(m => m.id === id);
+            
+            // Generate email with markdown recommendation
+            const savings = item.currentPrice - item.recommendedPrice;
+            const subject = encodeURIComponent(`Markdown Request: ${item.name.split(' - ')[0]} - ${item.sku}`);
+            const body = encodeURIComponent(
+`MARKDOWN REQUEST
+================
+
+Item: ${item.name}
+SKU: ${item.sku}
+Category: ${item.category}
+
+CURRENT PRICING
+Current Price: $${item.currentPrice.toLocaleString()}
+Current GP: ${item.currentGP}%
+Days on Floor: ${item.daysOnFloor}
+
+RECOMMENDED ACTION
+New Price: $${item.recommendedPrice.toLocaleString()}
+New GP: ${item.newGP}%
+Price Reduction: -$${savings}
+
+AI RECOMMENDATION
+${item.aiReason}
+
+---
+Requested by: ${user.name}
+Store: ${user.title.split(' // ')[1] || 'N/A'}
+Date: ${new Date().toLocaleDateString()}
+`);
+            
+            // Open email client
+            window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+            
+            showToast(`📧 Markdown request sent: ${item.name.split(' - ')[0]}`);
+            
+            // Sync to owner dashboard (simulated)
+            sync.broadcast({
+                type: 'MARKDOWN_APPLIED',
+                itemId: id,
+                itemName: item.name,
+                from: userId,
+                timestamp: Date.now()
+            });
+        }
+
+        function applyAllMarkdowns() {
+            // Generate bulk email with all pending markdowns
+            const pendingItems = markdownData.filter(item => !appliedMarkdowns.has(item.id));
+            
+            if (pendingItems.length === 0) {
+                showToast('No pending markdowns to send');
+                return;
+            }
+            
+            const subject = encodeURIComponent(`Bulk Markdown Request - ${pendingItems.length} Items`);
+            
+            let itemsList = pendingItems.map(item => {
+                const savings = item.currentPrice - item.recommendedPrice;
+                return `• ${item.name}
+  SKU: ${item.sku} | Days: ${item.daysOnFloor}
+  Current: $${item.currentPrice} → Recommended: $${item.recommendedPrice} (-$${savings})
+  Reason: ${item.aiReason}`;
+            }).join('\n\n');
+            
+            const totalSavings = pendingItems.reduce((sum, item) => sum + (item.currentPrice - item.recommendedPrice), 0);
+            
+            const body = encodeURIComponent(
+`BULK MARKDOWN REQUEST
+=====================
+
+Total Items: ${pendingItems.length}
+Total Price Reduction: -$${totalSavings.toLocaleString()}
+
+ITEMS REQUIRING MARKDOWN
+------------------------
+
+${itemsList}
+
+---
+Requested by: ${user.name}
+Store: ${user.title.split(' // ')[1] || 'N/A'}
+Date: ${new Date().toLocaleDateString()}
+`);
+            
+            // Open email client
+            window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+            
+            // Mark all as sent
+            markdownData.forEach(item => appliedMarkdowns.add(item.id));
+            renderMarkdowns();
+            updateMarkdownStats();
+            
+            showToast(`📧 Bulk markdown request sent: ${pendingItems.length} items!`);
+            
+            sync.broadcast({
+                type: 'BULK_MARKDOWN_APPLIED',
+                count: pendingItems.length,
+                from: userId,
+                timestamp: Date.now()
+            });
+        }
+
+        function updateMarkdownStats() {
+            const remaining = markdownData.length - appliedMarkdowns.size;
+            document.getElementById('markdownCount').textContent = remaining + ' ITEMS';
+            
+            // Calculate potential GP recovery
+            let totalRecovery = 0;
+            markdownData.forEach(item => {
+                if (!appliedMarkdowns.has(item.id)) {
+                    // Simulated holding cost recovery
+                    totalRecovery += (item.currentPrice - item.recommendedPrice) * 0.3;
+                }
+            });
+            document.getElementById('gpRecovery').textContent = '+$' + Math.round(totalRecovery).toLocaleString();
+        }
+        
+        // Initialize markdowns now that data is defined
+        initMarkdowns();
+
+        // ============================================
+        // LIVE LEADERBOARD - Stock Market Style
+        // ============================================
+        const leaderboardData = {
+            sales: [
+                { name: 'Amy K.', initials: 'AK', value: '$4,234', change: '+$892', direction: 'up' },
+                { name: 'Ben T.', initials: 'BT', value: '$3,892', change: '+$421', direction: 'up' },
+                { name: 'Chloe M.', initials: 'CM', value: '$3,456', change: '-$120', direction: 'down' },
+                { name: 'Dan W.', initials: 'DW', value: '$2,310', change: '+$89', direction: 'up' },
+                { name: 'Emma R.', initials: 'ER', value: '$1,000', change: '--', direction: 'same' },
+            ],
+            deals: [
+                { name: 'Ben T.', initials: 'BT', value: '12', change: '+3', direction: 'up' },
+                { name: 'Amy K.', initials: 'AK', value: '9', change: '+1', direction: 'up' },
+                { name: 'Chloe M.', initials: 'CM', value: '8', change: '--', direction: 'same' },
+                { name: 'Dan W.', initials: 'DW', value: '6', change: '-2', direction: 'down' },
+                { name: 'Emma R.', initials: 'ER', value: '3', change: '--', direction: 'same' },
+            ],
+            margin: [
+                { name: 'Chloe M.', initials: 'CM', value: '62.4%', change: '+4.1%', direction: 'up' },
+                { name: 'Amy K.', initials: 'AK', value: '58.2%', change: '+2.3%', direction: 'up' },
+                { name: 'Ben T.', initials: 'BT', value: '55.1%', change: '-1.2%', direction: 'down' },
+                { name: 'Dan W.', initials: 'DW', value: '54.8%', change: '+0.5%', direction: 'up' },
+                { name: 'Emma R.', initials: 'ER', value: '52.0%', change: '--', direction: 'same' },
+            ]
+        };
+
+        let currentLeaderboard = 'sales';
+
+        function switchLeaderboard(type) {
+            currentLeaderboard = type;
+            // Update active tab
+            document.querySelectorAll('.lb-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.textContent.toLowerCase() === type);
+            });
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const list = document.getElementById('leaderboardList');
+            const data = leaderboardData[currentLeaderboard];
+            
+            list.innerHTML = data.map((person, i) => {
+                const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+                
+                return `
+                    <div class="lb-row">
+                        <div class="lb-rank ${rankClass}">${rankEmoji}</div>
+                        <div class="lb-avatar">${person.initials}</div>
+                        <div class="lb-name">${person.name}</div>
+                        <div class="lb-value">${person.value}</div>
+                        <div class="lb-change ${person.direction}">${person.change}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initLeaderboard() {
+            renderLeaderboard();
+            // Auto-rotate leaderboards every 10 seconds for engagement
+            setInterval(() => {
+                const types = ['sales', 'deals', 'margin'];
+                const currentIndex = types.indexOf(currentLeaderboard);
+                const nextIndex = (currentIndex + 1) % types.length;
+                switchLeaderboard(types[nextIndex]);
+            }, 10000);
+        }
+        
+        // Initialize leaderboard now that data is defined
+        initLeaderboard();
+
+        // Simulate live updates - values change slightly every 30 seconds
+        setInterval(() => {
+            // Randomly adjust a value slightly for "live" feel
+            const types = ['sales', 'deals', 'margin'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const personIndex = Math.floor(Math.random() * leaderboardData[type].length);
+            
+            if (type === 'sales') {
+                const current = parseInt(leaderboardData[type][personIndex].value.replace(/[$,]/g, ''));
+                const change = Math.floor(Math.random() * 200) - 50;
+                leaderboardData[type][personIndex].value = '$' + (current + change).toLocaleString();
+                leaderboardData[type][personIndex].change = change >= 0 ? '+$' + change : '-$' + Math.abs(change);
+                leaderboardData[type][personIndex].direction = change >= 0 ? 'up' : 'down';
+            }
+            
+            // Re-render if viewing that leaderboard
+            if (currentLeaderboard === type) {
+                renderLeaderboard();
+            }
+        }, 30000);
+
+        // ============================================
+        // PERFORMANCE PULSE - Staff Performance System
+        // Track metrics, log notes, set follow-ups
+        // ============================================
+        
+        // Demo performance data
+        const performanceData = [
+            {
+                id: 1,
+                name: 'Amy Kennedy',
+                initials: 'AK',
+                role: 'Senior Sales',
+                status: 'needs-attention',
+                statusLaManager B: '⚠️ Needs Attention',
+                metrics: {
+                    sales: { value: '$8,420', change: -23, direction: 'down', vs: 'vs $10,920 last week' },
+                    deals: { value: '12', change: -4, direction: 'down', vs: 'vs 16 last week' },
+                    margin: { value: '52%', change: -8, direction: 'down', vs: 'vs 60% last week' }
+                },
+                insight: 'Sales down 23% from last week. Customer feedback mentions "seemed distracted". May be personal issue - check in privately.',
+                notes: [
+                    { date: 'Dec 2', text: 'Mentioned car troubles affecting commute', type: 'coaching' },
+                    { date: 'Nov 28', text: 'Great customer save on difficult return', type: 'praise' }
+                ],
+                followup: null
+            },
+            {
+                id: 2,
+                name: 'Ben Taylor',
+                initials: 'BT',
+                role: 'Sales Associate',
+                status: 'improving',
+                statusLaManager B: '📈 Improving',
+                metrics: {
+                    sales: { value: '$6,890', change: +18, direction: 'up', vs: 'vs $5,840 last week' },
+                    deals: { value: '14', change: +3, direction: 'up', vs: 'vs 11 last week' },
+                    margin: { value: '58%', change: +4, direction: 'up', vs: 'vs 54% last week' }
+                },
+                insight: 'Consistent improvement since training session. Strong on jewellery upsells. Consider for senior role by Q2.',
+                notes: [
+                    { date: 'Dec 4', text: 'Completed advanced valuations training', type: 'coaching' },
+                    { date: 'Dec 1', text: 'Handled $8k gold sale professionally', type: 'praise' }
+                ],
+                followup: null
+            },
+            {
+                id: 3,
+                name: 'Chloe Mitchell',
+                initials: 'CM',
+                role: 'Sales Associate',
+                status: 'steady',
+                statusLaManager B: '➡️ Steady',
+                metrics: {
+                    sales: { value: '$5,210', change: +2, direction: 'same', vs: 'vs $5,100 last week' },
+                    deals: { value: '9', change: 0, direction: 'same', vs: 'vs 9 last week' },
+                    margin: { value: '55%', change: 0, direction: 'same', vs: 'vs 55% last week' }
+                },
+                insight: 'Consistent performer. Could push harder on margin. Hasn\'t done any premium sales this month.',
+                notes: [
+                    { date: 'Nov 25', text: 'Discussed pathways to senior role', type: 'coaching' }
+                ],
+                followup: null
+            },
+            {
+                id: 4,
+                name: 'Dan Williams',
+                initials: 'DW',
+                role: 'Sales Associate',
+                status: 'follow-up',
+                statusLaManager B: '⏰ Follow-up Due',
+                metrics: {
+                    sales: { value: '$4,120', change: -12, direction: 'down', vs: 'vs $4,680 last week' },
+                    deals: { value: '8', change: -2, direction: 'down', vs: 'vs 10 last week' },
+                    margin: { value: '48%', change: -3, direction: 'down', vs: 'vs 51% last week' }
+                },
+                insight: 'Discussed lateness on Nov 29. Follow-up scheduled for today. Check if punctuality improved.',
+                notes: [
+                    { date: 'Nov 29', text: 'Late 3x this week. Discussed importance of punctuality. Committed to improvement.', type: 'warning' },
+                    { date: 'Nov 20', text: 'Strong close on gaming bundle sale', type: 'praise' }
+                ],
+                followup: { due: 'Today', daysAgo: 7, originalNote: 'Late 3x this week - punctuality discussion' }
+            },
+            {
+                id: 5,
+                name: 'Emma Roberts',
+                initials: 'ER',
+                role: 'Closer',
+                status: 'improving',
+                statusLaManager B: '🌟 Star Performer',
+                metrics: {
+                    sales: { value: '$12,340', change: +31, direction: 'up', vs: 'vs $9,420 last week' },
+                    deals: { value: '18', change: +5, direction: 'up', vs: 'vs 13 last week' },
+                    margin: { value: '64%', change: +6, direction: 'up', vs: 'vs 58% last week' }
+                },
+                insight: 'Exceptional week! Highest margin in team. Perfect candidate for training new starters.',
+                notes: [
+                    { date: 'Dec 5', text: 'Closed $3.2k Rolex - highest single sale this month!', type: 'praise' },
+                    { date: 'Dec 3', text: 'Volunteered to train new starter', type: 'praise' }
+                ],
+                followup: null
+            }
+        ];
+
+        // Store notes in localStorage
+        let staffNotes = JSON.parse(localStorage.getItem('cc_staff_notes') || '{}');
+        let currentNoteStaff = null;
+        let currentNoteType = 'coaching';
+
+        function initPerformance() {
+            renderPerformance();
+        }
+
+        function renderPerformance() {
+            const list = document.getElementById('performanceList');
+            if (!list) return;
+            
+            try {
+            list.innerHTML = performanceData.map(staff => {
+                const hasFollowup = staff.followup !== null;
+                const statusMap = {
+                    'needs-attention': { class: 'attention', laManager B: staff.statusLaManager B },
+                    'improving': { class: 'improving', laManager B: staff.statusLaManager B },
+                    'steady': { class: 'steady', laManager B: staff.statusLaManager B },
+                    'follow-up': { class: 'followup', laManager B: staff.statusLaManager B }
+                };
+                const status = statusMap[staff.status];
+                
+                return `
+                    <div class="perf-card ${staff.status}">
+                        <div class="perf-card-header">
+                            <div class="perf-staff">
+                                <div class="perf-avatar">${staff.initials}</div>
+                                <div>
+                                    <div class="perf-name">${staff.name}</div>
+                                    <div class="perf-role">${staff.role}</div>
+                                </div>
+                            </div>
+                            <div class="perf-status ${status.class}">${status.laManager B}</div>
+                        </div>
+                        
+                        <div class="perf-metrics">
+                            <div class="perf-metric">
+                                <div class="perf-metric-laManager B">Sales</div>
+                                <div class="perf-metric-value ${staff.metrics.sales.direction}">${staff.metrics.sales.value}</div>
+                                <div class="perf-metric-change">${staff.metrics.sales.change > 0 ? '+' : ''}${staff.metrics.sales.change}%</div>
+                            </div>
+                            <div class="perf-metric">
+                                <div class="perf-metric-laManager B">Deals</div>
+                                <div class="perf-metric-value ${staff.metrics.deals.direction}">${staff.metrics.deals.value}</div>
+                                <div class="perf-metric-change">${staff.metrics.deals.change > 0 ? '+' : ''}${staff.metrics.deals.change}</div>
+                            </div>
+                            <div class="perf-metric">
+                                <div class="perf-metric-laManager B">Margin</div>
+                                <div class="perf-metric-value ${staff.metrics.margin.direction}">${staff.metrics.margin.value}</div>
+                                <div class="perf-metric-change">${staff.metrics.margin.change > 0 ? '+' : ''}${staff.metrics.margin.change}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="perf-insight">
+                            <span class="perf-insight-icon">🧠</span>
+                            <span>${staff.insight}</span>
+                        </div>
+                        
+                        ${hasFollowup ? `
+                            <div class="followup-due">
+                                <span>⏰</span>
+                                <span>Follow-up due ${staff.followup.due} - "${staff.followup.originalNote}"</span>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="perf-actions">
+                            <button class="perf-action-btn note" onclick="openNoteModal(${staff.id}, '${staff.name}')">
+                                📝 Add Note
+                            </button>
+                            <button class="perf-action-btn followup" onclick="openNoteModal(${staff.id}, '${staff.name}', true)">
+                                ⏰ Set Follow-up
+                            </button>
+                            ${staff.status === 'improving' || staff.metrics.sales.direction === 'up' ? `
+                                <button class="perf-action-btn praise" onclick="quickPraise(${staff.id})">
+                                    ⭐ Quick Praise
+                                </button>
+                            ` : ''}
+                            ${staff.status === 'needs-attention' ? `
+                                <button class="perf-action-btn formal" onclick="openNoteModal(${staff.id}, '${staff.name}', false, 'warning')">
+                                    ⚠️ Formal Note
+                                </button>
+                            ` : ''}
+                        </div>
+                        
+                        ${staff.notes && staff.notes.length > 0 ? `
+                            <div class="perf-notes-history">
+                                <div style="font-size: 10px; color: var(--text-dim); margin-bottom: 6px;">📋 Recent Notes</div>
+                                ${staff.notes.slice(0, 2).map(note => `
+                                    <div class="perf-note-item">
+                                        <span class="perf-note-date">${note.date}</span>
+                                        <span class="perf-note-text">${note.text}</span>
+                                        <span class="perf-note-type ${note.type}">${note.type}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            } catch (err) {
+                // Silent fail - graceful degradation
+            }
+        }
+
+        function openNoteModal(staffId, staffName, isFollowup = false, defaultType = 'coaching') {
+            currentNoteStaff = staffId;
+            document.getElementById('noteStaffName').textContent = staffName;
+            document.getElementById('noteModal').classList.add('active');
+            document.getElementById('noteText').value = '';
+            document.getElementById('noteFollowup').value = isFollowup ? '7' : '';
+            
+            // Set default type
+            selectNoteType(document.querySelector(`[data-type="${defaultType}"]`));
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            currentNoteStaff = null;
+        }
+
+        function selectNoteType(btn) {
+            document.querySelectorAll('.note-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentNoteType = btn.dataset.type;
+        }
+
+        function saveNote() {
+            const text = document.getElementById('noteText').value.trim();
+            const followupDays = document.getElementById('noteFollowup').value;
+            
+            if (!text) {
+                showToast('⚠️ Please enter a note');
+                return;
+            }
+            
+            // Find staff member
+            const staff = performanceData.find(s => s.id === currentNoteStaff);
+            if (!staff) return;
+            
+            // Add note to demo data (in production, this would go to server)
+            const today = new Date().toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+            staff.notes.unshift({
+                date: today,
+                text: text,
+                type: currentNoteType
+            });
+            
+            // Set follow-up if specified
+            if (followupDays) {
+                const followupDate = new Date();
+                followupDate.setDate(followupDate.getDate() + parseInt(followupDays));
+                staff.followup = {
+                    due: followupDate.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' }),
+                    daysAgo: 0,
+                    originalNote: text.substring(0, 50) + (text.length > 50 ? '...' : '')
+                };
+                staff.status = 'follow-up';
+            }
+            
+            // Save to localStorage
+            if (!staffNotes[currentNoteStaff]) staffNotes[currentNoteStaff] = [];
+            staffNotes[currentNoteStaff].push({
+                date: new Date().toISOString(),
+                text: text,
+                type: currentNoteType,
+                followup: followupDays ? parseInt(followupDays) : null,
+                author: userId
+            });
+            localStorage.setItem('cc_staff_notes', JSON.stringify(staffNotes));
+            
+            // Sync to vault (simulated)
+            sync.broadcast({
+                type: 'PERFORMANCE_NOTE_ADDED',
+                staffId: currentNoteStaff,
+                staffName: staff.name,
+                noteType: currentNoteType,
+                hasFollowup: !!followupDays,
+                from: userId,
+                timestamp: Date.now()
+            });
+            
+            closeNoteModal();
+            renderPerformance();
+            showToast(`✅ Note saved for ${staff.name}${followupDays ? ` • Follow-up in ${followupDays} days` : ''}`);
+        }
+
+        function quickPraise(staffId) {
+            const staff = performanceData.find(s => s.id === staffId);
+            if (!staff) return;
+            
+            const praises = [
+                'Great work this week! Keep it up!',
+                'Excellent improvement - noticed and appreciated!',
+                'Outstanding performance - you\'re setting the standard!',
+                'Fantastic effort - customers love you!'
+            ];
+            const praise = praises[Math.floor(Math.random() * praises.length)];
+            
+            const today = new Date().toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+            staff.notes.unshift({
+                date: today,
+                text: praise,
+                type: 'praise'
+            });
+            
+            renderPerformance();
+            showToast(`⭐ Praise logged for ${staff.name}!`);
+            
+            sync.broadcast({
+                type: 'QUICK_PRAISE',
+                staffId: staffId,
+                staffName: staff.name,
+                from: userId,
+                timestamp: Date.now()
+            });
+        }
+
+        // Initialize Performance Pulse
+        initPerformance();
+    </script>
+    
+    <!-- The Oracle - Knowledge & Pricing Assistant -->
+    <script src="oracle-widget.js"></script>
+</body>
+</html>

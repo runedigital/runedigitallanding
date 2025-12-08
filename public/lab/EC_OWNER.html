@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="googlebot" content="noindex, nofollow">
+    <title>Enterprise Owner // Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0d0d0d;
+            --bg-card: #141414;
+            --border: #252525;
+            --user-color: #00ffea;
+            --user-accent: #ff0055;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --success: #00ff88;
+            --warning: #f59e0b;
+            --danger: #ff0055;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: #0d0d0d !important;
+            background-color: #0d0d0d !important;
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-card), #1a1a1a);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--user-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .user-info h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--user-color);
+        }
+
+        .user-info span {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .owner-badge {
+            background: linear-gradient(135deg, var(--user-color), var(--user-accent));
+            color: #000;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            margin-left: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notif-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+
+        .notif-badge.show { display: block; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Section */
+        .section {
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
+
+        /* Pending Requests - Priority Box */
+        .requests-section {
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(245, 158, 11, 0.05));
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .requests-section.empty {
+            background: var(--bg-card);
+            border-color: var(--border);
+        }
+
+        .requests-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--danger);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .requests-title.empty {
+            color: var(--text-dim);
+        }
+
+        .request-count {
+            background: var(--danger);
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .request-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .request-from {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .request-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .request-name {
+            font-weight: 500;
+        }
+
+        .request-time {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .request-feature {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .request-feature strong {
+            color: var(--user-color);
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .request-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .request-btn.approve {
+            background: var(--success);
+            color: #000;
+        }
+
+        .request-btn.deny {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .request-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* Manager Cards */
+        .manager-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .manager-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .manager-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--manager-color, #888);
+        }
+
+        .manager-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .manager-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .manager-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .manager-role {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .manager-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .manager-features {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feature-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-toggle:last-child {
+            border-bottom: none;
+        }
+
+        .feature-laManager B {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-switch {
+            width: 40px;
+            height: 22px;
+            background: var(--border);
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--success);
+        }
+
+        .toggle-switch.active::after {
+            left: 20px;
+        }
+
+        /* Control All Section */
+        .control-all {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .control-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--user-color);
+            margin-bottom: 15px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .control-laManager B {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--user-color);
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 300;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Live indicator */
+        .live-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+        }
+
+        /* Data Sync Status Panel */
+        .sync-status-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0d0d1a 100%);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 10px;
+            z-index: 1000;
+            min-width: 220px;
+        }
+
+        .sync-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .sync-title {
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 1px;
+            font-size: 9px;
+        }
+
+        .sync-timestamp {
+            color: #666;
+            font-size: 8px;
+        }
+
+        .sync-sources {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sync-source {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sync-dot.connected {
+            background: #00ff88;
+            box-shadow: 0 0 6px #00ff88;
+        }
+
+        .sync-dot.syncing {
+            background: #ffd700;
+            animation: syncPulse 1s infinite;
+        }
+
+        .sync-dot.beta {
+            background: #a855f7;
+            box-shadow: 0 0 6px #a855f7;
+        }
+
+        @keyframes syncPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .sync-source-name {
+            color: #888;
+            flex: 1;
+        }
+
+        .sync-source-status {
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sync-source-status.live {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+        }
+
+        .sync-source-status.beta {
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+        }
+
+        .sync-beta-badge {
+            font-size: 7px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-dim);
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        /* ═══════════════════════════════════════
+           MARKDOWN OVERSIGHT - Owner B's Bird's Eye View
+           ═══════════════════════════════════════ */
+        .markdown-summary {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(10, 10, 10, 0.95));
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+        }
+
+        .markdown-summary-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent);
+        }
+
+        .markdown-summary-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .markdown-summary-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .ms-stat {
+            text-align: center;
+            padding: 5px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .ms-stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        .ms-stat-laManager B {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .store-markdown-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .store-markdown-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .store-markdown-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--store-color, #ffd700);
+        }
+
+        .store-markdown-card.urgent::before { background: #ff0055; }
+        .store-markdown-card.warning::before { background: #f59e0b; }
+        .store-markdown-card.good::before { background: #00ff88; }
+
+        .smc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .smc-store {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .smc-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .smc-status.urgent { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+        .smc-status.warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .smc-status.good { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+
+        .smc-metrics {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .smc-metric {
+            text-align: center;
+        }
+
+        .smc-metric-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+        }
+
+        .smc-metric-value.red { color: #ff0055; }
+        .smc-metric-value.yellow { color: #f59e0b; }
+        .smc-metric-value.green { color: #00ff88; }
+
+        .smc-metric-laManager B {
+            font-size: 9px;
+            color: var(--text-dim);
+        }
+
+        .markdown-action-bar {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .markdown-last-update {
+            font-size: 10px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .markdown-update-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: livePulse 2s infinite;
+        }
+
+        .markdown-nudge-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            background: transparent;
+            color: #ffd700;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .markdown-nudge-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* ═══════════════════════════════════════
+           PERFORMANCE PULSE - Cross-Store Staff Overview
+           ═══════════════════════════════════════ */
+        .performance-overview {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(10, 10, 10, 0.95));
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+        }
+
+        .perf-overview-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(0, 255, 136, 0.1), transparent);
+        }
+
+        .perf-overview-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .perf-overview-badge {
+            font-size: 9px;
+            padding: 4px 10px;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border-radius: 10px;
+            letter-spacing: 1px;
+        }
+
+        .perf-totals {
+            display: flex;
+            gap: 15px;
+        }
+
+        .perf-total {
+            text-align: center;
+            padding: 5px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .perf-total-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+        }
+
+        .perf-total-value.green { color: #00ff88; }
+        .perf-total-value.yellow { color: #f59e0b; }
+        .perf-total-value.red { color: #ff0055; }
+
+        .perf-total-laManager B {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .store-perf-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .store-perf-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .store-perf-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+        }
+
+        .store-perf-card.great::before { background: #00ff88; }
+        .store-perf-card.concern::before { background: #ff0055; }
+        .store-perf-card.ok::before { background: #f59e0b; }
+
+        .spc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .spc-store {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .spc-status {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .spc-status.great { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .spc-status.concern { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+        .spc-status.ok { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+        .spc-alerts {
+            margin-bottom: 10px;
+        }
+
+        .spc-alert-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+            font-size: 11px;
+        }
+
+        .spc-alert-row:last-child {
+            border-bottom: none;
+        }
+
+        .spc-alert-name {
+            color: #fff;
+        }
+
+        .spc-alert-issue {
+            color: var(--text-dim);
+            font-size: 10px;
+        }
+
+        .spc-alert-tag {
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .spc-alert-tag.down { background: rgba(255, 0, 85, 0.15); color: #ff6b6b; }
+        .spc-alert-tag.up { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+        .spc-alert-tag.followup { background: rgba(0, 255, 234, 0.15); color: #00ffea; }
+
+        .spc-metrics {
+            display: flex;
+            gap: 8px;
+        }
+
+        .spc-metric {
+            flex: 1;
+            text-align: center;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .spc-metric-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .spc-metric-laManager B {
+            font-size: 8px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .perf-action-bar {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .perf-vault-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            background: transparent;
+            color: #00ff88;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .perf-vault-btn:hover {
+            background: rgba(0, 255, 136, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* ═══════════════════════════════════════
+           KNOWLEDGE BASE - The Oracle's Brain
+           ═══════════════════════════════════════ */
+        .knowledge-section {
+            background: linear-gradient(135deg, rgba(0, 255, 234, 0.05), rgba(10, 10, 10, 0.95));
+            border: 1px solid rgba(0, 255, 234, 0.2);
+            border-radius: 12px;
+            margin: 0 20px 20px;
+            overflow: hidden;
+        }
+
+        .knowledge-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 234, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(0, 255, 234, 0.1), transparent);
+        }
+
+        .knowledge-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #00ffea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .knowledge-stats {
+            display: flex;
+            gap: 15px;
+        }
+
+        .kb-stat {
+            text-align: center;
+            padding: 5px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .kb-stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            color: #00ffea;
+        }
+
+        .kb-stat-laManager B {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .knowledge-search {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 234, 0.1);
+        }
+
+        .kb-search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .kb-search-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .kb-search-input:focus {
+            outline: none;
+            border-color: rgba(0, 255, 234, 0.4);
+        }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .kb-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .kb-card:hover {
+            background: rgba(0, 255, 234, 0.05);
+            border-color: rgba(0, 255, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .kb-card-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .kb-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .kb-card-category {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .kb-card-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+
+        .kb-card-badge.pdf { background: rgba(255, 0, 85, 0.2); color: #ff0055; }
+        .kb-card-badge.doc { background: rgba(0, 136, 255, 0.2); color: #0088ff; }
+        .kb-card-badge.html { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+
+        .knowledge-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(0, 255, 234, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .kb-add-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #00ffea, #00ff88);
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .kb-add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.4);
+        }
+
+        /* Guide Creator Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .guide-modal {
+            background: linear-gradient(135deg, var(--bg-card), #0a0a0a);
+            border: 1px solid rgba(0, 255, 234, 0.3);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: modalSlide 0.3s ease-out;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .guide-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(0, 255, 234, 0.1), transparent);
+        }
+
+        .guide-modal-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: #00ffea;
+        }
+
+        .guide-modal-close {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: transparent;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-modal-close:hover {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: #ff0055;
+        }
+
+        .guide-modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .guide-input-group {
+            margin-bottom: 20px;
+        }
+
+        .guide-input-laManager B {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .guide-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .guide-input:focus {
+            outline: none;
+            border-color: rgba(0, 255, 234, 0.4);
+        }
+
+        .guide-textarea {
+            min-height: 200px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .guide-category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .guide-category-btn {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-category-btn:hover, .guide-category-btn.active {
+            background: rgba(0, 255, 234, 0.15);
+            border-color: #00ffea;
+            color: #00ffea;
+        }
+
+        .guide-modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .guide-ai-hint {
+            font-size: 10px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .guide-save-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #00ffea, #00ff88);
+            color: #000;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .guide-save-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 234, 0.5);
+        }
+
+        .guide-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .guide-preview.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .guide-preview-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            color: #00ffea;
+            margin-bottom: 10px;
+        }
+
+        .guide-preview-content {
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .guide-preview-content h4 {
+            color: #fff;
+            margin: 10px 0 5px;
+        }
+
+        .guide-preview-content ol, .guide-preview-content ul {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="user-badge">
+            <div class="user-avatar" id="userAvatar">D</div>
+            <div class="user-info">
+                <h1 id="userName">Owner A <span class="owner-badge">OWNER</span></h1>
+                <span id="userTitle">OWNER // Location Beta</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="notif-btn" id="notifBtn">
+                🔔
+                <span class="notif-badge" id="notifBadge">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="requests-section" id="requestsSection">
+        <div class="requests-title" id="requestsTitle">
+            ⚡ PENDING REQUESTS
+            <span class="request-count" id="requestCount">0</span>
+        </div>
+        <div id="requestsList">
+            <!-- Requests populated by JS -->
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         MARKDOWN OVERSIGHT - Cross-Store Stock Optimization Summary
+         Owner B's bird's eye view of markdown compliance across all stores
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="markdown-summary">
+        <div class="markdown-summary-header">
+            <div class="markdown-summary-title">
+                📊 MARKDOWN OVERSIGHT
+            </div>
+            <div class="markdown-summary-stats">
+                <div class="ms-stat">
+                    <div class="ms-stat-value" id="totalPendingMarkdowns">27</div>
+                    <div class="ms-stat-laManager B">Pending</div>
+                </div>
+                <div class="ms-stat">
+                    <div class="ms-stat-value" id="potentialRecovery">$8.4K</div>
+                    <div class="ms-stat-laManager B">At Risk</div>
+                </div>
+            </div>
+        </div>
+        <div class="store-markdown-grid" id="storeMarkdownGrid">
+            <!-- Store 1: Location Alpha (Manager A) -->
+            <div class="store-markdown-card warning">
+                <div class="smc-header">
+                    <div class="smc-store">🏠 Location Alpha</div>
+                    <div class="smc-status warning">⚠️ ATTENTION</div>
+                </div>
+                <div class="smc-metrics">
+                    <div class="smc-metric">
+                        <div class="smc-metric-value yellow">10</div>
+                        <div class="smc-metric-laManager B">Pending</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value red">3</div>
+                        <div class="smc-metric-laManager B">Urgent</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value green">$2.8K</div>
+                        <div class="smc-metric-laManager B">At Risk</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store 2: Location Beta (Manager B) -->
+            <div class="store-markdown-card good">
+                <div class="smc-header">
+                    <div class="smc-store">⚓ Location Beta</div>
+                    <div class="smc-status good">✓ ON TRACK</div>
+                </div>
+                <div class="smc-metrics">
+                    <div class="smc-metric">
+                        <div class="smc-metric-value green">4</div>
+                        <div class="smc-metric-laManager B">Pending</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value green">0</div>
+                        <div class="smc-metric-laManager B">Urgent</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value green">$890</div>
+                        <div class="smc-metric-laManager B">At Risk</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store 3: Location Delta -->
+            <div class="store-markdown-card urgent">
+                <div class="smc-header">
+                    <div class="smc-store">🌾 Location Delta</div>
+                    <div class="smc-status urgent">🔥 OVERDUE</div>
+                </div>
+                <div class="smc-metrics">
+                    <div class="smc-metric">
+                        <div class="smc-metric-value red">9</div>
+                        <div class="smc-metric-laManager B">Pending</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value red">5</div>
+                        <div class="smc-metric-laManager B">Urgent</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value red">$3.2K</div>
+                        <div class="smc-metric-laManager B">At Risk</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store 4: Location Gamma -->
+            <div class="store-markdown-card warning">
+                <div class="smc-header">
+                    <div class="smc-store">🏢 Location Gamma</div>
+                    <div class="smc-status warning">⚠️ REVIEW</div>
+                </div>
+                <div class="smc-metrics">
+                    <div class="smc-metric">
+                        <div class="smc-metric-value yellow">4</div>
+                        <div class="smc-metric-laManager B">Pending</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value yellow">1</div>
+                        <div class="smc-metric-laManager B">Urgent</div>
+                    </div>
+                    <div class="smc-metric">
+                        <div class="smc-metric-value yellow">$1.5K</div>
+                        <div class="smc-metric-laManager B">At Risk</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="markdown-action-bar">
+            <div class="markdown-last-update">
+                <div class="markdown-update-dot"></div>
+                Live sync • Updated 2 mins ago
+            </div>
+            <button class="markdown-nudge-btn" onclick="nudgeAllManagers()">
+                📢 NUDGE ALL MANAGERS
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         PERFORMANCE PULSE - Cross-Store Staff Performance Overview
+         Identify coaching opportunities before they become problems
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="performance-overview">
+        <div class="perf-overview-header">
+            <div class="perf-overview-title">
+                📊 PERFORMANCE PULSE
+                <span class="perf-overview-badge">STAFF RETENTION ADVOCATE</span>
+            </div>
+            <div class="perf-totals">
+                <div class="perf-total">
+                    <div class="perf-total-value green">16</div>
+                    <div class="perf-total-laManager B">On Track</div>
+                </div>
+                <div class="perf-total">
+                    <div class="perf-total-value yellow">4</div>
+                    <div class="perf-total-laManager B">Watch</div>
+                </div>
+                <div class="perf-total">
+                    <div class="perf-total-value red">2</div>
+                    <div class="perf-total-laManager B">Action</div>
+                </div>
+            </div>
+        </div>
+        <div class="store-perf-grid" id="storePerfGrid">
+            <!-- Store 1: Location Alpha -->
+            <div class="store-perf-card concern">
+                <div class="spc-header">
+                    <div class="spc-store">🏠 Location Alpha</div>
+                    <div class="spc-status concern">⚠️ 1 ACTION</div>
+                </div>
+                <div class="spc-alerts">
+                    <div class="spc-alert-row">
+                        <div>
+                            <span class="spc-alert-name">Amy K.</span>
+                            <span class="spc-alert-issue">Sales -23%</span>
+                        </div>
+                        <span class="spc-alert-tag down">↓ Action</span>
+                    </div>
+                    <div class="spc-alert-row">
+                        <div>
+                            <span class="spc-alert-name">Dan W.</span>
+                            <span class="spc-alert-issue">Follow-up due</span>
+                        </div>
+                        <span class="spc-alert-tag followup">⏰ Today</span>
+                    </div>
+                </div>
+                <div class="spc-metrics">
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">5</div>
+                        <div class="spc-metric-laManager B">Staff</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">12</div>
+                        <div class="spc-metric-laManager B">Notes/Mo</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">2</div>
+                        <div class="spc-metric-laManager B">Follow-ups</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store 2: Location Beta -->
+            <div class="store-perf-card great">
+                <div class="spc-header">
+                    <div class="spc-store">⚓ Location Beta</div>
+                    <div class="spc-status great">✓ ALL GOOD</div>
+                </div>
+                <div class="spc-alerts">
+                    <div class="spc-alert-row">
+                        <div>
+                            <span class="spc-alert-name">Lucy T.</span>
+                            <span class="spc-alert-issue">Top performer!</span>
+                        </div>
+                        <span class="spc-alert-tag up">⭐ +28%</span>
+                    </div>
+                </div>
+                <div class="spc-metrics">
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">4</div>
+                        <div class="spc-metric-laManager B">Staff</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">8</div>
+                        <div class="spc-metric-laManager B">Notes/Mo</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">0</div>
+                        <div class="spc-metric-laManager B">Follow-ups</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store 3: Location Delta -->
+            <div class="store-perf-card concern">
+                <div class="spc-header">
+                    <div class="spc-store">🌾 Location Delta</div>
+                    <div class="spc-status concern">🔥 1 ACTION</div>
+                </div>
+                <div class="spc-alerts">
+                    <div class="spc-alert-row">
+                        <div>
+                            <span class="spc-alert-name">Jake P.</span>
+                            <span class="spc-alert-issue">Late 4x this week</span>
+                        </div>
+                        <span class="spc-alert-tag down">↓ Warning</span>
+                    </div>
+                    <div class="spc-alert-row">
+                        <div>
+                            <span class="spc-alert-name">Sam R.</span>
+                            <span class="spc-alert-issue">Margin -12%</span>
+                        </div>
+                        <span class="spc-alert-tag followup">Watch</span>
+                    </div>
+                </div>
+                <div class="spc-metrics">
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">6</div>
+                        <div class="spc-metric-laManager B">Staff</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">5</div>
+                        <div class="spc-metric-laManager B">Notes/Mo</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">3</div>
+                        <div class="spc-metric-laManager B">Follow-ups</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store 4: Location Gamma -->
+            <div class="store-perf-card ok">
+                <div class="spc-header">
+                    <div class="spc-store">🏢 Location Gamma</div>
+                    <div class="spc-status ok">👀 WATCH</div>
+                </div>
+                <div class="spc-alerts">
+                    <div class="spc-alert-row">
+                        <div>
+                            <span class="spc-alert-name">Team avg</span>
+                            <span class="spc-alert-issue">Margin slipping</span>
+                        </div>
+                        <span class="spc-alert-tag followup">-5%</span>
+                    </div>
+                </div>
+                <div class="spc-metrics">
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">4</div>
+                        <div class="spc-metric-laManager B">Staff</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">6</div>
+                        <div class="spc-metric-laManager B">Notes/Mo</div>
+                    </div>
+                    <div class="spc-metric">
+                        <div class="spc-metric-value">1</div>
+                        <div class="spc-metric-laManager B">Follow-ups</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="perf-action-bar">
+            <div class="markdown-last-update">
+                <div class="markdown-update-dot"></div>
+                Live metrics • 6 follow-ups pending
+            </div>
+            <button class="perf-vault-btn" onclick="openPerformanceVault()">
+                📁 OPEN PERFORMANCE VAULT
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         KNOWLEDGE BASE - The Oracle's Brain
+         Your institutional knowledge, immortalized
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="knowledge-section">
+        <div class="knowledge-header">
+            <div class="knowledge-title">
+                🧠 KNOWLEDGE BASE
+            </div>
+            <div class="knowledge-stats">
+                <div class="kb-stat">
+                    <div class="kb-stat-value" id="guideCount">9</div>
+                    <div class="kb-stat-laManager B">Guides</div>
+                </div>
+                <div class="kb-stat">
+                    <div class="kb-stat-value" id="queryCount">847</div>
+                    <div class="kb-stat-laManager B">Queries</div>
+                </div>
+            </div>
+        </div>
+        <div class="knowledge-search">
+            <input type="text" class="kb-search-input" placeholder="🔍 Search guides... (e.g., 'gold pricing', 'stocktake')" id="kbSearch" oninput="filterGuides()">
+        </div>
+        <div class="knowledge-grid" id="knowledgeGrid">
+            <!-- Guides populated by JS -->
+        </div>
+        <div class="knowledge-footer">
+            <div style="font-size: 10px; color: var(--text-dim);">
+                📊 <span id="oracleQueries">23</span> Oracle queries today
+            </div>
+            <button class="kb-add-btn" onclick="openGuideCreator()">
+                ✨ CREATE NEW GUIDE
+            </button>
+        </div>
+    </div>
+
+    <!-- Guide Creator Modal -->
+    <div class="modal-overlay" id="guideModal">
+        <div class="guide-modal">
+            <div class="guide-modal-header">
+                <div class="guide-modal-title">✨ CREATE NEW GUIDE</div>
+                <button class="guide-modal-close" onclick="closeGuideCreator()">×</button>
+            </div>
+            <div class="guide-modal-body">
+                <div class="guide-input-group">
+                    <laManager B class="guide-input-laManager B">Guide Title</laManager B>
+                    <input type="text" class="guide-input" id="guideTitle" placeholder="e.g., How to Process Gold Jewellery">
+                </div>
+                <div class="guide-input-group">
+                    <laManager B class="guide-input-laManager B">Category</laManager B>
+                    <div class="guide-category-grid">
+                        <button class="guide-category-btn active" onclick="selectCategory(this, 'jewellery')">💎 Jewellery</button>
+                        <button class="guide-category-btn" onclick="selectCategory(this, 'gold')">🥇 Gold</button>
+                        <button class="guide-category-btn" onclick="selectCategory(this, 'stocktake')">📋 Stocktake</button>
+                        <button class="guide-category-btn" onclick="selectCategory(this, 'repairs')">🔧 Repairs</button>
+                        <button class="guide-category-btn" onclick="selectCategory(this, 'pricing')">💰 Pricing</button>
+                        <button class="guide-category-btn" onclick="selectCategory(this, 'other')">📁 Other</button>
+                    </div>
+                </div>
+                <div class="guide-input-group">
+                    <laManager B class="guide-input-laManager B">Process Steps (just type naturally - AI will structure it)</laManager B>
+                    <textarea class="guide-input guide-textarea" id="guideContent" placeholder="Type the process from start to finish...
+
+Example:
+When a customer brings in gold jewellery first you need to test it with the acid kit. Start with 9ct acid on the test stone. If it dissolves its not gold. If it stays then test with 14ct and so on. Once you know the carat weigh it on the scale and use the calculator to get the buy price. Always check the current gold price first by..."></textarea>
+                </div>
+                <div class="guide-preview" id="guidePreview">
+                    <div class="guide-preview-title">📄 AI-Structured Preview</div>
+                    <div class="guide-preview-content" id="guidePreviewContent">
+                        <!-- Preview populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="guide-modal-footer">
+                <div class="guide-ai-hint">
+                    🧠 AI will structure your guide with numbered steps, tips, and warnings
+                </div>
+                <button class="guide-save-btn" onclick="saveGuide()">
+                    ⚡ STRUCTURE & SAVE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manager Control Cards -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">MANAGER ACCESS CONTROL</div>
+        </div>
+    </div>
+    
+    <div class="manager-grid">
+        <!-- Manager A -->
+        <div class="manager-card" style="--manager-color: #f59e0b;">
+            <div class="manager-header">
+                <div class="manager-avatar" style="background: #f59e0b;">J</div>
+                <div>
+                    <div class="manager-name">Manager A</div>
+                    <div class="manager-role">FLOOR OPS</div>
+                    <div class="manager-status">
+                        <div class="status-dot"></div>
+                        <span>Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="manager-features" id="Manager AFeatures">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Manager B -->
+        <div class="manager-card" style="--manager-color: #ec4899;">
+            <div class="manager-header">
+                <div class="manager-avatar" style="background: #ec4899;">B</div>
+                <div>
+                    <div class="manager-name">Manager B</div>
+                    <div class="manager-role">CUSTOMER SERVICE</div>
+                    <div class="manager-status">
+                        <div class="status-dot"></div>
+                        <span>Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="manager-features" id="Manager BFeatures">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Controls -->
+    <div class="control-all">
+        <div class="control-title">🌐 GLOBAL FEATURE CONTROLS</div>
+        <div class="control-grid" id="globalControls">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Updated!</div>
+
+    <!-- Live Indicator -->
+    <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE SYNC ACTIVE
+    </div>
+
+    <!-- Data Sync Status Panel -->
+    <div class="sync-status-panel" id="syncPanel">
+        <div class="sync-header">
+            <span class="sync-title">⚡ DATA SOURCES</span>
+            <span class="sync-timestamp" id="lastSyncTime">Updated: --:--</span>
+        </div>
+        <div class="sync-sources">
+            <div class="sync-source">
+                <div class="sync-dot connected"></div>
+                <span class="sync-source-name">Report Warehouse</span>
+                <span class="sync-source-status live">LIVE</span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot connected"></div>
+                <span class="sync-source-name">Employment Hero</span>
+                <span class="sync-source-status live">LIVE</span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot connected"></div>
+                <span class="sync-source-name">Manager Dashboards</span>
+                <span class="sync-source-status live">LIVE</span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot syncing"></div>
+                <span class="sync-source-name">POS Integration</span>
+                <span class="sync-source-status beta">BETA<span class="sync-beta-badge">COMING</span></span>
+            </div>
+            <div class="sync-source">
+                <div class="sync-dot beta"></div>
+                <span class="sync-source-name">AI Insights Engine</span>
+                <span class="sync-source-status beta">BETA</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get user from URL param (default: Owner A)
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user') || 'Owner A';
+        
+        // Initialize sync
+        const sync = new CCSync(userId);
+        const user = CC_CONFIG.users[userId];
+
+        // ============================================
+        // DATA SYNC STATUS - Live timestamp & status
+        // ============================================
+        function updateSyncTimestamp() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastSyncTime').textContent = `Updated: ${timeStr}`;
+        }
+        
+        updateSyncTimestamp();
+        setInterval(updateSyncTimestamp, 30000);
+        
+        function simulateSync() {
+            const sources = document.querySelectorAll('.sync-source .sync-dot.connected');
+            const randomSource = sources[Math.floor(Math.random() * sources.length)];
+            if (randomSource) {
+                randomSource.classList.remove('connected');
+                randomSource.classList.add('syncing');
+                setTimeout(() => {
+                    randomSource.classList.remove('syncing');
+                    randomSource.classList.add('connected');
+                    updateSyncTimestamp();
+                }, 1500);
+            }
+        }
+        
+        setInterval(simulateSync, 45000);
+
+        // Apply user theme
+        document.documentElement.style.setProperty('--user-color', user.color);
+        document.documentElement.style.setProperty('--user-accent', user.accent);
+        document.getElementById('userAvatar').textContent = user.icon || user.name[0];
+        document.getElementById('userAvatar').style.background = user.color;
+        document.getElementById('userName').innerHTML = `${user.name.toUpperCase()} <span class="owner-badge">OWNER</span>`;
+        document.getElementById('userTitle').textContent = user.title;
+        document.title = `Enterprise Owner // ${user.name}`;
+
+        // Apply theme-specific styles
+        applyTheme(user.theme);
+
+        function applyTheme(theme) {
+            const body = document.body;
+            
+            if (theme === 'hedge-fund') {
+                // Owner A - Café / Hedge Fund / Entrepreneur
+                body.style.background = '#0d0d0d';
+                document.documentElement.style.setProperty('--bg-card', '#141414');
+                document.documentElement.style.setProperty('--border', '#252525');
+            } else if (theme === 'ironman') {
+                // Owner B - Ironman / Husqvarna / Tech
+                body.style.background = '#0d0d0d';
+                document.documentElement.style.setProperty('--bg-card', '#141414');
+                document.documentElement.style.setProperty('--border', '#252525');
+            } else {
+                // Default dark theme
+                body.style.background = '#0d0d0d';
+                document.documentElement.style.setProperty('--bg-card', '#141414');
+                document.documentElement.style.setProperty('--border', '#252525');
+            }
+        }
+
+        // All controllable features
+        const allFeatures = [
+            { key: 'showSalesData', icon: '💰', name: 'Sales Data' },
+            { key: 'showStaffLeaderboard', icon: '🏆', name: 'Staff Leaderboard' },
+            { key: 'showMargins', icon: '📊', name: 'Margin Data', sensitive: true },
+            { key: 'showShrinkage', icon: '📉', name: 'Shrinkage Data', sensitive: true },
+            { key: 'showSentiment', icon: '😊', name: 'Sentiment Indicators' },
+            { key: 'showCustomerHistory', icon: '👤', name: 'Customer History' },
+            { key: 'showChurnRisk', icon: '❄️', name: 'Churn Risk' },
+            { key: 'showAiInsights', icon: '🧠', name: 'AI Insights' },
+            { key: 'showCompetitorAlerts', icon: '⚔️', name: 'Competitor Alerts' }
+        ];
+
+        // Render pending requests
+        function renderRequests() {
+            const requests = sync.getRequests().filter(r => r.status === 'pending');
+            const section = document.getElementById('requestsSection');
+            const title = document.getElementById('requestsTitle');
+            const count = document.getElementById('requestCount');
+            const list = document.getElementById('requestsList');
+            const notifBadge = document.getElementById('notifBadge');
+
+            count.textContent = requests.length;
+            notifBadge.textContent = requests.length;
+            notifBadge.classList.toggle('show', requests.length > 0);
+
+            if (requests.length === 0) {
+                section.classList.add('empty');
+                title.classList.add('empty');
+                title.innerHTML = '✅ NO PENDING REQUESTS';
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🎉</div>
+                        <div>All caught up! No pending requests.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            section.classList.remove('empty');
+            title.classList.remove('empty');
+            title.innerHTML = `⚡ PENDING REQUESTS <span class="request-count">${requests.length}</span>`;
+
+            list.innerHTML = requests.map(r => {
+                const fromUser = CC_CONFIG.users[r.from];
+                const time = new Date(r.timestamp).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+                const featureInfo = allFeatures.find(f => f.key === r.feature) || { icon: '⚙️', name: r.feature };
+
+                return `
+                    <div class="request-card">
+                        <div class="request-header">
+                            <div class="request-from">
+                                <div class="request-avatar" style="background: ${fromUser.color}">${fromUser.name[0]}</div>
+                                <span class="request-name">${fromUser.name}</span>
+                            </div>
+                            <span class="request-time">${time}</span>
+                        </div>
+                        <div class="request-feature">
+                            ${featureInfo.icon} Requesting access to <strong>${featureInfo.name}</strong>
+                        </div>
+                        <div class="request-actions">
+                            <button class="request-btn approve" onclick="handleRequest(${r.id}, true)">✓ APPROVE</button>
+                            <button class="request-btn deny" onclick="handleRequest(${r.id}, false)">✕ DENY</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleRequest(requestId, approved) {
+            sync.handleRequest(requestId, approved);
+            showToast(approved ? '✅ Request approved!' : '❌ Request denied');
+            renderRequests();
+            renderManagerFeatures();
+        }
+
+        // Render manager feature toggles
+        function renderManagerFeatures() {
+            const features = sync.getFeatures();
+            
+            // For simplicity, both managers see same features in demo
+            // In production, you'd have per-manager feature states
+            const featureHtml = allFeatures.filter(f => f.sensitive).map(f => `
+                <div class="feature-toggle">
+                    <div class="feature-laManager B">
+                        <span>${f.icon}</span>
+                        <span>${f.name}</span>
+                    </div>
+                    <div class="toggle-switch ${features[f.key] ? 'active' : ''}" 
+                         onclick="toggleFeature('${f.key}')"></div>
+                </div>
+            `).join('');
+
+            document.getElementById('Manager AFeatures').innerHTML = featureHtml;
+            document.getElementById('Manager BFeatures').innerHTML = featureHtml;
+        }
+
+        // Render global controls
+        function renderGlobalControls() {
+            const features = sync.getFeatures();
+
+            document.getElementById('globalControls').innerHTML = allFeatures.map(f => `
+                <div class="control-item">
+                    <div class="control-laManager B">
+                        <span>${f.icon}</span>
+                        <span>${f.name}</span>
+                    </div>
+                    <div class="toggle-switch ${features[f.key] ? 'active' : ''}" 
+                         onclick="toggleFeature('${f.key}')"></div>
+                </div>
+            `).join('');
+        }
+
+        function toggleFeature(featureKey) {
+            sync.toggleFeature(featureKey);
+            showToast('⚡ Feature updated - syncing...');
+            renderManagerFeatures();
+            renderGlobalControls();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Listen for real-time updates
+        sync.onUpdate((message) => {
+            if (message.type === 'NEW_REQUEST') {
+                showToast(`📬 New request from ${message.request.fromName}!`);
+                renderRequests();
+                // Vibrate if supported
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            }
+            if (message.type === 'FEATURES_UPDATED' && message.source !== userId) {
+                renderManagerFeatures();
+                renderGlobalControls();
+            }
+        });
+
+        // Initialize
+        renderRequests();
+        renderManagerFeatures();
+        renderGlobalControls();
+
+        // Refresh periodically
+        setInterval(() => {
+            renderRequests();
+            renderManagerFeatures();
+            renderGlobalControls();
+        }, 3000);
+
+        // ============================================
+        // MARKDOWN OVERSIGHT - Manager Nudge Function
+        // ============================================
+        function nudgeAllManagers() {
+            // Send nudge notification to all managers
+            sync.broadcast({
+                type: 'MARKDOWN_NUDGE',
+                from: userId,
+                fromName: user.name,
+                message: 'Action required: Please review pending markdown alerts',
+                timestamp: Date.now()
+            });
+
+            // Add notifications for all managers
+            ['Manager A', 'Manager B'].forEach(managerId => {
+                const notifications = sync.getData('notifications') || [];
+                notifications.push({
+                    id: Date.now() + Math.random(),
+                    userId: managerId,
+                    type: 'markdown_nudge',
+                    title: '📊 Markdown Review Required',
+                    message: `${user.name} is requesting markdown action on overdue items`,
+                    timestamp: Date.now(),
+                    read: false
+                });
+                sync.setData('notifications', notifications);
+            });
+
+            showToast('📢 Nudge sent to all managers!');
+
+            // Visual feedback - flash the cards
+            document.querySelectorAll('.store-markdown-card').forEach(card => {
+                card.style.transition = 'all 0.3s';
+                card.style.transform = 'scale(1.02)';
+                card.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.3)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                    card.style.boxShadow = '';
+                }, 300);
+            });
+        }
+
+        // ============================================
+        // KNOWLEDGE BASE - The Oracle's Brain
+        // Your institutional knowledge, immortalized
+        // ============================================
+        const knowledgeBase = [
+            { id: 1, title: 'CC Retail Jewellery Pricing Guide', category: 'Pricing', icon: '💰', type: 'pdf', queries: 156 },
+            { id: 2, title: 'Gold Calculator - How to Update Gemini', category: 'Gold', icon: '🥇', type: 'doc', queries: 89 },
+            { id: 3, title: 'Gold Pricing Guide', category: 'Gold', icon: '🥇', type: 'doc', queries: 234 },
+            { id: 4, title: 'Jewellery Processing Guide', category: 'Jewellery', icon: '💎', type: 'doc', queries: 178 },
+            { id: 5, title: 'Jewellery Repairs and Valuations', category: 'Repairs', icon: '🔧', type: 'doc', queries: 67 },
+            { id: 6, title: 'Jewellery Stocktake Process', category: 'Stocktake', icon: '📋', type: 'doc', queries: 45 },
+            { id: 7, title: 'Pricing Calculator', category: 'Pricing', icon: '🧮', type: 'html', queries: 312 },
+            { id: 8, title: 'Scrap Jewellery Training', category: 'Jewellery', icon: '💎', type: 'doc', queries: 123 },
+            { id: 9, title: 'Shop Floor Stocktake Process', category: 'Stocktake', icon: '📋', type: 'doc', queries: 56 }
+        ];
+
+        let selectedCategory = 'jewellery';
+
+        function initKnowledgeBase() {
+            renderKnowledgeGrid();
+        }
+
+        function renderKnowledgeGrid(filter = '') {
+            const grid = document.getElementById('knowledgeGrid');
+            const filtered = knowledgeBase.filter(guide => 
+                guide.title.toLowerCase().includes(filter.toLowerCase()) ||
+                guide.category.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            grid.innerHTML = filtered.map(guide => `
+                <div class="kb-card" onclick="openGuide(${guide.id})">
+                    <span class="kb-card-badge ${guide.type}">${guide.type.toUpperCase()}</span>
+                    <div class="kb-card-icon">${guide.icon}</div>
+                    <div class="kb-card-title">${guide.title}</div>
+                    <div class="kb-card-category">${guide.category} • ${guide.queries} queries</div>
+                </div>
+            `).join('');
+        }
+
+        function filterGuides() {
+            const search = document.getElementById('kbSearch').value;
+            renderKnowledgeGrid(search);
+        }
+
+        function openGuide(id) {
+            const guide = knowledgeBase.find(g => g.id === id);
+            showToast(`📄 Opening: ${guide.title}`);
+            // In production, this would open the actual guide
+        }
+
+        function openGuideCreator() {
+            document.getElementById('guideModal').classList.add('show');
+        }
+
+        function closeGuideCreator() {
+            document.getElementById('guideModal').classList.remove('show');
+        }
+
+        function selectCategory(btn, category) {
+            document.querySelectorAll('.guide-category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCategory = category;
+        }
+
+        function saveGuide() {
+            const title = document.getElementById('guideTitle').value;
+            const content = document.getElementById('guideContent').value;
+
+            if (!title || !content) {
+                showToast('⚠️ Please fill in all fields');
+                return;
+            }
+
+            // Simulate AI structuring
+            const preview = document.getElementById('guidePreview');
+            const previewContent = document.getElementById('guidePreviewContent');
+            
+            // Simple AI structuring simulation
+            const steps = content.split(/\.\s+/).filter(s => s.trim().length > 10);
+            let structured = '<h4>📋 Process Steps</h4><ol>';
+            steps.forEach((step, i) => {
+                structured += `<li>${step.trim()}.</li>`;
+            });
+            structured += '</ol>';
+            structured += '<h4>⚠️ Important Notes</h4><ul>';
+            structured += '<li>Always verify current gold prices before quoting</li>';
+            structured += '<li>Document all tests performed</li>';
+            structured += '</ul>';
+
+            previewContent.innerHTML = structured;
+            preview.classList.add('show');
+
+            // Add to knowledge base (simulated)
+            const newGuide = {
+                id: knowledgeBase.length + 1,
+                title: title,
+                category: selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1),
+                icon: getCategoryIcon(selectedCategory),
+                type: 'doc',
+                queries: 0
+            };
+            knowledgeBase.push(newGuide);
+            renderKnowledgeGrid();
+            document.getElementById('guideCount').textContent = knowledgeBase.length;
+
+            showToast(`✅ Guide created: ${title}`);
+
+            // Broadcast to Oracle
+            sync.broadcast({
+                type: 'NEW_GUIDE',
+                guide: newGuide,
+                timestamp: Date.now()
+            });
+
+            // Close modal after short delay
+            setTimeout(() => {
+                closeGuideCreator();
+                document.getElementById('guideTitle').value = '';
+                document.getElementById('guideContent').value = '';
+                preview.classList.remove('show');
+            }, 2000);
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                jewellery: '💎',
+                gold: '🥇',
+                stocktake: '📋',
+                repairs: '🔧',
+                pricing: '💰',
+                other: '📁'
+            };
+            return icons[category] || '📄';
+        }
+
+        // Initialize Knowledge Base
+        initKnowledgeBase();
+
+        // ============================================
+        // PERFORMANCE VAULT - Secure Note Storage
+        // For disciplinary purposes if ever needed
+        // ============================================
+        function openPerformanceVault() {
+            // In production, this would open a secure view of all notes
+            // For demo, we'll show a summary alert
+            const allNotes = JSON.parse(localStorage.getItem('cc_staff_notes') || '{}');
+            const noteCount = Object.values(allNotes).reduce((sum, arr) => sum + arr.length, 0);
+            
+            showToast(`📁 Performance Vault: ${noteCount} notes stored securely`);
+            
+            // Visual feedback
+            document.querySelectorAll('.store-perf-card').forEach(card => {
+                card.style.transition = 'all 0.3s';
+                card.style.transform = 'scale(1.02)';
+                card.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.3)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                    card.style.boxShadow = '';
+                }, 300);
+            });
+            
+            // In real implementation:
+            // window.open('performance_vault.html', '_blank');
+        }
+
+        // Listen for performance notes from managers
+        sync.onUpdate((message) => {
+            if (message.type === 'PERFORMANCE_NOTE_ADDED') {
+                showToast(`📝 ${message.from}: Note added for ${message.staffName}`);
+            }
+            if (message.type === 'QUICK_PRAISE') {
+                showToast(`⭐ ${message.from} praised ${message.staffName}!`);
+            }
+        });
+    </script>
+    
+    <!-- Discreet Partnership Link -->
+    <a href="partnership.html" style="position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #333; text-decoration: none; letter-spacing: 1px; opacity: 0.4; transition: opacity 0.3s; z-index: 999;" onmouseover="this.style.opacity='1';this.style.color='#c9a962'" onmouseout="this.style.opacity='0.4';this.style.color='#333'">📜 PARTNERSHIP</a>
+    
+    <!-- The Oracle - Knowledge & Pricing Assistant -->
+    <script src="oracle-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BURNRATE // API Cost Dashboard for Developers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0a0a0f',
+                        surface: '#12121a',
+                        border: '#1e1e2e',
+                        primary: '#00ff88',
+                        accent: '#ff3366',
+                        warning: '#ffaa00',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow { box-shadow: 0 0 40px rgba(0, 255, 136, 0.15); }
+        .gradient-text { background: linear-gradient(135deg, #00ff88, #00ccff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .float { animation: float 3s ease-in-out infinite; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.2); } 50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.4); } }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-bg text-white min-h-screen">
+    <!-- NAV -->
+    <nav class="border-b border-border/50 backdrop-blur-xl fixed w-full z-50 bg-bg/80">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center">
+                    <span class="text-primary font-bold">🔥</span>
+                </div>
+                <span class="font-bold text-xl tracking-tight">BURNRATE</span>
+            </div>
+            <div class="flex gap-6 items-center">
+                <a href="#features" class="text-gray-400 hover:text-white transition">Features</a>
+                <a href="#pricing" class="text-gray-400 hover:text-white transition">Pricing</a>
+                <a href="#" class="bg-primary text-bg px-4 py-2 rounded-lg font-semibold hover:bg-primary/90 transition">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-block mb-6 px-4 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-sm mono">
+                BETA • Track all your API costs in one place
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                Stop <span class="gradient-text">bleeding money</span><br>on API calls
+            </h1>
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                One dashboard for OpenAI, Anthropic, DALL-E, ElevenLabs, and 20+ APIs. 
+                Real-time cost tracking. Alerts before you hit your limit.
+            </p>
+            <div class="flex gap-4 justify-center flex-wrap">
+                <a href="#" class="bg-primary text-bg px-8 py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition glow">
+                    Start Free →
+                </a>
+                <a href="#demo" class="border border-border px-8 py-4 rounded-xl font-semibold text-lg hover:border-primary/50 transition">
+                    View Demo
+                </a>
+            </div>
+            <p class="text-gray-500 text-sm mt-4">No credit card required • 7-day free trial</p>
+        </div>
+    </section>
+
+    <!-- DASHBOARD PREVIEW -->
+    <section class="px-6 pb-20">
+        <div class="max-w-5xl mx-auto">
+            <div class="bg-surface border border-border rounded-2xl p-6 glow float">
+                <!-- Mock Dashboard -->
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-border">
+                    <div>
+                        <p class="text-gray-500 text-sm">Today's Spend</p>
+                        <p class="text-3xl font-bold">$4.82</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">This Month</p>
+                        <p class="text-3xl font-bold">$127.43</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 text-sm">Budget Used</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-32 h-3 bg-border rounded-full overflow-hidden">
+                                <div class="w-[64%] h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full"></div>
+                            </div>
+                            <span class="text-lg font-bold">64%</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Provider Table -->
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-gray-500 text-sm">
+                            <th class="text-left py-2">Provider</th>
+                            <th class="text-right">Requests</th>
+                            <th class="text-right">Cost</th>
+                            <th class="text-right">Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody class="mono text-sm">
+                        <tr class="border-t border-border/50">
+                            <td class="py-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                OpenAI
+                            </td>
+                            <td class="text-right text-gray-400">1,247</td>
+                            <td class="text-right">$3.21</td>
+                            <td class="text-right text-green-400">↑ 12%</td>
+                        </tr>
+                        <tr class="border-t border-border/50">
+                            <td class="py-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                Anthropic
+                            </td>
+                            <td class="text-right text-gray-400">89</td>
+                            <td class="text-right">$0.94</td>
+                            <td class="text-right text-red-400">↓ 5%</td>
+                        </tr>
+                        <tr class="border-t border-border/50">
+                            <td class="py-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                DALL-E 3
+                            </td>
+                            <td class="text-right text-gray-400">12</td>
+                            <td class="text-right">$0.48</td>
+                            <td class="text-right text-yellow-400">↑ 200%</td>
+                        </tr>
+                        <tr class="border-t border-border/50">
+                            <td class="py-3 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                ElevenLabs
+                            </td>
+                            <td class="text-right text-gray-400">3</td>
+                            <td class="text-right">$0.19</td>
+                            <td class="text-right text-gray-500">→ 0%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- Alert -->
+                <div class="mt-6 p-4 bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-3">
+                    <span class="text-warning text-xl">⚠️</span>
+                    <p class="text-warning text-sm">DALL-E spend 3x higher than usual. <a href="#" class="underline">View details</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="px-6 py-20 border-t border-border">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Everything you need to <span class="gradient-text">control costs</span></h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="text-3xl mb-4">📊</div>
+                    <h3 class="font-bold text-lg mb-2">Real-Time Dashboard</h3>
+                    <p class="text-gray-400 text-sm">See all your API spend in one place. Updated every minute.</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="text-3xl mb-4">🚨</div>
+                    <h3 class="font-bold text-lg mb-2">Smart Alerts</h3>
+                    <p class="text-gray-400 text-sm">Get notified before you hit budget limits. Spike detection included.</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="text-3xl mb-4">🔌</div>
+                    <h3 class="font-bold text-lg mb-2">20+ Integrations</h3>
+                    <p class="text-gray-400 text-sm">OpenAI, Anthropic, Cohere, Stability, ElevenLabs, and more.</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="text-3xl mb-4">📱</div>
+                    <h3 class="font-bold text-lg mb-2">Mobile Friendly</h3>
+                    <p class="text-gray-400 text-sm">Check your burn rate from anywhere. Full mobile support.</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="text-3xl mb-4">🏷️</div>
+                    <h3 class="font-bold text-lg mb-2">Project Tagging</h3>
+                    <p class="text-gray-400 text-sm">Track costs per project, feature, or environment.</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="text-3xl mb-4">📈</div>
+                    <h3 class="font-bold text-lg mb-2">Cost Forecasting</h3>
+                    <p class="text-gray-400 text-sm">Predict next month's bill based on usage patterns.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="px-6 py-20 border-t border-border">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Setup in <span class="gradient-text">2 minutes</span></h2>
+            <div class="space-y-8">
+                <div class="flex gap-6 items-start">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shrink-0">1</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Connect your providers</h3>
+                        <p class="text-gray-400">Add your API keys (we only store encrypted hints for display).</p>
+                        <div class="mt-4 bg-surface border border-border rounded-lg p-4 mono text-sm">
+                            <span class="text-gray-500"># Or use our proxy URL</span><br>
+                            <span class="text-primary">OPENAI_BASE_URL</span>=https://api.burnrate.dev/v1/openai
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-6 items-start">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shrink-0">2</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Set your budgets</h3>
+                        <p class="text-gray-400">Define monthly limits and alert thresholds for each provider.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6 items-start">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shrink-0">3</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Ship with confidence</h3>
+                        <p class="text-gray-400">Never get surprised by a $500 bill again.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="px-6 py-20 border-t border-border">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">Simple pricing</h2>
+            <p class="text-gray-400 text-center mb-12">Start free, upgrade when you need more.</p>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Free -->
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <h3 class="font-bold text-lg mb-2">Free</h3>
+                    <p class="text-3xl font-bold mb-4">$0<span class="text-gray-500 text-lg">/mo</span></p>
+                    <ul class="space-y-2 text-sm text-gray-400 mb-6">
+                        <li>✓ 3 providers</li>
+                        <li>✓ 30-day history</li>
+                        <li>✓ Email alerts</li>
+                        <li class="text-gray-600">✗ Project tagging</li>
+                        <li class="text-gray-600">✗ Team access</li>
+                    </ul>
+                    <a href="#" class="block text-center border border-border py-2 rounded-lg hover:border-primary transition">Get Started</a>
+                </div>
+                <!-- Pro -->
+                <div class="bg-surface border-2 border-primary rounded-xl p-6 relative pulse-glow">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-bg px-3 py-1 rounded-full text-xs font-bold">POPULAR</div>
+                    <h3 class="font-bold text-lg mb-2">Pro</h3>
+                    <p class="text-3xl font-bold mb-4">$9<span class="text-gray-500 text-lg">/mo</span></p>
+                    <ul class="space-y-2 text-sm text-gray-400 mb-6">
+                        <li>✓ Unlimited providers</li>
+                        <li>✓ 1-year history</li>
+                        <li>✓ Slack + Email alerts</li>
+                        <li>✓ Project tagging</li>
+                        <li class="text-gray-600">✗ Team access</li>
+                    </ul>
+                    <a href="#" class="block text-center bg-primary text-bg py-2 rounded-lg font-semibold hover:bg-primary/90 transition">Get Started</a>
+                </div>
+                <!-- Team -->
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <h3 class="font-bold text-lg mb-2">Team</h3>
+                    <p class="text-3xl font-bold mb-4">$29<span class="text-gray-500 text-lg">/mo</span></p>
+                    <ul class="space-y-2 text-sm text-gray-400 mb-6">
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ 5 team members</li>
+                        <li>✓ Shared dashboards</li>
+                        <li>✓ Cost allocation</li>
+                        <li>✓ Priority support</li>
+                    </ul>
+                    <a href="#" class="block text-center border border-border py-2 rounded-lg hover:border-primary transition">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="px-6 py-20 border-t border-border">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to take control?</h2>
+            <p class="text-gray-400 mb-8">Join 500+ developers who track their API costs with BURNRATE.</p>
+            <a href="#" class="inline-block bg-primary text-bg px-8 py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition glow">
+                Start Free Trial →
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-border px-6 py-10">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="font-bold">🔥 BURNRATE</span>
+                <span class="text-gray-500 text-sm">• A RUNE DIGITAL product</span>
+            </div>
+            <div class="flex gap-6 text-gray-400 text-sm">
+                <a href="#" class="hover:text-white">Twitter</a>
+                <a href="#" class="hover:text-white">GitHub</a>
+                <a href="#" class="hover:text-white">Docs</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

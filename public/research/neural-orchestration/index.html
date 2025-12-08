@@ -119,8 +119,10 @@
             color: #c5a059;
             font-size: 1.5rem;
             margin-bottom: 20px;
-            letter-spacing: 1px;
+            letter-spacing: 0.15em;
             font-family: 'Cinzel', serif;
+            line-height: 1.4;
+            font-weight: 400;
         }
         
         .section h3 {
@@ -128,7 +130,9 @@
             font-size: 1.1rem;
             margin-top: 20px;
             margin-bottom: 12px;
-            font-weight: 700;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            line-height: 1.4;
         }
         
         .tech-list {
@@ -283,9 +287,9 @@
     <div class="scanlines"></div>
     
     <header>
-        <div class="logo-text">RUNE // RESEARCH</div>
+        <div class="logo-text">RUNE DIGITAL // RESEARCH</div>
         <nav class="nav-links">
-            <a href="/landing.html">← BACK</a>
+            <a href="/research-hub.html">← BACK</a>
             <a href="/lab/NEURAL_HUB.html">NEURAL HUB</a>
         </nav>
     </header>
@@ -298,7 +302,7 @@
         
         <section class="section">
             <div class="executive-summary">
-                <strong>Executive Summary:</strong> Rune AI utilizes a deterministic orchestration framework to manage non-deterministic agent outputs. Unlike standard linear chains, our "RUNE Protocol" employs a state-based architecture where Tier 1 "Executive" agents manage the lifecycle of Tier 2 "Specialist" swarms. This ensures auditability and fault tolerance in complex decision trees, specifically for high-value asset valuation where hallucinations are unacceptable.
+                <strong>Executive Summary:</strong> RUNE AI utilizes a deterministic orchestration framework to manage non-deterministic agent outputs. Currently operating with <strong>11+ specialized agents</strong> coordinated through a three-tier hierarchy, with <strong>2,170+ lines of logged decisions</strong> in STATE.json. Local inference powered by <strong>rune-ai-v1</strong> running on RTX 4070 GPU via Ollama, with escalation to Gemini 1.5 Pro for complex reasoning.
             </div>
         </section>
         
@@ -308,7 +312,7 @@
             <h3>State Machine Architecture</h3>
             <p>Centralized STATE.json audit trail ensuring 100% replayability of agent decisions. Every decision is timestamped, indexed by agent, and committed to immutable storage (Git).</p>
             <ul class="tech-list">
-                <li><strong>Immutable Decision Log:</strong> 231+ documented decisions with full context trails</li>
+                <li><strong>Immutable Decision Log:</strong> 2,170+ lines of documented decisions with full context trails</li>
                 <li><strong>Replay Capability:</strong> Reproduce any decision state at any timestamp</li>
                 <li><strong>Audit Trail:</strong> Git-backed versioning for compliance and forensics</li>
                 <li><strong>Performance Tracking:</strong> Token usage, latency, and accuracy metrics per agent</li>
@@ -339,54 +343,57 @@
             </div>
         </section>
         
+        <section class="section" style="background: rgba(255, 136, 0, 0.02); border-left: 3px solid #ff8800;">
+            <h2 style="color: #ff8800;">Wrecking Crew Execution Logs</h2>
+            <p style="margin-bottom: 20px; color: #999;">Real orchestration runs from the RUNE Agent Swarm (December 2025):</p>
+            
+            <h3>Parallel Model Dispatch (Tier 1)</h3>
+            <ul class="tech-list">
+                <li><strong>GPT-4o (Architect):</strong> System architecture, code structure, component design</li>
+                <li><strong>DeepSeek R1 (Philosopher):</strong> Strategic reasoning, edge case analysis, philosophical framing</li>
+                <li><strong>Gemini 1.5 Pro (Visionary):</strong> Creative solutions, multi-modal integration, UX innovation</li>
+                <li><strong>Llama 70B (Engineer):</strong> Performance optimization, implementation details, error handling</li>
+            </ul>
+            
+            <h3>R&D Hypothesis Tracking</h3>
+            <ul class="tech-list">
+                <li><strong>H-001:</strong> Multi-agent specialization produces higher quality than single generalist (ONGOING)</li>
+                <li><strong>H-002:</strong> Context persists across sessions via structured handover docs (VALIDATED)</li>
+                <li><strong>H-004:</strong> Self-aware AI creates better immersion in games (PROTOTYPE EXISTS)</li>
+                <li><strong>H-005:</strong> Multi-model synthesis produces better results with proper weighting (ONGOING)</li>
+            </ul>
+            
+            <div class="gcp-connection" style="border-color: #ff8800; background: rgba(255, 136, 0, 0.05);">
+                <span style="color: #ff8800;">📊 EXECUTION EVIDENCE:</span> December 7, 2025 run: 4 AI models queried in parallel, 87.2s total execution time, all agents returned success. Results saved to <strong>CREW_OUTPUTS/results.json</strong>. Full audit trail in R&D Experiment Logs with timestamped git commits.
+            </div>
+        </section>
+        
         <section class="demo-section">
             <h2>See It Live</h2>
             <div class="demo-grid">
                 <div class="demo-card">
-                    <h3>Orchestration Demo</h3>
-                    <p>Watch all agents execute in parallel. View real-time decision logs with timestamps and confidence scores.</p>
-                    <a href="https://runedigitalstudio.com/" class="demo-link" target="_blank">ENTER DEMO →</a>
-                </div>
-                
-                <div class="demo-card">
-                    <h3>State Viewer</h3>
-                    <p>Inspect full STATE.json audit trail. Filter by agent, timestamp, or decision type.</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ/blob/main/STATE.json" class="demo-link" target="_blank">VIEW STATE →</a>
-                </div>
-                
-                <div class="demo-card">
                     <h3>Neural Hub</h3>
-                    <p>3D visualization of agent hierarchy. Double-click nodes to explore agent outputs and decision trees.</p>
-                    <a href="/lab/NEURAL_HUB.html" class="demo-link">EXPLORE HUB →</a>
+                    <p>Watch all agents execute in parallel. View real-time decision logs with timestamps.</p>
+                    <a href="/lab/NEURAL_HUB.html" class="demo-link">ENTER DEMO →</a>
                 </div>
                 
                 <div class="demo-card">
-                    <h3>R&D Evidence</h3>
-                    <p>Timestamped experiment logs proving multi-agent orchestration hypothesis (H-001).</p>
-                    <a href="https://github.com/runedigital/RUNE_HQ/tree/main/OPS_CENTER/R%26D_LAB" class="demo-link" target="_blank">HYPOTHESIS →</a>
+                    <h3>CMD_SCHOOL</h3>
+                    <p>Interactive terminal training. See orchestrated command processing in action.</p>
+                    <a href="/lab/CMD_SCHOOL.html" class="demo-link">LAUNCH TERMINAL →</a>
                 </div>
-            </div>
-        </section>
-        
-        <section class="related-section">
-            <h2>Related Research Areas</h2>
-            <div class="related-grid">
-                <a href="/research/agent-specialization/" class="related-link">
-                    AGENT SPECIALIZATION<br/>
-                    <span style="font-size: 10px; color: #999;">11+ domain-specific agents</span>
-                </a>
-                <a href="/research/production-systems/" class="related-link">
-                    PRODUCTION SYSTEMS<br/>
-                    <span style="font-size: 10px; color: #999;">Cloud Run deployment</span>
-                </a>
-                <a href="/research/ai-safety/" class="related-link">
-                    AI SAFETY & ALIGNMENT<br/>
-                    <span style="font-size: 10px; color: #999;">Constitutional guardrails</span>
-                </a>
-                <a href="/research/vertex-ai-native/" class="related-link">
-                    VERTEX AI NATIVE<br/>
-                    <span style="font-size: 10px; color: #999;">Gemini 1.5 Pro integration</span>
-                </a>
+                
+                <div class="demo-card">
+                    <h3>Enterprise Command</h3>
+                    <p>Multi-role dashboard with The Oracle. See hierarchical orchestration patterns.</p>
+                    <a href="/lab/ENTERPRISE_COMMAND.html" class="demo-link">EXPLORE →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <h3>Research Hub</h3>
+                    <p>Explore all research areas and related orchestration experiments.</p>
+                    <a href="/research-hub.html" class="demo-link">VIEW ALL →</a>
+                </div>
             </div>
         </section>
     </main>
@@ -394,9 +401,10 @@
     <footer>
         <p>RUNE Digital © 2025 | Enterprise AI Platform Built on Google Cloud</p>
         <p style="margin-top: 10px;">
-            <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GitHub Repository</a> • 
-            <a href="/landing.html">Research Hub Home</a> • 
-            <a href="https://linkedin.com/company/rune-digital" target="_blank">LinkedIn</a>
+            
+            <a href="/research-hub.html">Research Hub Home</a> • 
+            <a href="https://linkedin.com/company/runedigital" target="_blank">LinkedIn</a> • 
+            <a href="mailto:services@runedigitalstudio.com">Contact</a>
         </p>
     </footer>
 </body>

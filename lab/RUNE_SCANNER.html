@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE SCANNER // Real-Time Trend Intelligence</title>
+    <meta name="description" content="See what others miss. Real-time trend scanning across public data, social signals, news, and dark data. From free to enterprise.">
+    <meta name="keywords" content="trend scanner, real-time trends, market intelligence, social signals, dark data, alpha generation">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="RUNE SCANNER - Real-Time Trend Intelligence">
+    <meta property="og:description" content="See what others miss. AI-powered trend detection across multiple data layers.">
+    <meta property="og:type" content="website">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Fira+Code:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --void: #050505;
+            --void-light: #0a0a0a;
+            --gold: #c9a227;
+            --gold-dim: #6b5a1e;
+            --gold-glow: rgba(201, 162, 39, 0.3);
+            --cyan: #00f0ff;
+            --blood: #ff003c;
+            --green: #00ff6a;
+            --purple: #9945ff;
+            --panel-bg: rgba(10, 10, 10, 0.95);
+            --border: #1a1a1a;
+            --text: #e0e0e0;
+            --text-dim: #666;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--void);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: #444; font-weight: 400; }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        .nav-cta {
+            background: var(--gold);
+            color: #000;
+            padding: 10px 25px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-cta:hover {
+            box-shadow: 0 0 30px var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        /* === HERO SECTION === */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 40px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(201, 162, 39, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            background: rgba(201, 162, 39, 0.1);
+            border: 1px solid var(--gold-dim);
+            padding: 8px 20px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 30px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: #000;
+            padding: 18px 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 50px var(--gold-glow);
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            padding: 18px 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* === LIVE SCANNER PREVIEW === */
+        #scanner-preview {
+            width: 100%;
+            max-width: 1200px;
+            margin: 60px auto 0;
+            border: 1px solid var(--border);
+            background: var(--void-light);
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        #scanner-preview::before {
+            content: 'LIVE DEMO';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--green);
+            color: #000;
+            padding: 5px 15px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            z-index: 10;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        #scanner-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .punch-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, transparent, var(--gold), transparent);
+            box-shadow: 0 0 20px var(--gold), 5px 0 40px var(--gold-glow);
+        }
+
+        /* === TIERS SECTION === */
+        #tiers {
+            padding: 120px 40px;
+            background: var(--void-light);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-tag {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tiers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tier-card {
+            background: var(--void);
+            border: 1px solid var(--border);
+            padding: 40px 30px;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .tier-card:hover {
+            border-color: var(--gold-dim);
+            transform: translateY(-5px);
+        }
+
+        .tier-card.featured {
+            border-color: var(--gold);
+            box-shadow: 0 0 40px var(--gold-glow);
+        }
+
+        .tier-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #000;
+            padding: 5px 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .tier-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .tier-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .tier-price span {
+            font-size: 1rem;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .tier-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            min-height: 50px;
+        }
+
+        .tier-features {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .tier-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tier-features li::before {
+            content: '◆';
+            color: var(--gold);
+            font-size: 0.6rem;
+        }
+
+        .tier-features li.locked {
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        .tier-features li.locked::before {
+            content: '○';
+            color: var(--text-dim);
+        }
+
+        .tier-cta {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            background: transparent;
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .tier-cta:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .tier-card.featured .tier-cta {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .tier-card.featured .tier-cta:hover {
+            box-shadow: 0 0 30px var(--gold-glow);
+        }
+
+        /* === DATA LAYERS === */
+        #layers {
+            padding: 120px 40px;
+        }
+
+        .layers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .layer-card {
+            background: var(--void-light);
+            border: 1px solid var(--border);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .layer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gold-dim);
+        }
+
+        .layer-card.free::before { background: var(--cyan); }
+        .layer-card.pro::before { background: var(--green); }
+        .layer-card.enterprise::before { background: var(--purple); }
+        .layer-card.alpha::before { background: var(--gold); }
+
+        .layer-tier {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+
+        .layer-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .layer-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .layer-sources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .source-tag {
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* === CTA SECTION === */
+        #cta {
+            padding: 120px 40px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--void) 0%, var(--void-light) 100%);
+            position: relative;
+        }
+
+        #cta::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .cta-subtitle {
+            color: var(--text-dim);
+            max-width: 500px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        /* === FOOTER === */
+        footer {
+            padding: 60px 40px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 2px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover { color: var(--gold); }
+
+        .footer-copy {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .nav-links { display: none; }
+            #hero { padding: 100px 20px 60px; }
+            .hero-title { font-size: 2rem; }
+            #tiers, #layers, #cta { padding: 80px 20px; }
+            .section-title { font-size: 1.8rem; }
+            footer { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" class="nav-logo">RUNE <span>SCANNER</span></a>
+        <div class="nav-links">
+            <a href="#scanner-preview">Demo</a>
+            <a href="#tiers">Pricing</a>
+            <a href="#layers">Data Layers</a>
+            <a href="#cta" class="nav-cta">START FREE</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+        <div class="hero-badge">● REAL-TIME INTELLIGENCE</div>
+        <h1 class="hero-title">SEE WHAT<br>OTHERS MISS</h1>
+        <p class="hero-subtitle">AI-powered trend detection across public data, social signals, news filings, and dark data. From free to enterprise.</p>
+        <div class="hero-cta-group">
+            <a href="#scanner-preview" class="btn-primary">LAUNCH SCANNER</a>
+            <a href="#tiers" class="btn-secondary">VIEW PRICING</a>
+        </div>
+
+        <!-- LIVE SCANNER PREVIEW -->
+        <div id="scanner-preview">
+            <div class="punch-line"></div>
+            <canvas id="scanner-canvas"></canvas>
+        </div>
+    </section>
+
+    <!-- PRICING TIERS -->
+    <section id="tiers">
+        <div class="section-header">
+            <div class="section-tag">// PRICING</div>
+            <h2 class="section-title">PAY FOR DEPTH</h2>
+            <p class="section-subtitle">Same interface. Same power. The deeper you go, the more you see.</p>
+        </div>
+
+        <div class="tiers-grid">
+            <!-- FREE -->
+            <div class="tier-card">
+                <div class="tier-name">FREE</div>
+                <div class="tier-price">$0<span>/forever</span></div>
+                <div class="tier-desc">Start scanning public trends. No credit card required.</div>
+                <ul class="tier-features">
+                    <li>Google Trends data</li>
+                    <li>24-hour history</li>
+                    <li>Basic visualizer</li>
+                    <li class="locked">Social signals</li>
+                    <li class="locked">News & filings</li>
+                    <li class="locked">Dark data</li>
+                    <li class="locked">Custom alerts</li>
+                    <li class="locked">API access</li>
+                </ul>
+                <a href="#" class="tier-cta">START FREE</a>
+            </div>
+
+            <!-- PRO -->
+            <div class="tier-card featured">
+                <div class="tier-name">PRO</div>
+                <div class="tier-price">$29<span>/month</span></div>
+                <div class="tier-desc">Unlock social signals. See what's moving before it trends.</div>
+                <ul class="tier-features">
+                    <li>Everything in Free</li>
+                    <li>Reddit rising signals</li>
+                    <li>Twitter/X trends</li>
+                    <li>Hacker News velocity</li>
+                    <li>30-day history</li>
+                    <li>5 custom alerts</li>
+                    <li class="locked">News & filings</li>
+                    <li class="locked">Dark data</li>
+                </ul>
+                <a href="#" class="tier-cta">UPGRADE TO PRO</a>
+            </div>
+
+            <!-- ENTERPRISE -->
+            <div class="tier-card">
+                <div class="tier-name">ENTERPRISE</div>
+                <div class="tier-price">$299<span>/month</span></div>
+                <div class="tier-desc">News, SEC filings, patents. Professional-grade intelligence.</div>
+                <ul class="tier-features">
+                    <li>Everything in Pro</li>
+                    <li>SEC Edgar filings</li>
+                    <li>Patent velocity tracking</li>
+                    <li>News API (50+ sources)</li>
+                    <li>1-year history</li>
+                    <li>Unlimited alerts</li>
+                    <li>CSV & API export</li>
+                    <li class="locked">Dark data</li>
+                </ul>
+                <a href="#" class="tier-cta">GO ENTERPRISE</a>
+            </div>
+
+            <!-- ALPHA -->
+            <div class="tier-card">
+                <div class="tier-name">ALPHA</div>
+                <div class="tier-price">$5K<span>/month+</span></div>
+                <div class="tier-desc">Dark data. Insider signals. Competitive intelligence. White glove.</div>
+                <ul class="tier-features">
+                    <li>Everything in Enterprise</li>
+                    <li>Insider trading signals</li>
+                    <li>Supply chain data</li>
+                    <li>Employee sentiment</li>
+                    <li>Custom data ingestion</li>
+                    <li>Dedicated API</li>
+                    <li>On-premise option</li>
+                    <li>Direct analyst support</li>
+                </ul>
+                <a href="#" class="tier-cta">CONTACT SALES</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- DATA LAYERS -->
+    <section id="layers">
+        <div class="section-header">
+            <div class="section-tag">// DATA LAYERS</div>
+            <h2 class="section-title">FOUR DEPTHS OF SIGNAL</h2>
+            <p class="section-subtitle">Each tier unlocks a new layer of intelligence.</p>
+        </div>
+
+        <div class="layers-grid">
+            <div class="layer-card free">
+                <div class="layer-tier">FREE TIER</div>
+                <div class="layer-name">PUBLIC TRENDS</div>
+                <div class="layer-desc">What the world is searching for right now. Real-time Google Trends data visualized.</div>
+                <div class="layer-sources">
+                    <span class="source-tag">Google Trends</span>
+                    <span class="source-tag">YouTube Trending</span>
+                </div>
+            </div>
+
+            <div class="layer-card pro">
+                <div class="layer-tier">PRO TIER</div>
+                <div class="layer-name">SOCIAL SIGNALS</div>
+                <div class="layer-desc">What's gaining momentum before it hits mainstream. Early signal detection.</div>
+                <div class="layer-sources">
+                    <span class="source-tag">Reddit</span>
+                    <span class="source-tag">Twitter/X</span>
+                    <span class="source-tag">Hacker News</span>
+                    <span class="source-tag">Discord</span>
+                </div>
+            </div>
+
+            <div class="layer-card enterprise">
+                <div class="layer-tier">ENTERPRISE TIER</div>
+                <div class="layer-name">NEWS & FILINGS</div>
+                <div class="layer-desc">Regulatory filings, patents, and news. The data that moves markets.</div>
+                <div class="layer-sources">
+                    <span class="source-tag">SEC Edgar</span>
+                    <span class="source-tag">USPTO Patents</span>
+                    <span class="source-tag">News APIs</span>
+                    <span class="source-tag">Earnings Calls</span>
+                </div>
+            </div>
+
+            <div class="layer-card alpha">
+                <div class="layer-tier">ALPHA TIER</div>
+                <div class="layer-name">DARK DATA</div>
+                <div class="layer-desc">The signals your competitors can't see. Insider activity, supply chain, sentiment.</div>
+                <div class="layer-sources">
+                    <span class="source-tag">Form 4 Filings</span>
+                    <span class="source-tag">Supply Chain</span>
+                    <span class="source-tag">Employee Sentiment</span>
+                    <span class="source-tag">Custom Feeds</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta">
+        <h2 class="cta-title">START SCANNING NOW</h2>
+        <p class="cta-subtitle">Free tier. No credit card. See what you've been missing.</p>
+        <a href="#" class="btn-primary">LAUNCH FREE SCANNER</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-logo">RUNE SCANNER</div>
+        <div class="footer-links">
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+            <a href="#">API Docs</a>
+            <a href="#">Contact</a>
+        </div>
+        <div class="footer-copy">© 2025 RUNE DIGITAL. All rights reserved.</div>
+    </footer>
+
+    <!-- SCANNER ANIMATION -->
+    <script>
+        const canvas = document.getElementById('scanner-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Sample trending words
+        const trendWords = [
+            { word: 'AI', category: 'hot' },
+            { word: 'Bitcoin', category: 'hot' },
+            { word: 'GPT-5', category: 'hot' },
+            { word: 'acquisition', category: 'signal' },
+            { word: 'restructuring', category: 'risk' },
+            { word: 'layoffs', category: 'risk' },
+            { word: 'breakthrough', category: 'signal' },
+            { word: 'record earnings', category: 'hot' },
+            { word: 'investigation', category: 'risk' },
+            { word: 'merger', category: 'signal' },
+            { word: 'blockchain', category: 'neutral' },
+            { word: 'quantum', category: 'hot' },
+            { word: 'startup', category: 'neutral' },
+            { word: 'funding', category: 'signal' },
+            { word: 'bankrupt', category: 'risk' },
+            { word: 'viral', category: 'hot' },
+            { word: 'partnership', category: 'signal' },
+            { word: 'scandal', category: 'risk' }
+        ];
+
+        const colors = {
+            hot: '#00ff6a',
+            signal: '#c9a227',
+            risk: '#ff003c',
+            neutral: '#444'
+        };
+
+        class Word {
+            constructor() {
+                const trend = trendWords[Math.floor(Math.random() * trendWords.length)];
+                this.word = trend.word;
+                this.category = trend.category;
+                this.x = -100;
+                this.y = Math.random() * (canvas.height - 40) + 20;
+                this.vx = 1 + Math.random() * 2;
+                this.alpha = 0;
+                this.maxAlpha = this.category === 'neutral' ? 0.3 : 0.9;
+                this.size = this.category === 'neutral' ? 12 : 14 + Math.random() * 4;
+                this.glow = this.category !== 'neutral';
+            }
+
+            update() {
+                this.x += this.vx;
+                if (this.alpha < this.maxAlpha) this.alpha += 0.02;
+                if (this.x > canvas.width + 100) return false;
+                return true;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.font = `${this.glow ? 'bold ' : ''}${this.size}px 'Fira Code', monospace`;
+                ctx.fillStyle = colors[this.category];
+                
+                if (this.glow) {
+                    ctx.shadowColor = colors[this.category];
+                    ctx.shadowBlur = 10;
+                }
+                
+                ctx.fillText(this.word, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        let words = [];
+        let frame = 0;
+
+        function animate() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Spawn new words
+            if (frame % 30 === 0) {
+                words.push(new Word());
+            }
+
+            // Update and draw
+            words = words.filter(w => {
+                const alive = w.update();
+                if (alive) w.draw();
+                return alive;
+            });
+
+            frame++;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE | GRAVITY</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>body { margin: 0; background: #000; overflow: hidden; }</style>
+</head>
+<body>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // --- THE BLACK HOLE SHADER ---
+        const uniforms = {
+            u_time: { value: 0.0 },
+            u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            u_mouse: { value: new THREE.Vector2(0.5, 0.5) }
+        };
+
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform float u_time;
+            uniform vec2 u_resolution;
+            uniform vec2 u_mouse;
+            varying vec2 vUv;
+
+            // Pseudo-random function
+            float random (in vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            // Noise function
+            float noise (in vec2 st) {
+                vec2 i = floor(st);
+                vec2 f = fract(st);
+                float a = random(i);
+                float b = random(i + vec2(1.0, 0.0));
+                float c = random(i + vec2(0.0, 1.0));
+                float d = random(i + vec2(1.0, 1.0));
+                vec2 u = f * f * (3.0 - 2.0 * f);
+                return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+            }
+
+            void main() {
+                vec2 st = gl_FragCoord.xy / u_resolution.xy;
+                st.x *= u_resolution.x / u_resolution.y; // Aspect correction
+                
+                vec2 mouse = u_mouse;
+                mouse.x *= u_resolution.x / u_resolution.y;
+
+                // Distance from mouse/center
+                vec2 dist = st - mouse;
+                float r = length(dist);
+                
+                // GRAVITY WARP
+                // Bends space towards the center
+                float warp = 0.1 / (r + 0.05); // Inverse square law ish
+                vec2 warpedSt = st + normalize(dist) * warp * 0.05;
+
+                // Background Grid/Stars based on WARPED coords
+                float grid = step(0.98, fract(warpedSt.x * 20.0)) + step(0.98, fract(warpedSt.y * 20.0));
+                
+                // Accretion Disk (Ring)
+                float ring = smoothstep(0.2, 0.25, r) - smoothstep(0.25, 0.6, r);
+                // Add noise to ring
+                float n = noise(vec2(r * 10.0 - u_time * 2.0, atan(dist.y, dist.x) * 5.0));
+                ring *= n;
+
+                // Event Horizon (Black Hole center)
+                float hole = 1.0 - smoothstep(0.1, 0.12, r);
+
+                // Compose colors
+                vec3 color = vec3(0.0);
+                
+                // Grid (Background space)
+                color += vec3(0.2) * grid; 
+                
+                // Glowing Ring
+                color += vec3(1.0, 0.6, 0.2) * ring * 2.0; 
+                
+                // Black Hole
+                color *= (1.0 - hole);
+
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader
+        });
+
+        const plane = new THREE.Mesh(geometry, material);
+        scene.add(plane);
+
+        // --- EVENTS ---
+        window.addEventListener('mousemove', (e) => {
+            uniforms.u_mouse.value.x = e.clientX / window.innerWidth;
+            uniforms.u_mouse.value.y = 1.0 - (e.clientY / window.innerHeight); // Flip Y
+        });
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.u_resolution.value.x = window.innerWidth;
+            uniforms.u_resolution.value.y = window.innerHeight;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            uniforms.u_time.value += 0.01;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
