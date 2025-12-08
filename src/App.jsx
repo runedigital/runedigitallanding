@@ -346,66 +346,6 @@ const ControlDeck = ({ activeColor, setColor, activeText, setText, activeFont, s
  )
 }
 
-// --- NEURAL HUB (IFRAME WRAPPER) ---
-const NeuralHub = ({ setPage }) => (
- <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
-  <button 
-   onClick={() => setPage('landing')}
-   style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 999, background: '#ff0055', color: '#fff', border: 'none', padding: '10px 20px', cursor: 'pointer', fontFamily: "'Oswald', sans-serif", letterSpacing: '2px', fontWeight: 600 }}
-  >
-   EXIT NEURAL HUB
-  </button>
-  <iframe 
-   src="/lab/NEURAL_HUB.html" 
-   style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-   title="NEURAL HUB - RUNE Control Center"
-  />
- </div>
-)
-
-// --- LANDING HUB (MAIN ENTRY) ---
-const LandingHub = ({ setPage }) => {
- const isMobile = useIsMobile()
- return (
-  <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', zIndex: 1000, color: '#fff', fontFamily: "'Oswald', sans-serif" }}>
-   <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-    <svg width={isMobile ? 60 : 100} height={isMobile ? 60 : 100} viewBox="0 0 100 100" fill="none" style={{ marginBottom: '20px' }}>
-     <path d="M30 20 L10 50 L30 80 H50 L70 50 L50 20 H30 Z" fill="none" stroke="white" strokeWidth="4" />
-     <path d="M35 20 L15 50 L35 80" stroke="#00ffea" strokeWidth="4" style={{ mixBlendMode: 'screen' }} />
-     <circle cx="40" cy="50" r="4" fill="#ff0055" />
-    </svg>
-    <h1 style={{ fontSize: isMobile ? '28px' : '48px', letterSpacing: '6px', marginBottom: '20px', textShadow: '0 0 20px #00ffea' }}>RUNE DIGITAL</h1>
-    <p style={{ fontSize: '14px', color: '#999', letterSpacing: '2px', marginBottom: '40px' }}>SELECT INTERFACE</p>
-   </div>
-   
-   <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '30px', justifyContent: 'center', flexWrap: 'wrap', maxWidth: '900px' }}>
-    <button 
-     onClick={() => setPage('neural-hub')}
-     style={{ background: 'rgba(0, 255, 234, 0.1)', border: '2px solid #00ffea', color: '#00ffea', padding: isMobile ? '30px 40px' : '40px 60px', fontSize: '16px', letterSpacing: '3px', fontWeight: 600, fontFamily: "'Oswald', sans-serif", cursor: 'pointer', transition: 'all 0.3s', minWidth: '200px' }}
-     onMouseEnter={(e) => { e.target.style.background = '#00ffea'; e.target.style.color = '#000'; }}
-     onMouseLeave={(e) => { e.target.style.background = 'rgba(0, 255, 234, 0.1)'; e.target.style.color = '#00ffea'; }}
-    >
-     NEURAL HUB
-    </button>
-    
-    <button 
-     onClick={() => setPage('gate')}
-     style={{ background: 'rgba(255, 255, 255, 0.1)', border: '2px solid #fff', color: '#fff', padding: isMobile ? '30px 40px' : '40px 60px', fontSize: '16px', letterSpacing: '3px', fontWeight: 600, fontFamily: "'Oswald', sans-serif", cursor: 'pointer', transition: 'all 0.3s', minWidth: '200px' }}
-     onMouseEnter={(e) => { e.target.style.background = '#fff'; e.target.style.color = '#000'; }}
-     onMouseLeave={(e) => { e.target.style.background = 'rgba(255, 255, 255, 0.1)'; e.target.style.color = '#fff'; }}
-    >
-     SHOWROOM
-    </button>
-   </div>
-   
-   <div style={{ position: 'fixed', bottom: '30px', left: '30px', fontSize: '12px', color: '#666', letterSpacing: '1px' }}>
-    <div>RUNE DIGITAL STUDIO</div>
-    <div style={{ marginTop: '5px' }}>v1.0 // ENTERPRISE AI PLATFORM</div>
-   </div>
-  </div>
- )
-}
-
 const InterventionModal = ({ onClose, onReset, onClaimOffer, isMobile }) => (
  <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 600, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
   <div style={{ width: '100%', maxWidth: '400px', border: '1px solid #ff0055', background: '#000', padding: '40px', textAlign: 'center', position: 'relative' }}>
@@ -419,11 +359,7 @@ const InterventionModal = ({ onClose, onReset, onClaimOffer, isMobile }) => (
 )
 
 export default function App() {
- const [page, setPage] = useState('landing')
- 
- if (page === 'landing') {
-  return <LandingHub setPage={setPage} />
- }
+ const [page, setPage] = useState('gate')
  
  if (page === 'gate') {
   return <GateKeeper onEnter={() => setPage('showroom')} />
@@ -431,10 +367,6 @@ export default function App() {
  
  if (page === 'orchestration-demo') {
   return <OrchestrationDemo />
- }
- 
- if (page === 'neural-hub') {
-  return <NeuralHub setPage={setPage} />
  }
  
  return <Showroom setPage={setPage} />

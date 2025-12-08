@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RUNE // VIVALDI MASTER</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #050505; font-family: monospace; }
+        
+        /* START OVERLAY */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease;
+        }
+        
+        h1 { color: #d4af37; letter-spacing: 5px; font-size: 2rem; margin-bottom: 10px; text-transform: uppercase; }
+        p { color: #888; font-size: 0.8rem; letter-spacing: 2px; }
+        
+        .hidden { opacity: 0; pointer-events: none; }
+    </style>
+    
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+</head>
+<body>
+
+    <div id="overlay" onclick="startAudio()">
+        <h1>Vivaldi Protocol</h1>
+        <p>[ CLICK TO INITIALIZE ]</p>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // 1. SETUP SCENE
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // Perfect Angle for 16:9 Recording
+        camera.position.set(0, -85, 130);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        // 2. THE GEOMETRY
+        const count = 2500; 
+        const geometry = new THREE.BoxGeometry(1, 1, 10); 
+        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const mesh = new THREE.InstancedMesh(geometry, material, count);
+        
+        const dummy = new THREE.Object3D();
+        const color = new THREE.Color();
+        const goldenAngle = 137.508; 
+
+        // Initialize flat spiral
+        for (let i = 0; i < count; i++) {
+            const angle = i * goldenAngle * (Math.PI / 180);
+            const radius = 3.5 * Math.sqrt(i); 
+            
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const z = 0;
+
+            dummy.position.set(x, y, z);
+            dummy.lookAt(0, 0, 0);
+            dummy.updateMatrix();
+            mesh.setMatrixAt(i, dummy.matrix);
+            mesh.setColorAt(i, new THREE.Color(0x111111));
+        }
+
+        scene.add(mesh);
+
+        // 3. AUDIO SYSTEM (RAW MODE)
+        let analyser, dataArray;
+        let audioActive = false;
+
+        window.startAudio = async () => {
+            document.getElementById('overlay').classList.add('hidden');
+            
+            try {
+                // DISABLE CHROME PROCESSING (Pure Audio)
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        autoGainControl: false,
+                        noiseSuppression: false,
+                        latency: 0
+                    } 
+                });
+                
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioCtx.createMediaStreamSource(stream);
+                
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048; 
+                // Smoothing: 0.8 makes it snappy, 0.9 makes it smooth. 
+                // For Vivaldi, 0.85 is good to catch the fast notes.
+                analyser.smoothingTimeConstant = 0.85; 
+                source.connect(analyser);
+                
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                audioActive = true;
+            } catch (err) {
+                alert("Microphone access required.");
+            }
+        };
+
+        // 4. ANIMATION LOOP
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const time = clock.getElapsedTime();
+
+            // Cinematic Camera Drift
+            camera.position.x = Math.sin(time * 0.1) * 25;
+            camera.position.y = -85 + Math.cos(time * 0.15) * 10;
+            camera.lookAt(0, 0, 0);
+
+            // Slow Spiral Rotation
+            mesh.rotation.z -= 0.0015;
+
+            if (audioActive) {
+                analyser.getByteFrequencyData(dataArray);
+                
+                for (let i = 0; i < count; i++) {
+                    // FREQUENCY MAPPING (Wide Range for Strings)
+                    const freqIndex = Math.floor((i / count) * 600); 
+                    const rawVal = dataArray[freqIndex] || 0;
+
+                    // GAIN STAGE (The "1.6" Sweet Spot)
+                    // Multiplies volume by 1.6 to boost quiet parts
+                    let input = Math.min((rawVal / 255) * 1.6, 1.0);
+
+                    // CURVE
+                    // 1.5 keeps contrast but allows mids to exist
+                    const value = Math.pow(input, 1.5) * 255;
+
+                    // POSITION
+                    const angle = i * goldenAngle * (Math.PI / 180);
+                    const radius = 3.5 * Math.sqrt(i);
+                    const x = radius * Math.cos(angle);
+                    const y = radius * Math.sin(angle);
+                    
+                    // Z-AXIS (Dynamic Height)
+                    // idle breath + reaction
+                    const idle = Math.sin((time * 2) + (i * 0.05)) * 4; 
+                    const z = idle + ((value / 255) * 60); 
+                    
+                    dummy.position.set(x, y, z);
+                    dummy.lookAt(0, 0, 0);
+                    
+                    // SCALE (Needles)
+                    const scale = 0.5 + (value / 255) * 7;
+                    dummy.scale.set(1, 1, scale);
+                    
+                    dummy.updateMatrix();
+                    mesh.setMatrixAt(i, dummy.matrix);
+
+                    // COLOR (Gold Palette)
+                    const intensity = value / 255;
+                    color.setHSL(0.11, 1.0, 0.05 + (intensity * 0.6));
+                    mesh.setColorAt(i, color);
+                }
+                mesh.instanceMatrix.needsUpdate = true;
+                mesh.instanceColor.needsUpdate = true;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>

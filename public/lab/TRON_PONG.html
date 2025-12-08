@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TRON // PONG</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #ui {
+            position: absolute; top: 20px; width: 100%; text-align: center;
+            color: #00ffea; font-family: 'Courier New', monospace; pointer-events: none;
+            text-shadow: 0 0 10px #00ffea; z-index: 10;
+        }
+        /* Hidden inputs */
+        video, canvas { position: absolute; top: 0; left: 0; opacity: 0; pointer-events: none; }
+    </style>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+</head>
+<body>
+
+    <div id="ui">INITIALIZING GRID... WAVE TO START</div>
+    <video id="video" playsinline></video>
+    <!-- Processing Canvas -->
+    <canvas id="proc"></canvas>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- 1. THREE.JS SETUP ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.02); // Deep black fog
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 15); // Behind/Above player view
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // GRID FLOOR (Tron Style)
+        const gridHelper = new THREE.GridHelper(200, 50, 0x00ffea, 0x111111);
+        scene.add(gridHelper);
+
+        // THE BALL
+        const ballGeo = new THREE.SphereGeometry(0.8, 32, 32);
+        const ballMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const ball = new THREE.Mesh(ballGeo, ballMat);
+        scene.add(ball);
+        
+        // Ball Glow
+        const ballLight = new THREE.PointLight(0x00ffea, 100, 20);
+        ball.add(ballLight);
+
+        // FORCE FIELD VISUALIZER (Represents your body)
+        const particlesGeo = new THREE.BufferGeometry();
+        const pCount = 2000; // Max particles for body
+        const pPos = new Float32Array(pCount * 3);
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({ 
+            color: 0xff0055, size: 0.3, transparent: true, opacity: 0.8 
+        });
+        const bodyCloud = new THREE.Points(particlesGeo, pMat);
+        scene.add(bodyCloud);
+
+        // --- 2. GAME LOGIC ---
+        let ballVel = new THREE.Vector3(0, 0, 0);
+        let isPlaying = false;
+        const arenaWidth = 15;
+        const arenaHeight = 10;
+        const arenaDepth = 20; // How far back the court goes
+
+        function resetBall() {
+            ball.position.set(0, 5, -10); // Start far back
+            ballVel.set(0, 0, 0.2); // Move slowly towards player
+            isPlaying = false;
+            document.getElementById('ui').innerText = "WAVE TO SERVE";
+        }
+        resetBall();
+
+        // --- 3. PIXEL DIFF ENGINE ---
+        const video = document.getElementById('video');
+        const proc = document.getElementById('proc');
+        const ctx = proc.getContext('2d');
+        const resX = 64; const resY = 48; // Low Res Grid
+        proc.width = resX; proc.height = resY;
+        let prevFrame = null;
+        
+        // Store active body pixels in normalized coordinates
+        let activePixels = []; 
+
+        async function startCam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.onloadedmetadata = () => { video.play(); loop(); };
+            } catch(e) { console.log(e); }
+        }
+
+        function processVision() {
+            if (video.readyState !== 4) return;
+            
+            // Flip X for mirror effect logic
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, -resX, resY);
+            ctx.restore();
+
+            const frame = ctx.getImageData(0,0,resX,resY).data;
+            if(!prevFrame) { prevFrame = frame; return; }
+
+            activePixels = []; // Reset frame buffer
+            let pIdx = 0;
+
+            for(let i=0; i<frame.length; i+=4) {
+                // Green Channel Diff
+                const diff = Math.abs(frame[i+1] - prevFrame[i+1]);
+                
+                if(diff > 30) {
+                    const x = (i/4) % resX;
+                    const y = Math.floor((i/4) / resX);
+                    
+                    // Store normalized (0-1) coordinates
+                    // 1.0 - x/resX flips it back to mirror correctly for 3D mapping
+                    activePixels.push({ x: (x/resX), y: 1.0 - (y/resY) });
+                }
+                prevFrame[i+1] = frame[i+1]; // Only store green channel optimization
+            }
+        }
+
+        // --- 4. MAIN LOOP ---
+        function loop() {
+            processVision();
+
+            // UPDATE BODY CLOUD (Visuals)
+            const positions = bodyCloud.geometry.attributes.position.array;
+            let posIdx = 0;
+            
+            // Map 2D Pixels to 3D Wall at Z=0
+            // Width: -10 to 10, Height: 0 to 10
+            for(let i=0; i<activePixels.length && posIdx < pCount*3; i++) {
+                const p = activePixels[i];
+                
+                // Map 0..1 to Arena Coords
+                const wx = (p.x - 0.5) * 20; // -10 to 10
+                const wy = (p.y) * 10;       // 0 to 10
+                
+                positions[posIdx++] = wx;
+                positions[posIdx++] = wy;
+                positions[posIdx++] = 0; // At the player plane
+            }
+            
+            // Hide unused particles
+            for(let i=posIdx; i<pCount*3; i++) positions[i] = 0;
+            
+            bodyCloud.geometry.attributes.position.needsUpdate = true;
+
+            // BALL PHYSICS
+            if(!isPlaying && activePixels.length > 50) {
+                // Serve if enough motion
+                isPlaying = true;
+                ballVel.z = -0.5; // Shoot back
+                ballVel.x = (Math.random()-0.5)*0.2;
+                ballVel.y = (Math.random()-0.5)*0.2;
+                document.getElementById('ui').innerText = "";
+            }
+
+            if(isPlaying) {
+                ball.position.add(ballVel);
+
+                // 3D WALL COLLISIONS
+                // Floor
+                if(ball.position.y < 0.8) { ball.position.y = 0.8; ballVel.y *= -1; }
+                // Ceiling
+                if(ball.position.y > 15) { ballVel.y *= -1; }
+                // Walls
+                if(ball.position.x > 15 || ball.position.x < -15) { ballVel.x *= -1; }
+                // Back Wall (CPU)
+                if(ball.position.z < -30) { ballVel.z *= -1; }
+
+                // PLAYER COLLISION (Z > -1 && Z < 1)
+                // If ball is crossing the player plane
+                if(ball.position.z > -1 && ball.position.z < 1) {
+                    
+                    // Check against active pixels
+                    let hit = false;
+                    for(let p of activePixels) {
+                        const wx = (p.x - 0.5) * 20;
+                        const wy = (p.y) * 10;
+                        
+                        // Simple distance check in X/Y plane
+                        const dx = ball.position.x - wx;
+                        const dy = ball.position.y - wy;
+                        if(Math.sqrt(dx*dx + dy*dy) < 1.5) {
+                            hit = true;
+                            // Deflect
+                            ballVel.z = -Math.abs(ballVel.z) * 1.1; // Bounce back & speed up
+                            ballVel.x += dx * 0.1; // Add spin
+                            ballVel.y += dy * 0.1;
+                            
+                            // Flash Color
+                            ballLight.color.setHex(0xff0055);
+                            setTimeout(() => ballLight.color.setHex(0x00ffea), 200);
+                            break; 
+                        }
+                    }
+                }
+
+                // Miss condition
+                if(ball.position.z > 5) {
+                    resetBall();
+                }
+            }
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        startCam();
+    </script>
+</body>
+</html>

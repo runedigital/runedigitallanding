@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ABYSSAL_TERMINAL // ORGANIC_UI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300&display=swap');
+
+        body {
+            background-color: #000508; /* Deep Ocean Black */
+            color: #00ff9d; /* Bioluminescent Green */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Fira Code', monospace;
+            overflow: hidden;
+        }
+
+        /* THE CONTAINER */
+        .terminal-window {
+            width: 80%;
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        /* THE TEXT LINES */
+        .line {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            opacity: 0;
+            /* The Drift Animation */
+            animation: drift 8s ease-in-out infinite alternate;
+        }
+
+        /* APPLYING THE LIQUID FILTER */
+        .liquid-text {
+            filter: url(#water-ripple); /* Connects to the SVG below */
+        }
+
+        /* STAGGERED ENTRANCES */
+        .line:nth-child(1) { animation-delay: 0s; opacity: 1; }
+        .line:nth-child(2) { animation-delay: 0.5s; opacity: 0.8; }
+        .line:nth-child(3) { animation-delay: 1s; opacity: 0.6; }
+        .line:nth-child(4) { animation-delay: 1.5s; opacity: 0.4; }
+
+        /* KEYFRAMES FOR THE DRIFT */
+        @keyframes drift {
+            0% { transform: translateX(-5px) translateY(0px); }
+            100% { transform: translateX(5px) translateY(10px); }
+        }
+
+        /* THE FLASHLIGHT EFFECT (The Cursor) */
+        .abyss-light {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 255, 157, 0.15) 0%, rgba(0,0,0,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: screen;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- THE ATMOSPHERE -->
+    <div class="abyss-light" id="light"></div>
+
+    <div class="terminal-window">
+        <div class="line liquid-text">> INITIALIZING DEEP_DIVE...</div>
+        <div class="line liquid-text">> PRESSURE: 11,000 PSI</div>
+        <div class="line liquid-text">> SIGNAL STRENGTH: 12%</div>
+        <div class="line liquid-text">> UNKNOWN LIFEFORM DETECTED.</div>
+    </div>
+
+    <!-- THE MATH ENGINE (SVG FILTERS) -->
+    <!-- This sits invisible in the DOM but processes the pixels of the text -->
+    <svg style="display: none;">
+        <defs>
+            <filter id="water-ripple">
+                <!-- 
+                   feTurbulence: Generates "Perlin Noise" (Cloud/Water texture)
+                   baseFrequency: How "noisy" the water is (0.01 = big waves, 0.1 = static)
+                   numOctaves: Detail level
+                -->
+                <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
+                
+                <!-- 
+                   feDisplacementMap: Takes the noise and pushes the pixels of the text around 
+                   scale: How far the pixels move (30 = very liquid)
+                -->
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" />
+            </filter>
+        </defs>
+    </svg>
+
+    <script>
+        // Make the "flashlight" follow the mouse sluggishly
+        const light = document.getElementById('light');
+        
+        document.addEventListener('mousemove', (e) => {
+            // Simple delay logic for "underwater" feel
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            light.animate({
+                left: `${x}px`,
+                top: `${y}px`
+            }, { duration: 3000, fill: "forwards" }); 
+            // Duration 3000ms makes the light drag very slowly behind the mouse
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE Digital - Enterprise AI Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f1e 100%);
+            color: #fff;
+            font-family: 'Oswald', monospace;
+            overflow-x: hidden;
+        }
+        
+        .nav {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .nav a {
+            color: #00ffea;
+            text-decoration: none;
+            border: 1px solid #00ffea;
+            padding: 8px 15px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav a:hover {
+            background: #00ffea;
+            color: #000;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .logo svg {
+            filter: drop-shadow(0 0 20px #00ffea);
+        }
+        
+        h1 {
+            font-size: 48px;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00ffea;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: #999;
+            letter-spacing: 2px;
+            margin-bottom: 60px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 100px;
+        }
+        
+        .btn {
+            padding: 40px 60px;
+            font-size: 16px;
+            letter-spacing: 3px;
+            font-weight: 600;
+            font-family: 'Oswald', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid;
+            background: transparent;
+        }
+        
+        .btn-primary {
+            color: #00ffea;
+            border-color: #00ffea;
+        }
+        
+        .btn-primary:hover {
+            background: #00ffea;
+            color: #000;
+        }
+        
+        .btn-secondary {
+            color: #fff;
+            border-color: #fff;
+        }
+        
+        .btn-secondary:hover {
+            background: #fff;
+            color: #000;
+        }
+        
+        .about-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid #00ffea;
+            border-bottom: 1px solid #00ffea;
+            padding: 80px 40px;
+            margin-top: 60px;
+        }
+        
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .about-section h2 {
+            font-size: 32px;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            color: #00ffea;
+        }
+        
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .btn {
+                padding: 30px 40px;
+                font-size: 14px;
+            }
+        }
+        
+        .about-item h3 {
+            color: #ff0055;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            font-size: 14px;
+        }
+        
+        .about-item p {
+            color: #aaa;
+            line-height: 1.8;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .research-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            border: 1px solid #00ffea;
+            color: #00ffea;
+            text-decoration: none;
+            letter-spacing: 1px;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+        
+        .research-link:hover {
+            background: #00ffea;
+            color: #000;
+        }
+        
+        .footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: 80px;
+            color: #666;
+        }
+        
+        .footer a {
+            color: #00ffea;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/lab/NEURAL_HUB.html" target="_blank">RESEARCH HUB</a>
+        <a href="https://linkedin.com/in/your-profile" target="_blank">LINKEDIN</a>
+    </div>
+    
+    <div class="hero">
+        <div class="logo">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                <path d="M30 20 L10 50 L30 80 H50 L70 50 L50 20 H30 Z" fill="none" stroke="white" stroke-width="4" />
+                <path d="M35 20 L15 50 L35 80" stroke="#00ffea" stroke-width="4" style="mix-blend-mode: screen;" />
+                <circle cx="40" cy="50" r="4" fill="#ff0055" />
+            </svg>
+        </div>
+        
+        <h1>RUNE DIGITAL</h1>
+        <p class="tagline">ENTERPRISE AI PLATFORM // BUILT ON GOOGLE CLOUD</p>
+        
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="window.location.href='/'; return false;">SHOWROOM</button>
+            <button class="btn btn-secondary" onclick="window.location.href='/lab/NEURAL_HUB.html'; return false;">RESEARCH HUB</button>
+        </div>
+    </div>
+    
+    <div class="about-section">
+        <div class="about-content">
+            <h2>ABOUT RUNE</h2>
+            
+            <div class="about-grid">
+                <div class="about-item">
+                    <h3>// MULTI-DOMAIN AI SYSTEM</h3>
+                    <p>RUNE orchestrates 11+ specialized AI agents across creative asset generation, business intelligence, and strategic decision-making. Three-tier architecture spans from premium decision models to specialized downstream processors.</p>
+                </div>
+                
+                <div class="about-item">
+                    <h3>// VERTEX AI NATIVE</h3>
+                    <p>Entire platform built exclusively on Google Cloud Vertex AI and Gemini 1.5 Pro. Multi-modal capabilities enable vision + text analysis for secondary market asset valuation, competitive intelligence, and real-time market positioning.</p>
+                </div>
+                
+                <div class="about-item">
+                    <h3>// PRODUCTION READY</h3>
+                    <p>231+ documented decision cycles with full audit trails. Deployed on Cloud Run with BigQuery analytics. Currently processing live market data for Cash Converters secondary jewellery valuation pipeline.</p>
+                </div>
+                
+                <div class="about-item">
+                    <h3>// REVENUE GENERATING</h3>
+                    <p>Three revenue streams: SaaS platform ($50K-$5M), Digital asset library ($50K-$1.5M), and Enterprise consulting ($0-$2.4M). Projected $10.7M Year 3 with efficient Cloud operations ($0/month agent overhead).</p>
+                </div>
+            </div>
+            
+            <p style="color: #888; line-height: 1.8; margin-bottom: 30px; font-size: 13px; font-family: 'Courier New', monospace;">
+                RUNE represents a new category of AI orchestration: not a tool, not a service, but a self-organizing system that generates competitive advantage through collaborative multi-agent reasoning. The platform learns from 847+ documented AI startup failure patterns to deliver resilience-through-pattern-recognition rather than escape-through-statistics.
+            </p>
+            
+            <a href="/lab/NEURAL_HUB.html" class="research-link">EXPLORE RESEARCH HUB →</a>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>RUNE Digital Studio © 2025</p>
+        <p style="margin-top: 15px;">
+            <a href="https://linkedin.com/in/your-profile" target="_blank">LINKEDIN</a>
+            <span style="color: #333;">•</span>
+            <a href="mailto:contact@runedigitalstudio.com">CONTACT</a>
+            <span style="color: #333;">•</span>
+            <a href="/lab/NEURAL_HUB.html" target="_blank">RESEARCH</a>
+        </p>
+        <p style="margin-top: 20px; color: #666; font-size: 11px;">Built on Google Cloud Platform • Powered by Vertex AI & Gemini 1.5 Pro • Deployed via Cloud Run</p>
+    </div>
+    
+    <script>
+        // Update LinkedIn URL - replace with actual
+        document.querySelectorAll('a[href*="linkedin.com/in/your-profile"]').forEach(el => {
+            el.href = 'https://linkedin.com/in/your-actual-profile';
+        });
+    </script>
+</body>
+</html>

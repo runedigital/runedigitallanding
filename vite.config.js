@@ -12,6 +12,14 @@ export default defineConfig({
       '.js': 'application/javascript',
       '.css': 'text/css',
       '.html': 'text/html'
+    },
+    fs: {
+      strict: false
+    }
+  },
+  build: {
+    rollupOptions: {
+      external: []
     }
   }
 })

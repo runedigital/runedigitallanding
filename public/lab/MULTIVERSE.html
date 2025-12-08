@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RUNE // MULTIVERSE [FINAL]</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
+
+        body { 
+            margin: 0; overflow: hidden; background: #000; 
+            font-family: 'Rajdhani', sans-serif; 
+            cursor: none !important; /* KILL THE MOUSE */
+        }
+
+        /* HUD LAYER */
+        #hud {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 40px; box-sizing: border-box;
+        }
+
+        .header { display: flex; justify-content: space-between; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        .footer { display: flex; justify-content: space-between; align-items: flex-end; color: #fff; }
+
+        h1 { margin: 0; font-size: 1.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .mono { font-family: monospace; font-size: 0.8rem; color: #666; }
+        
+        #reality-indicator {
+            font-size: 4rem; font-weight: bold; text-align: center;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            opacity: 0.1; transition: color 0.5s;
+        }
+
+        .bar-container { width: 200px; height: 2px; background: #333; margin-bottom: 5px; position: relative; }
+        .bar-fill { height: 100%; background: #fff; width: 0%; position: absolute; top: 0; left: 0; }
+
+        #scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 51%);
+            background-size: 100% 4px; pointer-events: none; z-index: 5; opacity: 0.3;
+        }
+
+        /* CURSOR LAYER */
+        #cursor-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 20; pointer-events: none;
+        }
+    </style>
+
+    <!-- THREE.JS + POST PROCESSING -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="scan-line"></div>
+
+    <!-- CURSOR CANVAS -->
+    <canvas id="cursor-layer"></canvas>
+
+    <div id="hud">
+        <div class="header">
+            <div>
+                <h1>Quantum Tuner</h1>
+                <div class="mono">OBSERVER_ID: RUNE_DIGITAL</div>
+            </div>
+            <div class="mono" id="coords">XYZ: 0.00 / 0.00</div>
+        </div>
+        
+        <div id="reality-indicator">TIMELINE A</div>
+
+        <div class="footer">
+            <div>
+                <div class="mono">PROBABILITY FIELD</div>
+                <div class="bar-container"><div class="bar-fill" id="prob-bar"></div></div>
+            </div>
+            <div class="mono">WAVE FUNCTION: UNSTABLE</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+
+        // 1. SETUP THREE.JS
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.002);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+        const renderer = new THREE.WebGLRenderer({ antialias: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        // 2. SETUP CURSOR CANVAS
+        const cCanvas = document.getElementById('cursor-layer');
+        const ctx = cCanvas.getContext('2d');
+
+        // 3. POST PROCESSING
+        const composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.strength = 2.0; bloomPass.radius = 0.5;
+        composer.addPass(bloomPass);
+        const glitchPass = new GlitchPass();
+        glitchPass.goWild = false; glitchPass.enabled = false; 
+        composer.addPass(glitchPass);
+
+        // 4. THE REALITIES
+        // A: ARCHITECT
+        const groupA = new THREE.Group();
+        const geoA = new THREE.BoxGeometry(10, 10, 10, 4, 4, 4);
+        const matA = new THREE.MeshBasicMaterial({ color: 0x00ffea, wireframe: true, transparent: true, opacity: 0 });
+        const meshA = new THREE.Mesh(geoA, matA);
+        groupA.add(meshA);
+        const partGeoA = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        for(let i=0; i<50; i++) {
+            const m = new THREE.Mesh(partGeoA, matA);
+            m.position.set((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+            groupA.add(m);
+        }
+        scene.add(groupA);
+
+        // B: CHAOS
+        const groupB = new THREE.Group();
+        const geoB = new THREE.IcosahedronGeometry(9, 1);
+        const matB = new THREE.MeshBasicMaterial({ color: 0xff0055, wireframe: true, transparent: true, opacity: 0 });
+        const meshB = new THREE.Mesh(geoB, matB);
+        groupB.add(meshB);
+        const lineGeo = new THREE.BufferGeometry();
+        const linePos = [];
+        for(let i=0; i<100; i++) { linePos.push(0,0,0); linePos.push((Math.random()-0.5)*30, (Math.random()-0.5)*30, (Math.random()-0.5)*30); }
+        lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xff0055, transparent: true, opacity: 0 });
+        const meshB_Lines = new THREE.LineSegments(lineGeo, lineMat);
+        groupB.add(meshB_Lines);
+        scene.add(groupB);
+
+        // C: DIVINE
+        const groupC = new THREE.Group();
+        const geoC = new THREE.TorusKnotGeometry(6, 1.5, 100, 16);
+        const matC = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true, transparent: true, opacity: 0 });
+        const meshC = new THREE.Mesh(geoC, matC);
+        groupC.add(meshC);
+        const ringGeo = new THREE.TorusGeometry(12, 0.2, 16, 100);
+        const ringMesh = new THREE.Mesh(ringGeo, matC);
+        groupC.add(ringMesh);
+        scene.add(groupC);
+
+        // 5. VARIABLES
+        let mouseX = 0; // Smoothed
+        let rawX = 0; 
+        let rawY = 0;
+        let targetX = 0.5;
+        let activeColor = '#00ffea';
+        
+        const indicator = document.getElementById('reality-indicator');
+        const bar = document.getElementById('prob-bar');
+        const coords = document.getElementById('coords');
+
+        document.addEventListener('mousemove', (e) => {
+            rawX = e.clientX;
+            rawY = e.clientY;
+            targetX = e.clientX / window.innerWidth;
+            coords.innerText = `XYZ: ${targetX.toFixed(4)} / ${(e.clientY/window.innerHeight).toFixed(4)}`;
+        });
+
+        // 6. RESIZE
+        function resize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            composer.setSize(width, height);
+            
+            cCanvas.width = width;
+            cCanvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // 7. RENDER LOOPS
+        const clock = new THREE.Clock();
+
+        function drawCursor() {
+            ctx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+            
+            // The Vertical Needle
+            ctx.strokeStyle = activeColor;
+            ctx.lineWidth = 1;
+            
+            // Fade at top and bottom
+            let gradient = ctx.createLinearGradient(0, 0, 0, cCanvas.height);
+            gradient.addColorStop(0, "rgba(0,0,0,0)");
+            gradient.addColorStop(0.2, activeColor);
+            gradient.addColorStop(0.8, activeColor);
+            gradient.addColorStop(1, "rgba(0,0,0,0)");
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(rawX, 0, 1, cCanvas.height); // Draw line
+
+            // The Center Bracket (Follows Mouse)
+            ctx.strokeStyle = activeColor;
+            ctx.lineWidth = 1.5;
+            const size = 30;
+            const gap = 10;
+
+            ctx.beginPath();
+            // Top Left
+            ctx.moveTo(rawX - size, rawY - size); ctx.lineTo(rawX - gap, rawY - size); ctx.lineTo(rawX - gap, rawY - gap);
+            // Top Right
+            ctx.moveTo(rawX + size, rawY - size); ctx.lineTo(rawX + gap, rawY - size); ctx.lineTo(rawX + gap, rawY - gap);
+            // Bottom Left
+            ctx.moveTo(rawX - size, rawY + size); ctx.lineTo(rawX - gap, rawY + size); ctx.lineTo(rawX - gap, rawY + gap);
+            // Bottom Right
+            ctx.moveTo(rawX + size, rawY + size); ctx.lineTo(rawX + gap, rawY + size); ctx.lineTo(rawX + gap, rawY + gap);
+            ctx.stroke();
+
+            // Coordinates next to cursor
+            ctx.font = "10px monospace";
+            ctx.fillStyle = activeColor;
+            ctx.fillText(`FREQ: ${(mouseX * 100).toFixed(1)}Hz`, rawX + 15, rawY);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+
+            // Smooth Mouse
+            mouseX += (targetX - mouseX) * 0.1;
+
+            // Opacity Logic
+            let opacityA = Math.max(0, 1 - Math.abs(mouseX - 0.15) * 3);
+            let opacityB = Math.max(0, 1 - Math.abs(mouseX - 0.5) * 3);
+            let opacityC = Math.max(0, 1 - Math.abs(mouseX - 0.85) * 3);
+
+            // REALITY A
+            groupA.rotation.y += 0.002; groupA.rotation.x += 0.001;
+            matA.opacity = opacityA; groupA.scale.setScalar(0.8 + opacityA * 0.2);
+            
+            // REALITY B
+            groupB.rotation.y -= 0.01; groupB.rotation.z += 0.01;
+            matB.opacity = opacityB; lineMat.opacity = opacityB * 0.5;
+            meshB.scale.setScalar(0.8 + Math.sin(time*10)*0.05 * opacityB);
+
+            // REALITY C
+            groupC.rotation.x += 0.005;
+            matC.opacity = opacityC; ringMesh.rotation.x = Math.PI / 2; ringMesh.rotation.y += 0.01;
+
+            // UPDATE HUD & COLOR
+            bar.style.width = `${mouseX * 100}%`;
+            
+            if (mouseX < 0.33) {
+                indicator.innerText = "ARCHITECT";
+                activeColor = "#00ffea";
+                bloomPass.strength = 1.5 + (Math.random()*0.5);
+                glitchPass.enabled = false;
+            } else if (mouseX > 0.66) {
+                indicator.innerText = "DIVINITY";
+                activeColor = "#d4af37";
+                bloomPass.strength = 2.0;
+                glitchPass.enabled = false;
+            } else {
+                indicator.innerText = "ENTROPY";
+                activeColor = "#ff0055";
+                bloomPass.strength = 3.0 + Math.sin(time*20); 
+                if(Math.random() > 0.95) glitchPass.enabled = true; else glitchPass.enabled = false;
+            }
+
+            // CSS Color Update
+            indicator.style.color = activeColor;
+
+            // Camera Shake
+            const chaos = opacityB; 
+            camera.position.x = (Math.random()-0.5) * chaos * 0.5;
+            camera.position.y = (Math.random()-0.5) * chaos * 0.5;
+            camera.lookAt(0,0,0);
+
+            composer.render();
+            drawCursor();
+        }
+
+        animate();
+    </script>
+</body>
+</html>
