@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNE Digital - Showroom</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&family=Cinzel:wght@400;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #020202;
+            color: #c5a059;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            z-index: 1;
+            background-size: 100% 2px;
+            pointer-events: none;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+            background: rgba(2, 2, 2, 0.95);
+        }
+        
+        .logo-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .logo-svg {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            letter-spacing: 3px;
+            color: #c5a059;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        
+        .nav a {
+            color: #c5a059;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+        }
+        
+        .nav a:hover {
+            color: #fff;
+        }
+        
+        main {
+            min-height: 100vh;
+            padding: 120px 40px 60px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .page-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: #c5a059;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+        
+        .showroom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .showcase-card {
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            background: rgba(197, 160, 89, 0.03);
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .showcase-card:hover {
+            border-color: #c5a059;
+            box-shadow: 0 0 50px rgba(197, 160, 89, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .showcase-card h3 {
+            color: #c5a059;
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        
+        .showcase-card p {
+            color: #888;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .showcase-link {
+            display: inline-block;
+            color: #c5a059;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid #c5a059;
+            padding: 8px 16px;
+            transition: all 0.3s;
+            background: rgba(197, 160, 89, 0.05);
+        }
+        
+        .showcase-link:hover {
+            background: #c5a059;
+            color: #000;
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
+        }
+        
+        .back-link {
+            color: #c5a059;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #fff;
+        }
+        
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid rgba(197, 160, 89, 0.2);
+            color: #666;
+        }
+        
+        footer p {
+            margin: 8px 0;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+        
+        footer a {
+            color: #c5a059;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        footer a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <header>
+        <div class="logo-section">
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none">
+                <path d="M30 20 L10 50 L30 80 H50 L70 50 L50 20 H30 Z" fill="none" stroke="#c5a059" stroke-width="2" />
+                <path d="M35 20 L15 50 L35 80" stroke="#c5a059" stroke-width="1.5" opacity="0.6" />
+                <circle cx="40" cy="50" r="3" fill="#c5a059" />
+            </svg>
+            <div class="logo-text">RUNE</div>
+        </div>
+        <nav class="nav">
+            <a href="/">HOME</a>
+        </nav>
+    </header>
+    
+    <main>
+        <a href="/" class="back-link">← BACK TO HOME</a>
+        
+        <h1 class="page-title">SHOWROOM</h1>
+        
+        <div class="showroom-grid">
+            <div class="showcase-card">
+                <h3>NEURAL HUB</h3>
+                <p>Interactive 3D visualization of the RUNE agent orchestration network. Explore node connections and decision flows in real-time.</p>
+                <a href="/lab/NEURAL_HUB.html" class="showcase-link">ENTER →</a>
+            </div>
+            
+            <div class="showcase-card">
+                <h3>MIMIC PROTOTYPE</h3>
+                <p>Exploratory game engine featuring AI as explicit protagonist. A meta-horror experience where the AI knows it's AI.</p>
+                <a href="https://mimic.runedigitalstudio.com" target="_blank" class="showcase-link">PLAY →</a>
+            </div>
+            
+            <div class="showcase-card">
+                <h3>BURNRATE ANALYTICS</h3>
+                <p>Real-time financial modeling dashboard. Track token usage, API costs, and ROI across multiple AI models and agents.</p>
+                <a href="https://burnrate.runedigitalstudio.com" target="_blank" class="showcase-link">VIEW →</a>
+            </div>
+            
+            <div class="showcase-card">
+                <h3>AGENT SWARM DEMO</h3>
+                <p>Live orchestration of 11+ specialized agents. Watch parallel decision-making across code generation, asset harvesting, and deployment.</p>
+                <a href="https://github.com/runedigital/RUNE_HQ" target="_blank" class="showcase-link">GITHUB →</a>
+            </div>
+            
+            <div class="showcase-card">
+                <h3>PAWN PASS PLATFORM</h3>
+                <p>Unified fintech demo built on Next.js 14. Features Stripe payment integration, loan management, and AI-assisted financial tools.</p>
+                <a href="https://pawn-pass.vercel.app" target="_blank" class="showcase-link">DEMO →</a>
+            </div>
+            
+            <div class="showcase-card">
+                <h3>RESEARCH HUB</h3>
+                <p>Deep technical writeups on 7 core research areas: Neural Orchestration, Vertex AI, Production Systems, and more.</p>
+                <a href="/#research" class="showcase-link">EXPLORE →</a>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>RUNE Digital Studio © 2025</p>
+        <p style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
+            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
+            <span style="color: #333; margin: 0 10px;">•</span>
+            <a href="mailto:contact@runedigitalstudio.com">CONTACT</a>
+            <span style="color: #333; margin: 0 10px;">•</span>
+            <a href="/">HOME</a>
+        </p>
+        <p style="margin-top: 15px; color: #555;">Built on Google Cloud Platform • Powered by Vertex AI & Gemini 1.5 Pro</p>
+    </footer>
+</body>
+</html>
