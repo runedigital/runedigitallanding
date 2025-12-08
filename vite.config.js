@@ -6,5 +6,12 @@ export default defineConfig({
   base: '',
   resolve: {
     dedupe: ['react', 'react-dom', 'three', '@react-three/fiber']
+  },
+  server: {
+    mime: {
+      '.js': 'application/javascript',
+      '.css': 'text/css',
+      '.html': 'text/html'
+    }
   }
 })

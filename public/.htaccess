@@ -1,0 +1,26 @@
+<IfModule mod_mime.c>
+  AddType text/css .css
+  AddType application/javascript .js
+  AddType application/javascript .mjs
+  AddEncoding gzip .css.gz
+  AddEncoding gzip .js.gz
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css)$">
+    Header set Content-Type "application/javascript"
+  </FilesMatch>
+  <FilesMatch "\.css$">
+    Header set Content-Type "text/css"
+  </FilesMatch>
+</IfModule>
+
+# Handle SPA routing
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . index.html [L]
+</IfModule>
