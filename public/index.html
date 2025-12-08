@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUNE Digital - Research & Projects Hub</title>
+    <title>RUNE Digital - Artifact Entry</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;700&family=Cinzel:wght@400;700&display=swap');
         
@@ -14,6 +14,10 @@
             color: #c5a059;
             font-family: 'JetBrains Mono', monospace;
             overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         
         .scanlines {
@@ -28,297 +32,228 @@
             pointer-events: none;
         }
         
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 30px;
-            z-index: 50;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-            background: rgba(2, 2, 2, 0.95);
-        }
-        
-        .logo-section {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .logo-svg {
-            width: 40px;
-            height: 40px;
-        }
-        
-        .logo-text {
-            font-family: 'Cinzel', serif;
-            font-size: 16px;
-            letter-spacing: 3px;
-            color: #c5a059;
-        }
-        
-        .nav {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-        
-        .nav a {
-            color: #c5a059;
-            text-decoration: none;
-            font-size: 11px;
-            letter-spacing: 2px;
-            transition: color 0.3s;
-        }
-        
-        .nav a:hover {
-            color: #fff;
-        }
-        
-        .nav-showroom {
-            border: 1px solid rgba(197, 160, 89, 0.5);
-            padding: 8px 14px;
-            font-size: 10px;
-            background: rgba(197, 160, 89, 0.05);
-            transition: all 0.3s;
-        }
-        
-        .nav-showroom:hover {
-            background: #c5a059;
-            color: #000;
-            border-color: #c5a059;
-        }
-        
-        main {
+        .artifact-container {
             position: relative;
-            z-index: 2;
-            padding: 100px 40px 60px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
         }
         
-        .page-title {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            color: #c5a059;
-            margin-bottom: 50px;
-            letter-spacing: 4px;
-            text-align: center;
-        }
-        
-        .research-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .research-card {
-            border: 1px solid rgba(197, 160, 89, 0.3);
-            background: rgba(197, 160, 89, 0.03);
-            padding: 40px;
-            transition: all 0.3s ease;
+        .artifact {
+            width: 300px;
+            height: 300px;
             cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
             position: relative;
-            overflow: hidden;
+            transition: transform 0.3s;
         }
         
-        .research-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        .artifact:hover {
+            transform: scale(1.05);
+        }
+        
+        .artifact-core {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.1), transparent);
-            transition: left 0.5s ease;
-            z-index: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .research-card:hover::before {
-            left: 100%;
+        /* Shatter effect - fragments */
+        .fragment {
+            position: absolute;
+            background: rgba(197, 160, 89, 0.3);
+            border: 1px solid #c5a059;
+            opacity: 1;
         }
         
-        .research-card:hover {
-            border-color: #c5a059;
-            box-shadow: 0 0 50px rgba(197, 160, 89, 0.2);
-            transform: translateY(-5px);
-            background: rgba(197, 160, 89, 0.08);
+        .artifact.shattered .fragment {
+            animation: shatter 0.8s ease-out forwards;
         }
         
-        .research-card h3 {
+        @keyframes shatter {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0.3);
+            }
+        }
+        
+        .artifact-inner {
+            width: 250px;
+            height: 250px;
+            border: 2px solid #c5a059;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at 30% 30%, rgba(197, 160, 89, 0.1), transparent);
+            box-shadow: inset 0 0 30px rgba(197, 160, 89, 0.2);
+        }
+        
+        .artifact.shattered .artifact-inner {
+            animation: fadeOut 0.4s ease-out forwards;
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .artifact-symbol {
+            font-size: 120px;
             color: #c5a059;
-            font-family: 'Cinzel', serif;
-            font-size: 18px;
+            opacity: 0.8;
+            text-shadow: 0 0 20px rgba(197, 160, 89, 0.5);
+        }
+        
+        .artifact-label {
+            font-size: 14px;
             letter-spacing: 2px;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
-            text-transform: uppercase;
-        }
-        
-        .research-card p {
-            color: #888;
-            font-size: 12px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .research-card-link {
-            display: inline-block;
             color: #c5a059;
+            opacity: 0.6;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .artifact.shattered .artifact-label {
+            opacity: 0;
+        }
+        
+        .initialize-btn {
+            background: transparent;
+            border: 2px solid #c5a059;
+            color: #c5a059;
+            padding: 15px 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
             text-decoration: none;
+            display: inline-block;
+        }
+        
+        .artifact.shattered ~ .initialize-btn,
+        .initialize-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .initialize-btn:hover {
+            background: #c5a059;
+            color: #020202;
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.5);
+        }
+        
+        .instruction {
+            color: rgba(197, 160, 89, 0.6);
             font-size: 11px;
             letter-spacing: 1px;
-            text-transform: uppercase;
-            border: 1px solid #c5a059;
-            padding: 8px 16px;
-            transition: all 0.3s;
-            background: rgba(197, 160, 89, 0.05);
-            position: relative;
-            z-index: 1;
+            opacity: 0;
+            animation: fadeInInstruction 0.5s ease-out 0.3s forwards;
         }
         
-        .research-card-link:hover {
-            background: #c5a059;
-            color: #000;
-            box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
-        }
-        
-        footer {
-            padding: 40px;
-            text-align: center;
-            border-top: 1px solid rgba(197, 160, 89, 0.2);
-            color: #666;
-        }
-        
-        footer p {
-            margin: 8px 0;
-            font-size: 10px;
-            letter-spacing: 1px;
-        }
-        
-        footer a {
-            color: #c5a059;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        footer a:hover {
-            color: #fff;
-        }
-        
-        @media (max-width: 768px) {
-            .page-title {
-                font-size: 2rem;
-            }
-            
-            .research-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .research-card {
-                padding: 30px;
+        @keyframes fadeInInstruction {
+            to {
+                opacity: 1;
             }
         }
+        
+        .artifact.shattered ~ .instruction {
+            animation: fadeOutInstruction 0.3s ease-out forwards;
+        }
+        
+        @keyframes fadeOutInstruction {
+            to {
+                opacity: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
     <div class="scanlines"></div>
     
-    <header>
-        <div class="logo-section">
-            <svg class="logo-svg" viewBox="0 0 100 100" fill="none">
-                <path d="M30 20 L10 50 L30 80 H50 L70 50 L50 20 H30 Z" fill="none" stroke="#c5a059" stroke-width="2" />
-                <path d="M35 20 L15 50 L35 80" stroke="#c5a059" stroke-width="1.5" opacity="0.6" />
-                <circle cx="40" cy="50" r="3" fill="#c5a059" />
-            </svg>
-            <div class="logo-text">RUNE</div>
+    <div class="artifact-container">
+        <div class="artifact" id="mainArtifact">
+            <div class="artifact-core">
+                <div class="artifact-inner">
+                    <div class="artifact-symbol">◇</div>
+                </div>
+            </div>
+            <div class="artifact-label">Click to Initialize</div>
         </div>
-        <nav class="nav">
-            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
-            <a href="/showroom/" class="nav-showroom">SHOWROOM</a>
-        </nav>
-    </header>
-    
-    <main>
-        <h1 class="page-title">RESEARCH CENTER</h1>
         
-        <div class="research-grid">
-            <a href="/lab/NEURAL_HUB.html" class="research-card">
-                <h3>NEURAL HUB</h3>
-                <p>Interactive 3D visualization of the RUNE agent orchestration network. Explore node connections and decision flows in real-time.</p>
-                <span class="research-card-link">ENTER →</span>
-            </a>
-            
-            <a href="/cmd-school/" class="research-card">
-                <h3>CMD SCHOOL</h3>
-                <p>Command interface training system. Learn the RUNE orchestration commands and explore the operational interface.</p>
-                <span class="research-card-link">LAUNCH →</span>
-            </a>
-            
-            <a href="/showroom/" class="research-card">
-                <h3>SHOWROOM</h3>
-                <p>Showcase of production assets and live projects. Interactive demos, dashboards, and deployed systems.</p>
-                <span class="research-card-link">VIEW →</span>
-            </a>
-            
-            <a href="/research/neural-orchestration/" class="research-card">
-                <h3>NEURAL ORCHESTRATION</h3>
-                <p>Multi-tier AI coordination with 231+ documented decisions</p>
-                <span class="research-card-link">EXPLORE →</span>
-            </a>
-            
-            <a href="/research/vertex-ai-native/" class="research-card">
-                <h3>VERTEX AI NATIVE</h3>
-                <p>Gemini 1.5 Pro multi-modal vision + text analysis</p>
-                <span class="research-card-link">EXPLORE →</span>
-            </a>
-            
-            <a href="/research/production-systems/" class="research-card">
-                <h3>PRODUCTION SYSTEMS</h3>
-                <p>Cloud Run deployment with BigQuery analytics</p>
-                <span class="research-card-link">EXPLORE →</span>
-            </a>
-            
-            <a href="/research/knowledge-distillation/" class="research-card">
-                <h3>KNOWLEDGE DISTILLATION</h3>
-                <p>Foundation model fine-tuning & synthetic data generation</p>
-                <span class="research-card-link">EXPLORE →</span>
-            </a>
-            
-            <a href="/research/multimodal/" class="research-card">
-                <h3>MULTI-MODAL LEARNING</h3>
-                <p>Vision + text fusion for parallel decision-making</p>
-                <span class="research-card-link">EXPLORE →</span>
-            </a>
-            
-            <a href="/research/agent-specialization/" class="research-card">
-                <h3>AGENT SPECIALIZATION</h3>
-                <p>11+ domain-specific agents with three-tier hierarchy</p>
-                <span class="research-card-link">EXPLORE →</span>
-            </a>
-        </div>
-    </main>
+        <p class="instruction">CLICK THE ARTIFACT TO PROCEED →</p>
+        
+        <a href="research-hub.html" class="initialize-btn">INITIALIZE SYSTEM</a>
+    </div>
     
-    <footer>
-        <p>RUNE Digital Studio © 2025</p>
-        <p style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-            <a href="https://www.linkedin.com/company/rune-digital/" target="_blank">LINKEDIN</a>
-            <span style="color: #333; margin: 0 10px;">•</span>
-            <a href="mailto:contact@runedigitalstudio.com">CONTACT</a>
-            <span style="color: #333; margin: 0 10px;">•</span>
-            <a href="/showroom/">SHOWROOM</a>
-        </p>
-        <p style="margin-top: 15px; color: #555;">Built on Google Cloud Platform • Powered by Vertex AI & Gemini 1.5 Pro</p>
-    </footer>
+    <script>
+        const artifact = document.getElementById('mainArtifact');
+        const initBtn = document.querySelector('.initialize-btn');
+        
+        function createShatterEffect() {
+            const core = artifact.querySelector('.artifact-core');
+            const rect = core.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Create fragments
+            const fragmentCount = 12;
+            for (let i = 0; i < fragmentCount; i++) {
+                const fragment = document.createElement('div');
+                fragment.className = 'fragment';
+                
+                const size = Math.random() * 40 + 20;
+                fragment.style.width = size + 'px';
+                fragment.style.height = size + 'px';
+                
+                const angle = (i / fragmentCount) * Math.PI * 2;
+                const distance = Math.random() * 200 + 150;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                fragment.style.setProperty('--tx', tx + 'px');
+                fragment.style.setProperty('--ty', ty + 'px');
+                
+                const randomX = (Math.random() - 0.5) * 100;
+                const randomY = (Math.random() - 0.5) * 100;
+                fragment.style.left = (centerX - rect.left + randomX) + 'px';
+                fragment.style.top = (centerY - rect.top + randomY) + 'px';
+                
+                core.appendChild(fragment);
+            }
+            
+            // Trigger animation
+            setTimeout(() => {
+                artifact.classList.add('shattered');
+                initBtn.classList.add('visible');
+            }, 50);
+        }
+        
+        artifact.addEventListener('click', () => {
+            if (!artifact.classList.contains('shattered')) {
+                createShatterEffect();
+            }
+        });
+        
+        // Also allow clicking the button to proceed
+        initBtn.addEventListener('click', (e) => {
+            if (initBtn.classList.contains('visible')) {
+                window.location.href = 'research-hub.html';
+            }
+        });
+    </script>
 </body>
 </html>
