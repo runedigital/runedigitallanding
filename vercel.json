@@ -16,19 +16,6 @@
       ]
     },
     {
-      "source": "/lab/assets/(.*)",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
       "source": "/(.*)\\.css",
       "headers": [
         {
@@ -53,21 +40,8 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
-    },
-    {
-      "source": "/(.*)\\.mjs",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript; charset=utf-8"
-        }
-      ]
     }
   ],
-  "routes": [
-    {
-      "src": "^/lab/.*",
-      "dest": "/$0"
-    }
-  ]
+  "public": true
 }
+
