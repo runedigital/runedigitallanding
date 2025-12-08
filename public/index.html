@@ -63,6 +63,7 @@
         .nav {
             display: flex;
             gap: 30px;
+            align-items: center;
         }
         
         .nav a {
@@ -75,6 +76,20 @@
         
         .nav a:hover {
             color: #fff;
+        }
+        
+        .nav-showroom {
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            padding: 8px 14px;
+            font-size: 10px;
+            background: rgba(197, 160, 89, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .nav-showroom:hover {
+            background: #c5a059;
+            color: #000;
+            border-color: #c5a059;
         }
         
         .hero-section {
@@ -131,6 +146,18 @@
             background: #c5a059;
             color: #000;
             box-shadow: 0 0 30px rgba(197, 160, 89, 0.4);
+        }
+        
+        .btn-primary {
+            padding: 20px 50px;
+            border: 2px solid #00ffea;
+            color: #00ffea;
+        }
+        
+        .btn-primary:hover {
+            background: #00ffea;
+            color: #000;
+            box-shadow: 0 0 40px rgba(0, 255, 234, 0.5);
         }
         
         .research-section {
@@ -352,8 +379,8 @@
             <div class="logo-text">RUNE</div>
         </div>
         <nav class="nav">
-            <a href="#research">RESEARCH HUB</a>
             <a href="https://github.com/runedigital/RUNE_HQ" target="_blank">GITHUB</a>
+            <a href="/showroom/" class="nav-showroom">SHOWROOM</a>
         </nav>
     </header>
     
@@ -363,8 +390,7 @@
             <p class="hero-subtitle">ENTERPRISE AI PLATFORM // BUILT ON GOOGLE CLOUD</p>
             
             <div class="button-row">
-                <button class="btn" onclick="window.location.href='/'; return false;">ENTER SHOWROOM</button>
-                <button class="btn" onclick="document.getElementById('research').scrollIntoView({behavior:'smooth'}); return false;">RESEARCH BRAIN</button>
+                <button class="btn btn-primary" onclick="document.getElementById('research').scrollIntoView({behavior:'smooth'}); return false;">EXPLORE RESEARCH →</button>
             </div>
         </section>
         
