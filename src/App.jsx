@@ -14,6 +14,9 @@ import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocess
 import * as THREE from 'three'
 import GateKeeper from './GateKeeper'
 import OrchestrationDemo from './OrchestrationDemo'
+import Products from './Products'
+import Team from './Team'
+import Platform from './Platform'
 
 // --- RUNE DIGITAL // ASSET GALLERY ---
 import DARK_MATTER from './gallery/DARK_MATTER'
@@ -108,18 +111,21 @@ const GlobalStyles = () => (
    * { border-radius: 0px !important; box-sizing: border-box; }
    body { margin: 0; overflow: hidden; background: #000; font-family: 'Oswald', sans-serif; }
    .rune-btn { transition: all 0.3s ease; position: relative; overflow: hidden; }
-   .rune-btn:hover { letter-spacing: 4px !important; }
+   .rune-btn:hover { letter-spacing: 4px !important; border-color: #00ffea !important; color: #00ffea !important; box-shadow: 0 0 20px rgba(0,255,234,0.3); }
    .rune-btn:active { transform: scale(0.98); }
-   .rune-input { background: rgba(0,0,0,0.8); border: 1px solid #333; color: #fff; padding: 15px; font-family: 'Oswald'; font-size: 16px; width: 100%; margin-bottom: 10px; outline: none; transition: border 0.3s; }
-   .rune-input:focus { border-color: #00ffea; }
+   .rune-input { background: rgba(0,0,0,0.8); border: 1px solid #333; color: #fff; padding: 15px; font-family: 'Oswald'; font-size: 16px; width: 100%; margin-bottom: 10px; outline: none; transition: border 0.3s, box-shadow 0.3s; }
+   .rune-input:focus { border-color: #00ffea; box-shadow: 0 0 10px rgba(0,255,234,0.2); }
    .rune-select { appearance: none; -webkit-appearance: none; background: rgba(0,0,0,0.8); border: 1px solid #333; color: #fff; padding: 20px; font-family: 'Oswald'; font-size: 14px; letter-spacing: 2px; width: 100%; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease; }
-   .rune-select:hover { border-color: #fff; }
-   .rune-select:focus { border-color: #00ffea; outline: none; }
+   .rune-select:hover { border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+   .rune-select:focus { border-color: #00ffea; outline: none; box-shadow: 0 0 20px rgba(0,255,234,0.2); }
    .scope-item { display: flex; justify-content: space-between; padding: 15px; border: 1px solid #222; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
-   .scope-item:hover { background: #111; }
+   .scope-item:hover { background: #111; transform: translateX(5px); border-color: #444; }
    .scope-item.active { border-color: #ff0055; background: rgba(255,0,85,0.1); }
    @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-   ::-webkit-scrollbar { width: 0px; background: transparent; }
+   @keyframes glow { 0% { box-shadow: 0 0 5px #00ffea; } 50% { box-shadow: 0 0 20px #00ffea, 0 0 40px rgba(0,255,234,0.3); } 100% { box-shadow: 0 0 5px #00ffea; } }
+   ::-webkit-scrollbar { width: 8px; background: #0a0a0a; }
+   ::-webkit-scrollbar-thumb { background: #333; }
+   ::-webkit-scrollbar-thumb:hover { background: #00ffea; }
   `}</style>
  </>
 )
@@ -369,6 +375,18 @@ export default function App() {
   return <OrchestrationDemo />
  }
  
+ if (page === 'products') {
+  return <Products onBack={() => setPage('showroom')} />
+ }
+ 
+ if (page === 'team') {
+  return <Team onBack={() => setPage('showroom')} />
+ }
+ 
+ if (page === 'platform') {
+  return <Platform onBack={() => setPage('showroom')} />
+ }
+ 
  return <Showroom setPage={setPage} />
 }
 
@@ -443,6 +461,9 @@ export function Showroom({ setPage }) {
     <BrandWatermark isMobile={isMobile} />
     <InfoCard mode={mode} isMobile={isMobile} />
     <div style={{ position: 'fixed', top: isMobile ? '80px' : '40px', right: isMobile ? '20px' : '40px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-end' : 'center', gap: '20px', zIndex: 100 }}>
+     <button onClick={() => setPage('products')} className="rune-btn" style={{ background: 'transparent', color: '#888', border: '1px solid #333', padding: '0 20px', fontSize: '11px', letterSpacing: '2px', fontFamily: "'Oswald', sans-serif", fontWeight: 400, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.3s' }}>PRODUCTS</button>
+     <button onClick={() => setPage('platform')} className="rune-btn" style={{ background: 'transparent', color: '#888', border: '1px solid #333', padding: '0 20px', fontSize: '11px', letterSpacing: '2px', fontFamily: "'Oswald', sans-serif", fontWeight: 400, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.3s' }}>PLATFORM</button>
+     <button onClick={() => setPage('team')} className="rune-btn" style={{ background: 'transparent', color: '#888', border: '1px solid #333', padding: '0 20px', fontSize: '11px', letterSpacing: '2px', fontFamily: "'Oswald', sans-serif", fontWeight: 400, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.3s' }}>TEAM</button>
      <button onClick={() => setPage('orchestration-demo')} className="rune-btn" style={{ background: 'transparent', color: '#00ffea', border: '1px solid #00ffea', padding: '0 30px', fontSize: '12px', letterSpacing: '2px', fontFamily: "'Oswald', sans-serif", fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>RUNE DEMO</button>
      <div style={{ position: 'relative', width: '220px' }}>
       <select className="rune-select" value={mode} onChange={(e) => handleModeChange(e.target.value)}>
