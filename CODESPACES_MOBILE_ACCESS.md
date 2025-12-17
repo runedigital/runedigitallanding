@@ -36,8 +36,8 @@ GitHub Codespaces can be accessed on mobile devices, allowing you to code on the
 **Tips for Android:**
 - **Chrome** is recommended for best compatibility
 - Enable "Desktop site" mode for a better editing experience:
-  - Tap the three-dot menu
-  - Check "Desktop site"
+  - Tap the three-dot menu (⋮)
+  - Select "Desktop site" checkbox
 - Consider using Chrome's "Add to Home Screen" feature for quick access
 
 ### 2. Using GitHub Mobile App
@@ -92,7 +92,7 @@ You can find this URL from:
 
 ### Editing Features
 - **Touch Select**: Tap and hold to select text
-- **Multi-cursor**: Limited on mobile but possible with external keyboard
+- **Multi-cursor editing**: Limited on mobile but possible with external keyboard
 - **Find and Replace**: Available through the Command Palette (Ctrl/Cmd + Shift + P)
 - **Terminal Access**: The integrated terminal works but is better with an external keyboard
 
@@ -169,9 +169,9 @@ If Codespaces on mobile doesn't meet your needs:
 
 ## Additional Resources
 
-- [GitHub Codespaces Documentation](https://docs.github.com/en/codespaces)
-- [VS Code Web Documentation](https://code.visualstudio.com/docs/editor/vscode-web)
-- [GitHub Mobile Documentation](https://docs.github.com/en/get-started/using-github/github-mobile)
+- [GitHub Codespaces Documentation](https://docs.github.com/en/codespaces) - Official guide for all Codespaces features and capabilities
+- [VS Code Web Documentation](https://code.visualstudio.com/docs/editor/vscode-web) - Learn about VS Code in the browser and its features
+- [GitHub Mobile Documentation](https://docs.github.com/en/get-started/using-github/github-mobile) - Complete guide to using GitHub's mobile app
 
 ## Quick Start Summary
 

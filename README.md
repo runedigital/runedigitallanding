@@ -19,10 +19,6 @@ RUNE Digital is a Multi-agent AI orchestration platform featuring:
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/runedigital/runedigitallanding.git
-cd runedigitallanding
-
 # Install dependencies
 npm install
 
